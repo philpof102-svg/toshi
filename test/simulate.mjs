@@ -200,6 +200,38 @@ async function runHttp() {
   finally { try { brain.kill(); } catch {} }
 }
 
+// ── MCP: the stdio JSON-RPC contract an MCP client (openclaude / Claude Code / Cline) loads ─────────
+// Forces the EADDRINUSE degrade path (HTTP bridge port pre-occupied) — a client spawning Toshi while a
+// floating one holds the port must STILL get a live MCP server (this crashed before the httpServer.on error).
+async function runMcp() {
+  console.log(`\n${C.d}MCP — stdio contract survives a taken HTTP port (openclaude/Claude Code load path)${C.x}`);
+  const net = await import('node:net');
+  const P = 47355;
+  const blocker = net.createServer(() => {});
+  await new Promise((r) => blocker.listen(P, r)); // occupy the bridge port → force degrade
+  const srv = spawn(process.execPath, [join('mcp', 'toshi-mcp.mjs')], { cwd: REPO, env: { ...process.env, TOSHI_PORT: String(P) }, stdio: ['pipe', 'pipe', 'ignore'] });
+  const send = (o) => srv.stdin.write(JSON.stringify(o) + '\n');
+  const result = await new Promise((resolve) => {
+    let buf = ''; const seen = {};
+    const to = setTimeout(() => resolve(seen), 8000);
+    srv.stdout.on('data', (d) => {
+      buf += d; let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, i); buf = buf.slice(i + 1); if (!line.trim()) continue;
+        let m; try { m = JSON.parse(line); } catch { continue; }
+        if (m.id === 1) { seen.init = m.result?.serverInfo?.name; send({ jsonrpc: '2.0', id: 2, method: 'tools/list' }); }
+        else if (m.id === 2) { seen.tools = (m.result?.tools || []).map((x) => x.name); send({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'toshi_status', arguments: {} } }); }
+        else if (m.id === 3) { seen.status = m.result?.content?.[0]?.text || ''; clearTimeout(to); resolve(seen); }
+      }
+    });
+    send({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'smoke', version: '1' } } });
+  });
+  try { srv.kill(); } catch {} try { blocker.close(); } catch {}
+  check('initialize → serverInfo "toshi" (no crash on taken port)', result.init === 'toshi', JSON.stringify(result.init));
+  check('tools/list → 4 Toshi tools', ['toshi_ask', 'toshi_status', 'toshi_mood', 'toshi_watch'].every((t) => (result.tools || []).includes(t)), (result.tools || []).join(','));
+  check('tools/call toshi_status → repo + memoryBin', /repo/.test(result.status || '') && /memoryBin/.test(result.status || ''), (result.status || '').slice(0, 80));
+}
+
 // ── VOICE: NL synthesis through the zero CLI (optional — skips when zero isn't installed) ──────────
 async function runVoice() {
   console.log(`\n${C.d}VOICE — grounded NL synthesis via the zero CLI${C.x}`);
@@ -224,6 +256,7 @@ async function runVoice() {
     skipped('HTTP', 'backend not installed/indexed');
     console.log(`  ${C.d}→ install: npm i -g codebase-memory-mcp && codebase-memory-mcp cli index_repository '{"repo_path":"${REPO.replace(/\\/g, '/')}"}'${C.x}`);
   }
+  await runMcp();     // stdio MCP contract (the openclaude / Claude Code load path) — always runnable
   await runVoice();   // optional layer — self-skips without the zero CLI
   await runDegrade(); // always runnable — it tests the no-backend path itself
 

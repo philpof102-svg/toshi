@@ -59,7 +59,7 @@ readline.createInterface({ input: process.stdin }).on('line', (line) => {
 });
 
 // ── HTTP /ask bridge for the side-panel ──────────────────────────────────────────────────────────
-http.createServer(async (req, res) => {
+const httpServer = http.createServer(async (req, res) => {
   res.setHeader('access-control-allow-origin', '*');
   res.setHeader('access-control-allow-headers', 'content-type');
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
@@ -107,4 +107,12 @@ http.createServer(async (req, res) => {
     return;
   }
   res.writeHead(404, { 'content-type': 'application/json' }); res.end('{"error":"POST /ask | POST /repo | GET /health"}');
-}).listen(PORT, () => process.stderr.write(`toshi-mcp: /ask on :${PORT}, MCP on stdio, memory=${status().memoryBin}, voice=${voiceKind()}${voiceKind() === 'none' ? ' (install zero — or set TOSHI_API_URL/KEY/MODEL — for spoken answers)' : ''}\n`));
+});
+// The HTTP bridge (:4820, for the panel) and the MCP-over-stdio surface are INDEPENDENT. An MCP client
+// (openclaude / Claude Code / Cline) spawns this server while a floating Toshi may already hold :4820 —
+// a fatal EADDRINUSE would hand that client a DEAD MCP server. Degrade instead: log, drop the bridge,
+// keep serving MCP on stdio (which never needed the port).
+httpServer.on('error', (e) => {
+  process.stderr.write(`toshi-mcp: HTTP bridge on :${PORT} unavailable (${e.code || e.message}) — serving MCP on stdio only.\n`);
+});
+httpServer.listen(PORT, () => process.stderr.write(`toshi-mcp: /ask on :${PORT}, MCP on stdio, memory=${status().memoryBin}, voice=${voiceKind()}${voiceKind() === 'none' ? ' (install zero — or set TOSHI_API_URL/KEY/MODEL — for spoken answers)' : ''}\n`));
