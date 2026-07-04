@@ -151,47 +151,48 @@ async function runHttp() {
   console.log(`\n${C.d}HTTP — spawn the brain, POST /ask like the panel${C.x}`);
   // TOSHI_LLM=off keeps this layer deterministic + fast (VOICE tests the LLM path separately);
   // TOSHI_AUTOINDEX=off so the tmpdir watch-switch below stays honestly indexed:false
-  const brain = spawn(process.execPath, [join('mcp', 'toshi-mcp.mjs')], { cwd: REPO, env: { ...process.env, TOSHI_LLM: 'off', TOSHI_AUTOINDEX: 'off' }, stdio: 'ignore' });
+  const TP = 47311; // dedicated port — the user's live companion may hold :4820, and a silently-unbound test brain would make us assert against THEIR brain
+  const brain = spawn(process.execPath, [join('mcp', 'toshi-mcp.mjs')], { cwd: REPO, env: { ...process.env, TOSHI_LLM: 'off', TOSHI_AUTOINDEX: 'off', TOSHI_PORT: String(TP) }, stdio: 'ignore' });
   try {
     await new Promise((r) => setTimeout(r, 1800));
-    const res = await fetch('http://127.0.0.1:4820/ask', {
+    const res = await fetch(`http://127.0.0.1:${TP}/ask`, {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ q: 'who calls summarize?' }),
     });
     const j = await res.json();
     check('POST /ask → grounded trace answer', j.grounded === true && /callers/.test(j.answer || ''), JSON.stringify(j).slice(0, 120));
 
     // terminal connection: the `toshi` CLI POSTs /repo so the floating companion watches THAT terminal
-    const h1 = await (await fetch('http://127.0.0.1:4820/health')).json();
+    const h1 = await (await fetch(`http://127.0.0.1:${TP}/health`)).json();
     check('GET /health → reports watched repo', h1.ok === true && norm(h1.repo) === norm(REPO), JSON.stringify(h1).slice(0, 120));
     // a UNIQUE fresh dir = "another terminal's repo" — never pre-indexed (tmpdir root once leaked into
     // the graph via auto-index and made indexed:true honest-but-unexpected here)
     const { mkdtempSync } = await import('node:fs');
     const other = mkdtempSync(join(tmpdir(), 'toshi-watch-'));
-    const sw = await (await fetch('http://127.0.0.1:4820/repo', {
+    const sw = await (await fetch(`http://127.0.0.1:${TP}/repo`, {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: other }),
     })).json();
     check('POST /repo → switches watch (honest indexed flag)', norm(sw.repo) === norm(other) && sw.indexed === false, JSON.stringify(sw).slice(0, 120));
-    const back = await (await fetch('http://127.0.0.1:4820/repo', {
+    const back = await (await fetch(`http://127.0.0.1:${TP}/repo`, {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: REPO }),
     })).json();
     check('POST /repo back → grounded again', norm(back.repo) === norm(REPO) && back.indexed === true, JSON.stringify(back).slice(0, 120));
 
     // companion pulse: kind grounded comments about the session (comment may be null when nothing new)
-    const pu = await (await fetch('http://127.0.0.1:4820/pulse')).json();
+    const pu = await (await fetch(`http://127.0.0.1:${TP}/pulse`)).json();
     check('GET /pulse → event + honest comment shape',
       typeof pu.event === 'string' && (pu.comment === null || typeof pu.comment === 'string'),
       JSON.stringify(pu).slice(0, 140));
 
     // summon protocol: `toshi show|hide|toggle` queues a verb; /health delivers it exactly ONCE
-    const pc = await (await fetch('http://127.0.0.1:4820/panel', {
+    const pc = await (await fetch(`http://127.0.0.1:${TP}/panel`, {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'toggle' }),
     })).json();
     check('POST /panel toggle → accepted', pc.ok === true && pc.action === 'toggle', JSON.stringify(pc).slice(0, 100));
-    const d1 = await (await fetch('http://127.0.0.1:4820/health')).json();
-    const d2 = await (await fetch('http://127.0.0.1:4820/health')).json();
+    const d1 = await (await fetch(`http://127.0.0.1:${TP}/health`)).json();
+    const d2 = await (await fetch(`http://127.0.0.1:${TP}/health`)).json();
     check('panelCmd delivered exactly once', d1.panelCmd === 'toggle' && d2.panelCmd === null,
       `first=${d1.panelCmd} second=${d2.panelCmd}`);
-    const bad = await fetch('http://127.0.0.1:4820/panel', {
+    const bad = await fetch(`http://127.0.0.1:${TP}/panel`, {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'explode' }),
     });
     check('POST /panel invalid action → 400', bad.status === 400, `status=${bad.status}`);
