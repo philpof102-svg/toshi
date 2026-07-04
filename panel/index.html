@@ -104,7 +104,7 @@
       <input id="q" autocomplete="off" placeholder="ask Toshi about your session…" aria-label="talk to Toshi" />
       <button type="submit" id="send">›</button>
     </form>
-    <div class="foot">mascot <a href="https://github.com/tinyhumansai/mascots" target="_blank" rel="noopener">tinyhumans</a> · GPL-3.0 · on zero via MCP</div>
+    <div class="foot"><span id="watching"></span>mascot <a href="https://github.com/tinyhumansai/mascots" target="_blank" rel="noopener">tinyhumans</a> · GPL-3.0 · on zero via MCP</div>
   </div>
 
 <script>
@@ -219,6 +219,22 @@ $('ask').addEventListener('submit', async (e) => {
   busy = false; $('send').disabled=false; $('q').focus();
 });
 $('x').addEventListener('click', () => { try { window.close(); } catch {} document.querySelector('.pod').style.display='none'; });
+
+// Stay connected to the user's terminal: poll the brain for the repo it watches. When `toshi` is run in
+// another terminal (POST /repo), the footer updates and Toshi announces the switch — visibly connected.
+let watching = '';
+async function pollWatching() {
+  try {
+    const j = await (await fetch('http://127.0.0.1:4820/health')).json();
+    const base = String(j.repo || '').split(/[\\/]/).filter(Boolean).pop() || '';
+    if (base && base !== watching) {
+      const first = !watching; watching = base;
+      const el = $('watching'); el.textContent = `watching ${base} · `; el.style.color = 'var(--teal)';
+      if (!first) { say(`👀 now watching ${base}`, false, 5000); setPose('hand_wave', '👀 ' + base, 1900); }
+    }
+  } catch { const el = $('watching'); if (el) el.textContent = ''; watching = ''; }
+}
+setInterval(pollWatching, 4000); pollWatching();
 
 bootRive();
 </script>

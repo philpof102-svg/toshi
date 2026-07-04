@@ -55,17 +55,24 @@ const CORE = [
   ['what does ask depend on?',         'trace_call_path', (a) => /callees|callers/.test(a), 'depend → trace_call_path'],
   ['give me an architecture overview', 'get_architecture',(a) => /nodes?\b/i.test(a) && /edges?\b/i.test(a), 'overview → node/edge counts'],
   ['how is this codebase organized?',  'get_architecture',(a) => /nodes?/i.test(a), 'how..organized → architecture'],
-  // robustness
-  ['',                                 'detect_changes',  (a) => a.length > 0, 'empty query → default, no crash'],
+  // French (the router is bilingual — an EN-only router looped the same default phrase at FR questions)
+  ['quoi de neuf ?',                   'detect_changes',  (a) => /clean|changed|impacted/i.test(a), 'FR: quoi de neuf → detect_changes'],
+  ['où est la fonction `ask` ?',       'search_graph',    (a) => /\bask\b/.test(a), 'FR: où est → finds ask'],
+  ['qui appelle summarize ?',          'trace_call_path', (a) => /callers/.test(a), 'FR: qui appelle → trace'],
+  ['montre-moi la structure du projet','get_architecture',(a) => /nodes?/i.test(a), 'FR: structure → architecture'],
+  // robustness — unmatched questions get a HELP answer (what Toshi can do), not a repeated silent default
+  ['',                                 'help',            (a) => /demande|what changed/i.test(a), 'empty query → help, no crash'],
   ['where is fooBarDoesNotExist9000?', 'search_graph',    (a) => /nothing/i.test(a), 'unknown symbol → honest "nothing"'],
-  ['zzqq random noise words here',     'detect_changes',  (a) => a.length > 0, 'garbage → safe default'],
+  ['zzqq random noise words here',     'help',            (a) => /demande|what changed/i.test(a), 'garbage → help (no more looped default)'],
+  ['salut toshi',                      'help',            (a) => /où est|where is/i.test(a), 'greeting → help lists abilities'],
 ];
 
 async function runCore() {
   console.log(`\n${C.d}CORE — ask() against the live graph (${REPO})${C.x}`);
   for (const [q, tool, pred, label] of CORE) {
     let r; try { r = await ask(q); } catch (e) { check(label, false, 'threw: ' + e.message); continue; }
-    const ok = r.grounded === true && r.tool === tool && pred(r.answer);
+    const wantGrounded = tool !== 'help'; // help is honestly non-grounded (no graph call)
+    const ok = r.grounded === wantGrounded && r.tool === tool && pred(r.answer);
     check(label, ok, `got tool=${r.tool} grounded=${r.grounded} · ${JSON.stringify(r.answer).slice(0, 90)}`);
   }
 }
@@ -150,6 +157,19 @@ async function runHttp() {
     });
     const j = await res.json();
     check('POST /ask → grounded trace answer', j.grounded === true && /callers/.test(j.answer || ''), JSON.stringify(j).slice(0, 120));
+
+    // terminal connection: the `toshi` CLI POSTs /repo so the floating companion watches THAT terminal
+    const h1 = await (await fetch('http://127.0.0.1:4820/health')).json();
+    check('GET /health → reports watched repo', h1.ok === true && norm(h1.repo) === norm(REPO), JSON.stringify(h1).slice(0, 120));
+    const other = tmpdir(); // any other existing dir = "another terminal's repo"
+    const sw = await (await fetch('http://127.0.0.1:4820/repo', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: other }),
+    })).json();
+    check('POST /repo → switches watch (honest indexed flag)', norm(sw.repo) === norm(other) && sw.indexed === false, JSON.stringify(sw).slice(0, 120));
+    const back = await (await fetch('http://127.0.0.1:4820/repo', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: REPO }),
+    })).json();
+    check('POST /repo back → grounded again', norm(back.repo) === norm(REPO) && back.indexed === true, JSON.stringify(back).slice(0, 120));
   } catch (e) { check('POST /ask', false, e.message); }
   finally { try { brain.kill(); } catch {} }
 }
