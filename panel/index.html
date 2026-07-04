@@ -5,72 +5,84 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Toshi</title>
 <!--
-  Toshi — mini portable companion. ONE widget: the mascot, big and alive, + one text bar.
-  Drop it beside ANY terminal (WebView / small browser window). The brain is the stdio MCP
-  (mcp/toshi-mcp.mjs) — any MCP client can launch it: zero, Claude Desktop, Cline…
-  Mascot: the community-ready Toshi from tinyhumansai/mascots (GPL-3.0, attributed).
+  Toshi — a floating desktop companion (Clippy-energy). ONE widget: the mascot, big + alive, and one
+  text bar. In Electron it's a frameless, transparent, always-on-top window you drag over any terminal.
+  Mascot: the community-ready Toshi from tinyhumansai/mascots (GPL-3.0, attributed). Brain: the local
+  Toshi MCP (/ask on :4820) → codebase-memory-mcp. Nothing invented.
 -->
 <script src="https://unpkg.com/@rive-app/canvas@2.21.6/rive.js"></script>
 <style>
   :root{
-    --bg:#0d1117; --line:#232c37; --ink:#e8eef6; --dim:#8a97a6; --faint:#59636e;
+    --line:#232c37; --ink:#e8eef6; --dim:#8a97a6; --faint:#59636e;
     --teal:#4ec9b0; --amber:#e5b567;
     --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%}
-  body{
-    background:var(--bg); color:var(--ink); font-family:var(--mono); font-size:13px;
-    display:grid; place-items:center; -webkit-font-smoothing:antialiased;
-  }
-  /* the whole app IS one small widget — portable, resizable, nothing else on the page */
+  html,body{margin:0;height:100%;background:transparent}
+  body{color:var(--ink); font-family:var(--mono); font-size:13px; display:grid; place-items:center; -webkit-font-smoothing:antialiased; overflow:hidden}
+
+  /* the floating card — the whole app */
   .pod{
-    width:min(360px, 100vw); height:min(560px, 100vh);
+    width:min(300px,100vw); height:min(460px,100vh);
     display:flex; flex-direction:column;
-    background:
-      radial-gradient(130% 75% at 50% 18%, #1b2430 0%, #121821 58%, var(--bg) 100%);
-    border:1px solid var(--line); border-radius:16px; overflow:hidden;
-    box-shadow:0 30px 70px -35px #000;
+    background:linear-gradient(180deg,#161d26 0%, #11161d 100%);
+    border:1px solid var(--line); border-radius:18px; overflow:hidden;
+    box-shadow:0 30px 70px -28px #000, 0 0 0 1px rgba(255,255,255,.02) inset;
+    animation:pop .5s cubic-bezier(.2,1.3,.4,1) both;
   }
-  .head{display:flex; align-items:center; gap:8px; padding:10px 14px}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(78,201,176,.14)}
+  @keyframes pop{from{opacity:0; transform:translateY(14px) scale(.94)} to{opacity:1; transform:none}}
+
+  .head{display:flex; align-items:center; gap:8px; padding:9px 12px; -webkit-app-region:drag; cursor:grab}
+  .head:active{cursor:grabbing}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(78,201,176,.14); animation:pulse-dot 3s ease-in-out infinite}
+  @keyframes pulse-dot{50%{box-shadow:0 0 0 5px rgba(78,201,176,.05)}}
   .logo{font-weight:800; letter-spacing:.16em; font-size:12px}
   .logo b{color:var(--amber)}
-  .pose-tag{margin-left:auto; color:var(--faint); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase}
+  .pose-tag{margin-left:auto; color:var(--faint); font-size:9px; letter-spacing:.12em; text-transform:uppercase}
+  .x{-webkit-app-region:no-drag; margin-left:8px; color:var(--faint); background:none; border:0; font:inherit; font-size:14px; cursor:pointer; line-height:1; padding:2px 4px}
+  .x:hover{color:var(--ink)}
 
-  /* the star — the mascot takes almost everything */
+  /* the star — mascot fills the card, gently floating + reacting */
   .stage{position:relative; flex:1; min-height:0}
+  .floaty{position:absolute; inset:0; animation:float 5.5s ease-in-out infinite; transform-origin:50% 80%}
+  @keyframes float{0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)}}
+  .floaty.react{animation:react .5s ease}
+  @keyframes react{0%{transform:translateY(0) rotate(0)} 30%{transform:translateY(-4px) rotate(-3deg)} 60%{transform:translateY(-2px) rotate(2deg)} 100%{transform:none}}
+  .floaty.nope{animation:nope .45s ease}
+  @keyframes nope{0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
   #toshi{position:absolute; inset:0; width:100%; height:100%; display:block}
-  .stage::after{content:""; position:absolute; inset:0; pointer-events:none; opacity:.45;
-    background:repeating-linear-gradient(0deg, rgba(255,255,255,.016) 0 1px, transparent 1px 3px)}
+  .stage::after{content:""; position:absolute; inset:0; pointer-events:none; opacity:.4;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.014) 0 1px, transparent 1px 3px)}
   .loading{position:absolute; inset:0; display:grid; place-items:center; color:var(--dim); font-size:11px}
   .loading.gone{display:none}
 
-  /* one floating reply bubble — appears over the stage, fades out; no chat log */
+  /* sparkles on a grounded (real) answer */
+  .spark{position:absolute; width:5px;height:5px;border-radius:50%;background:var(--amber);opacity:0;pointer-events:none;filter:blur(.3px)}
+  .spark.go{animation:spark .9s ease-out forwards}
+  @keyframes spark{0%{opacity:1; transform:translate(0,0) scale(1)} 100%{opacity:0; transform:translate(var(--dx),var(--dy)) scale(.2)}}
+
+  /* one floating reply bubble */
   .bubble{
-    position:absolute; left:12px; right:12px; bottom:10px;
-    background:rgba(10,14,19,.92); border:1px solid var(--line); border-radius:12px;
-    padding:9px 12px; font-size:12px; line-height:1.5; color:var(--ink);
-    opacity:0; transform:translateY(6px); transition:.25s; pointer-events:none;
-    max-height:46%; overflow:hidden; white-space:pre-wrap;
+    position:absolute; left:10px; right:10px; bottom:8px;
+    background:rgba(10,14,19,.94); border:1px solid var(--line); border-radius:12px;
+    padding:9px 11px; font-size:12px; line-height:1.5; color:var(--ink);
+    opacity:0; transform:translateY(6px); transition:.22s; pointer-events:none;
+    max-height:52%; overflow:auto; white-space:pre-wrap;
   }
   .bubble.on{opacity:1; transform:none}
-  .bubble .who{color:var(--amber); font-size:9px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px}
+  .bubble .who{color:var(--amber); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; display:flex; align-items:center; gap:6px}
+  .bubble .grounded{color:var(--teal); font-size:8px; border:1px solid rgba(78,201,176,.4); border-radius:6px; padding:0 4px}
+  .dots span{animation:blink 1.2s infinite}
+  .dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,100%{opacity:.25} 50%{opacity:1}}
 
-  /* the one text bar */
-  .ask{display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--line); background:rgba(9,12,16,.6)}
-  .ask input{
-    flex:1; min-width:0; background:#0a0e13; border:1px solid var(--line); border-radius:10px;
-    color:var(--ink); font:inherit; font-size:12.5px; padding:10px 12px
-  }
+  .ask{display:flex; gap:8px; padding:9px 11px; border-top:1px solid var(--line); background:rgba(9,12,16,.55); -webkit-app-region:no-drag}
+  .ask input{flex:1; min-width:0; background:#0a0e13; border:1px solid var(--line); border-radius:10px; color:var(--ink); font:inherit; font-size:12.5px; padding:9px 11px}
   .ask input::placeholder{color:var(--faint)}
   .ask input:focus{outline:none; border-color:var(--teal)}
-  .ask button{
-    font:inherit; font-size:12px; font-weight:800; color:#08110e; background:var(--teal);
-    border:0; border-radius:10px; padding:0 14px; cursor:pointer
-  }
+  .ask button{font:inherit; font-size:13px; font-weight:800; color:#08110e; background:var(--teal); border:0; border-radius:10px; padding:0 13px; cursor:pointer}
   .ask button:disabled{opacity:.5}
-  .foot{padding:6px 12px 9px; color:var(--faint); font-size:8.5px; letter-spacing:.03em; text-align:center}
+  .foot{padding:5px 10px 8px; color:var(--faint); font-size:8px; letter-spacing:.03em; text-align:center; -webkit-app-region:no-drag}
   .foot a{color:var(--dim); text-decoration:none}
   @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important} }
 </style>
@@ -81,44 +93,59 @@
       <span class="dot" title="watching your session"></span>
       <span class="logo"><b>tosh</b>i</span>
       <span class="pose-tag" id="pose-tag">idle</span>
+      <button class="x" id="x" title="hide" aria-label="hide Toshi">✕</button>
     </div>
 
     <div class="stage">
-      <canvas id="toshi" width="720" height="880"></canvas>
+      <div class="floaty" id="floaty">
+        <canvas id="toshi" width="620" height="820"></canvas>
+      </div>
       <div class="loading" id="loading">waking Toshi…</div>
-      <div class="bubble" id="bubble"><div class="who">toshi</div><div id="bubble-body"></div></div>
+      <div class="bubble" id="bubble"><div class="who">toshi <span class="grounded" id="grounded" hidden>from your repo</span></div><div id="bubble-body"></div></div>
     </div>
 
     <form class="ask" id="ask">
-      <input id="q" autocomplete="off" placeholder="talk to Toshi about your session…" aria-label="talk to Toshi" />
+      <input id="q" autocomplete="off" placeholder="ask Toshi about your session…" aria-label="talk to Toshi" />
       <button type="submit" id="send">›</button>
     </form>
-    <div class="foot">
-      mascot <a href="https://github.com/tinyhumansai/mascots" target="_blank" rel="noopener">tinyhumans</a> · GPL-3.0 · wired on zero via MCP
-    </div>
+    <div class="foot">mascot <a href="https://github.com/tinyhumansai/mascots" target="_blank" rel="noopener">tinyhumans</a> · GPL-3.0 · on zero via MCP</div>
   </div>
 
 <script>
-/* Toshi mini — load the real mascot, keep it ALIVE (auto pose+eye cycles per the tinyhumans
- * state engine), one text bar to talk to the session via the local MCP (/ask). */
 const RIV_URL = 'https://raw.githubusercontent.com/tinyhumansai/mascots/main/mascots/toshi/toshi.riv';
 const EYES = ['look_up','look_down','look_left','look_right','blink','squinting','confused','thinking'];
-const POSES = ['idle','look_around','pointing','hand_wave','dancing','celebration']; // manifest idlePoseCycle
+const POSES = ['idle','look_around','pointing','hand_wave','dancing','celebration'];
 const MCP_ASK = (location.protocol === 'file:' ? 'http://127.0.0.1:4820' : '') + '/ask';
-
 const $ = (id) => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-let rive = null, smName = null, inputs = [];
+let rive = null, smName = null, inputs = [], idleTimer = null;
 const findInput = (re) => inputs.find((i) => re.test(i.name || ''));
 
 function setPose(name, idx){
-  $('pose-tag').textContent = name.replace(/_/g,' ');
+  if ($('pose-tag')) $('pose-tag').textContent = name.replace(/_/g,' ');
   const trig = findInput(new RegExp('^'+name+'$','i'));
   const pose = findInput(/pose|state|anim/i);
-  try {
-    if (trig && typeof trig.fire === 'function') trig.fire();
-    else if (pose) { if (typeof pose.value === 'number') pose.value = idx; else pose.value = name; }
-  } catch {}
+  try { if (trig && typeof trig.fire === 'function') trig.fire();
+        else if (pose) { if (typeof pose.value === 'number') pose.value = idx; else pose.value = name; } } catch {}
+}
+function reactWiggle(cls){ const f = $('floaty'); if (reduce||!f) return; f.classList.remove('react','nope'); void f.offsetWidth; f.classList.add(cls); }
+function sparkle(){
+  if (reduce) return;
+  const st = $('stage') || document.querySelector('.stage');
+  for (let i=0;i<10;i++){ const s=document.createElement('div'); s.className='spark';
+    const a=Math.random()*6.28, r=40+Math.random()*60;
+    s.style.left='50%'; s.style.top='42%'; s.style.setProperty('--dx',Math.cos(a)*r+'px'); s.style.setProperty('--dy',Math.sin(a)*r+'px');
+    document.querySelector('.stage').appendChild(s); requestAnimationFrame(()=>s.classList.add('go'));
+    setTimeout(()=>s.remove(),950); }
+}
+
+function startIdleCycle(){
+  if (reduce) return;
+  const eye = findInput(/eye/i);
+  if (eye) setInterval(() => { const k=Math.floor(Math.random()*EYES.length);
+    try { if (typeof eye.value==='number') eye.value=k; else eye.value=EYES[k]; } catch {} }, 2600);
+  // Toshi acts on its own: mostly idle, sometimes a flourish (the tiny idlePoseCycle)
+  idleTimer = setInterval(() => { const i = (Math.random()<0.6)?0:1+Math.floor(Math.random()*(POSES.length-1)); setPose(POSES[i],i); }, 6500);
 }
 
 function bootRive(){
@@ -129,56 +156,51 @@ function bootRive(){
       onLoad(){
         $('loading').classList.add('gone');
         try { rive.resizeDrawingSurfaceToCanvas(); } catch {}
-        try {
-          const c = rive.contents; const ab = c && c.artboards && c.artboards[0];
-          const sm = ab && ab.stateMachines && ab.stateMachines[0];
-          if (sm) { smName = sm.name; rive.play(smName); inputs = rive.stateMachineInputs(smName) || []; }
-        } catch {}
-        if (!reduce) {
-          // eyes on the manifest cadence (2600ms, random) — the tiny-terminal liveliness
-          const eye = findInput(/eye/i);
-          if (eye) setInterval(() => { const k = Math.floor(Math.random()*EYES.length);
-            try { if (typeof eye.value === 'number') eye.value = k; else eye.value = EYES[k]; } catch {} }, 2600);
-          // idle pose cycle — Toshi acts on its own: mostly idle, sometimes a flourish
-          let i = 0;
-          setInterval(() => {
-            i = (Math.random() < 0.55) ? 0 : 1 + Math.floor(Math.random() * (POSES.length - 1));
-            setPose(POSES[i], i);
-          }, 6500);
-        }
+        try { const c=rive.contents, ab=c&&c.artboards&&c.artboards[0], sm=ab&&ab.stateMachines&&ab.stateMachines[0];
+              if (sm){ smName=sm.name; rive.play(smName); inputs=rive.stateMachineInputs(smName)||[]; } } catch {}
+        setPose('hand_wave',3); reactWiggle('react');        // greet on arrival
+        setTimeout(()=>setPose('idle',0), 1500);
+        startIdleCycle();
       },
-      onLoadError(){ $('loading').textContent = 'could not load Toshi (network)'; },
+      onLoadError(){ $('loading').textContent='could not load Toshi (network)'; },
     });
-  } catch { $('loading').textContent = 'rive init failed'; }
+  } catch { $('loading').textContent='rive init failed'; }
 }
 window.addEventListener('resize', () => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} });
 
-/* one bubble, no log — mini */
-let bubbleTimer = null;
-function say(text, holdMs){
+/* one bubble, no log */
+let bubbleTimer=null;
+function say(text, grounded, holdMs){
+  $('grounded').hidden = !grounded;
   $('bubble-body').textContent = text;
   $('bubble').classList.add('on');
-  clearTimeout(bubbleTimer);
-  bubbleTimer = setTimeout(() => $('bubble').classList.remove('on'), holdMs || 9000);
+  clearTimeout(bubbleTimer); bubbleTimer=setTimeout(()=>$('bubble').classList.remove('on'), holdMs||10000);
+}
+function thinking(){
+  $('grounded').hidden = true;
+  $('bubble-body').innerHTML = '<span class="dots"><span>•</span><span>•</span><span>•</span></span>';
+  $('bubble').classList.add('on');
 }
 
 $('ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const q = $('q').value.trim(); if (!q) return;
-  $('q').value = ''; $('send').disabled = true;
-  setPose('look_around', 1); say('…', 20000);
+  $('q').value=''; $('send').disabled=true;
+  setPose('look_around',1); reactWiggle('react'); thinking();
   try {
     const r = await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q }) });
-    if (!r.ok) throw new Error('mcp ' + r.status);
+    if (!r.ok) throw new Error('mcp '+r.status);
     const j = await r.json();
-    setPose(j.grounded ? 'celebration' : 'idle', j.grounded ? 5 : 0);
-    say(j.answer || '(no answer)');
+    if (j.grounded){ setPose('celebration',5); sparkle(); } else { setPose('pointing',2); }
+    say(j.answer || '(no answer)', !!j.grounded);
   } catch {
-    setPose('confused' in {} ? 'idle' : 'idle', 0);
-    say("demo mode — start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I answer about your real session (via codebase-memory-mcp).");
+    setPose('idle',0); reactWiggle('nope');
+    say("start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I read your real session (via codebase-memory-mcp).", false);
   }
-  $('send').disabled = false; $('q').focus();
+  $('send').disabled=false; $('q').focus();
 });
+
+$('x').addEventListener('click', () => { try { window.close(); } catch {} document.querySelector('.pod').style.display='none'; });
 
 bootRive();
 </script>

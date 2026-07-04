@@ -4,12 +4,33 @@
   "description": "A terminal companion — the community Toshi mascot beside your terminal, wired on gitlawb/zero. Talk to your session; token-cheap via codebase-memory-mcp.",
   "type": "module",
   "license": "GPL-3.0-only",
-  "bin": { "toshi-mcp": "mcp/toshi-mcp.mjs" },
+  "main": "desktop/main.cjs",
+  "bin": {
+    "toshi-mcp": "mcp/toshi-mcp.mjs"
+  },
   "scripts": {
-    "start": "node mcp/toshi-mcp.mjs",
+    "toshi": "electron .",
+    "desktop": "electron .",
+    "brain": "node mcp/toshi-mcp.mjs",
     "ask": "node tools/toshi.mjs ask"
   },
-  "repository": { "type": "git", "url": "github:philpof102-svg/toshi" },
-  "keywords": ["mcp", "zero", "gitlawb", "terminal", "mascot", "companion", "codebase-memory"],
-  "engines": { "node": ">=18" }
+  "repository": {
+    "type": "git",
+    "url": "github:philpof102-svg/toshi"
+  },
+  "keywords": [
+    "mcp",
+    "zero",
+    "gitlawb",
+    "terminal",
+    "mascot",
+    "companion",
+    "codebase-memory"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "electron": "^43.0.0"
+  }
 }
