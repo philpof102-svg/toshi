@@ -1,5 +1,7 @@
 # Toshi — a terminal companion
 
+[![ci](https://github.com/philpof102-svg/toshi/actions/workflows/ci.yml/badge.svg)](https://github.com/philpof102-svg/toshi/actions/workflows/ci.yml)
+
 ![Toshi answering from your repo](docs/toshi-panel.png)
 
 A tiny AI companion that lives **beside your terminal**, wearing the community-ready **Toshi** mascot from

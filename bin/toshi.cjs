@@ -17,6 +17,22 @@ const sub = (process.argv[2] || '').toLowerCase();
 
 (async () => {
   // ── subcommands ────────────────────────────────────────────────────────────────────────────────
+  if (['help', '--help', '-h'].includes(sub)) {
+    console.log(`🐈  toshi — a companion beside your terminal (GPL-3.0)
+  toshi              float the companion watching this repo (or connect this repo to it)
+  toshi show|hide    summon / hide the floating window     toshi toggle     flip it
+  toshi collapse     fold into a small head                toshi expand     unfold
+  toshi setup        auto-float whenever zero starts (--remove undoes, --project scopes)
+  toshi version      print version
+grounded answers: npm i -g codebase-memory-mcp, then codebase-memory-mcp cli index_repository '{"repo_path":"<repo>"}'
+voice: install zero (github.com/gitlawb/zero) + zero setup — Toshi speaks through it. TOSHI_LLM=off disables.
+docs: https://github.com/philpof102-svg/toshi`);
+    return;
+  }
+  if (['version', '--version', '-v'].includes(sub)) {
+    console.log('toshi-companion ' + require(path.join(ROOT, 'package.json')).version);
+    return;
+  }
   if (sub === 'setup') {
     // the "auto-float when your agent starts" option, offered to everyone installing the CLI
     const extra = process.argv.slice(3); // pass --remove / --project through
@@ -58,7 +74,12 @@ const sub = (process.argv[2] || '').toLowerCase();
 
   const env = { ...process.env, TOSHI_REPO: repo };
   let electron = null;
-  try { electron = require('electron'); } catch { /* optional dep — fall back to the browser panel */ }
+  try {
+    electron = require('electron');
+    // the electron MODULE can exist while its BINARY doesn't (ELECTRON_SKIP_BINARY_DOWNLOAD,
+    // failed postinstall, full disk) — claiming "floating" would be a lie; verify the exe is real
+    if (typeof electron !== 'string' || !require('node:fs').existsSync(electron)) electron = null;
+  } catch { /* optional dep — fall back to the browser panel */ }
   if (electron) {
     const child = spawn(electron, ['.'], { cwd: ROOT, env, stdio: 'ignore', detached: true });
     child.unref(); // don't block the terminal — Toshi floats independently

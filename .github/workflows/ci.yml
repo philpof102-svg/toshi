@@ -31,6 +31,28 @@ jobs:
       # PORTABILITY (8) + DEGRADE (2) must pass on every OS; grounded layers self-skip without the backend.
       - run: npm test
 
+  install:
+    name: global install → toshi works (clean machine)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # the exact "everyone" path: a global install on a machine with no Electron binary
+      - run: npm i -g .
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - run: toshi version && toshi help
+      - name: toshi → browser mode boots the brain + panel
+        run: |
+          toshi
+          sleep 4
+          curl -sf http://127.0.0.1:4820/health | grep -q '"ok":true'
+          curl -sf http://127.0.0.1:4821/panel/ | grep -qi toshi
+          toshi hide   # summon protocol reachable on the live brain
+          echo "global CLI verified end-to-end"
+
   grounded:
     name: grounded suite (linux, real backend)
     runs-on: ubuntu-latest
