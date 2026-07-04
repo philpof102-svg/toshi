@@ -11,7 +11,7 @@
   playing its named LINEAR animations (idle / wave / Dancing / Celebrating / eyes_* / mouth_*). Brain: the
   local Toshi MCP (/ask :4820) → codebase-memory-mcp. Nothing invented.
 -->
-<script src="https://unpkg.com/@rive-app/canvas@2.21.6/rive.js"></script>
+<script src="https://unpkg.com/@rive-app/canvas@2.38.4/rive.js"></script>
 <style>
   :root{
     --line:#232c37; --ink:#e8eef6; --dim:#8a97a6; --faint:#59636e;
@@ -109,33 +109,39 @@
 
 <script>
 const RIV_URL = 'https://raw.githubusercontent.com/tinyhumansai/mascots/main/mascots/toshi/toshi.riv';
-const VISEMES = ['mouth_AA','mouth_EE','mouth_OH','mouth_OU','mouth_PP'];
-const FLOURISH = [['look_around','looking'],['pointing','pointing'],['Dancing','dancing'],['Jumping','jumping']];
 const MCP_ASK = (location.protocol === 'file:' ? 'http://127.0.0.1:4820' : '') + '/ask';
 const $ = (id) => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = (xs) => xs[Math.floor(Math.random() * xs.length)];
 
-let rive = null;
-const play = (a) => { try { rive && rive.play(a); } catch {} };
-const stop = (a) => { try { rive && rive.stop(a); } catch {} };
-const tag  = (t) => { if ($('pose-tag')) $('pose-tag').textContent = t; };
+/* ── THE OFFICIAL DRIVING API (how openhuman does it — ManifestRiveMascot.tsx) ─────────────────────
+ * This mascot is driven by Rive DATA BINDING, not by playing linear animations: the artboard exposes a
+ * ViewModel with three enums — pose / eyes / mouthVisemeCode — and "MascotSM" blends transitions
+ * internally (no residual bones, no melted body, face always driven). Probed live from toshi.riv:
+ *   pose:  idle · look_around · pointing · hand_wave · dancing · celebration · jumping · walking(_side) · running
+ *   eyes:  NEUTRAL · blink · look_up/down/left/right · squinting · confused · thinking · closed
+ *   mouth: the 15 Oculus viseme codes (sil = resting/closed)
+ * Requires @rive-app/canvas ≥ 2.3x (autoBind + viewModelInstance). */
+const EYE_CYCLE = ['look_up','look_down','look_left','look_right','blink','squinting','confused','thinking']; // manifest channel
+const FLOURISH = ['look_around','pointing','hand_wave','dancing','celebration']; // ambient poses (openhuman-style)
+const VISEMES = ['aa','E','ih','oh','ou','PP','DD'];
 
-// THIS MASCOT'S BODY CLIPS ALL SHARE ONE SKELETON. Playing / swapping between them leaves residual bones
-// on their last frame → melted Toshi + hands the wrong way + "two poses at once". The only clean option
-// (its state machine has zero inputs, so no blending is available) is to keep the BODY on ONE clip —
-// `idle`, always looping, NEVER interrupted. Life comes from: the CSS float, the confetti particle overlay
-// (grounded answers), and mouth visemes for lip-flap. No wave/Dancing/pointing on the body — they corrupt it.
-function celebrate() { tag('🎉 got it'); play('confetti'); setTimeout(() => { stop('confetti'); tag('idle'); }, 2400); }
-function talk(ms) { // lip-flap while answering — mouth-only clips, safe to layer over idle
-  if (reduce) return;
-  let t = 0; const iv = setInterval(() => { const m = VISEMES[Math.floor(Math.random()*VISEMES.length)]; play(m); setTimeout(() => stop(m), 130); if ((t += 150) > (ms || 1200)) clearInterval(iv); }, 150);
+let rive = null, poseEnum = null, eyesEnum = null, mouthEnum = null, poseTimer = null;
+const tag = (t) => { if ($('pose-tag')) $('pose-tag').textContent = t; };
+const setEnum = (p, v) => { try { if (p) p.value = v; } catch {} };
+
+function setPose(name, label, holdMs) {
+  setEnum(poseEnum, name); tag((label || name).replace(/_/g, ' '));
+  clearTimeout(poseTimer);
+  if (name !== 'idle') poseTimer = setTimeout(() => { setEnum(poseEnum, 'idle'); tag('idle'); }, holdMs || 2600);
 }
-// debug hooks (for probing/screenshotting the mascot from the browser)
-window.__toshi = {
-  pause: () => { try { rive.pause(); } catch {} },
-  resume: () => { try { rive.play('idle'); } catch {} },
-  playing: () => { try { return rive.playingAnimationNames.slice(); } catch { return null; } },
-};
+function celebrate() { setPose('celebration', '🎉 got it', 2800); }
+function talk(ms) { // lip-flap via viseme codes; 'sil' closes the mouth at rest
+  if (reduce) return;
+  let t = 0; const iv = setInterval(() => { setEnum(mouthEnum, pick(VISEMES));
+    if ((t += 150) > (ms || 1200)) { clearInterval(iv); setEnum(mouthEnum, 'sil'); } }, 150);
+}
 function reactWiggle(cls) { const f = $('floaty'); if (reduce || !f) return; f.classList.remove('react','nope'); void f.offsetWidth; f.classList.add(cls); setTimeout(() => f.classList.remove(cls), 480); }
 function sparkle() {
   if (reduce) return; const st = document.querySelector('.stage');
@@ -144,25 +150,45 @@ function sparkle() {
     st.appendChild(s); requestAnimationFrame(()=>s.classList.add('go')); setTimeout(()=>s.remove(),950); }
 }
 
+// ambient life, the openhuman way: rest 6–12s → one flourish held 2.5–5s → back to idle. Eyes cycle on the
+// manifest cadence (2600ms, random), returning to NEUTRAL between glances so blinks stay momentary.
+let busy = false;
 function startLife() {
-  // idle loops on its own (breathing + blink live inside the 'idle' clip). No body swaps = no melted pose.
+  if (reduce) return;
+  (function ambient(){ setTimeout(() => {
+    if (!busy && poseEnum && poseEnum.value === 'idle') setPose(pick(FLOURISH), null, rand(2500, 5000));
+    ambient(); }, rand(6000, 12000)); })();
+  setInterval(() => { if (busy) return; setEnum(eyesEnum, pick(EYE_CYCLE)); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 650); }, 2600);
 }
 
 function bootRive() {
   if (!window.rive) { $('loading').textContent = 'rive runtime blocked — needs network'; return; }
   try {
     rive = new window.rive.Rive({
-      src: RIV_URL, canvas: $('toshi'), autoplay: true, animations: ['idle'], fit: 'contain', alignment: 'center',
+      src: RIV_URL, canvas: $('toshi'), stateMachines: 'MascotSM', autoplay: true, autoBind: true,
+      fit: 'contain', alignment: 'center',
       onLoad() {
         $('loading').classList.add('gone');
         try { rive.resizeDrawingSurfaceToCanvas(); } catch {}
-        reactWiggle('react'); tag('hi 👋'); setTimeout(() => tag('idle'), 1800);  // greet via a wiggle (no body swap)
+        try {
+          const vmi = rive.viewModelInstance;
+          poseEnum = vmi.enum('pose'); eyesEnum = vmi.enum('eyes'); mouthEnum = vmi.enum('mouthVisemeCode');
+          setEnum(eyesEnum, 'NEUTRAL'); setEnum(mouthEnum, 'sil'); // a driven face — no more weird resting expression
+        } catch (e) { /* older runtime: mascot still renders on the SM defaults */ }
+        setPose('hand_wave', 'hi 👋', 1900); reactWiggle('react'); // greet — the SM blends it cleanly
         startLife();
       },
       onLoadError() { $('loading').textContent = 'could not load Toshi (network)'; },
     });
   } catch { $('loading').textContent = 'rive init failed'; }
 }
+// debug hooks (pause stops the rAF loop so screenshots can capture)
+window.__toshi = {
+  pause: () => { try { rive.pause(); } catch {} },
+  resume: () => { try { rive.play('MascotSM'); } catch {} },
+  state: () => { try { return { pose: poseEnum && poseEnum.value, eyes: eyesEnum && eyesEnum.value, mouth: mouthEnum && mouthEnum.value }; } catch { return null; } },
+  setPose: (p, ms) => setPose(p, null, ms),
+};
 window.addEventListener('resize', () => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} });
 
 let bubbleTimer = null;
@@ -176,19 +202,21 @@ function thinking() { $('grounded').hidden = true; $('bubble-body').innerHTML = 
 $('ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const q = $('q').value.trim(); if (!q) return;
-  $('q').value=''; $('send').disabled=true;
-  tag('thinking'); reactWiggle('react'); thinking();
+  $('q').value=''; $('send').disabled=true; busy = true;
+  setPose('look_around', 'thinking', 15000); setEnum(eyesEnum, 'thinking'); reactWiggle('react'); thinking();
   try {
     const r = await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q }) });
     if (!r.ok) throw new Error('mcp '+r.status);
     const j = await r.json();
-    if (j.grounded) { celebrate(); sparkle(); } else { tag('heads-up'); setTimeout(() => tag('idle'), 1800); }
+    setEnum(eyesEnum, 'NEUTRAL');
+    if (j.grounded) { celebrate(); sparkle(); } else { setPose('pointing', 'heads-up', 2200); }
     talk(Math.min(2200, ((j.answer||'').length)*22)); say(j.answer || '(no answer)', !!j.grounded);
   } catch {
-    reactWiggle('nope'); tag('idle');
+    setEnum(eyesEnum, 'confused'); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 1200);
+    setPose('idle'); reactWiggle('nope');
     say("start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I read your real session (via codebase-memory-mcp).", false);
   }
-  $('send').disabled=false; $('q').focus();
+  busy = false; $('send').disabled=false; $('q').focus();
 });
 $('x').addEventListener('click', () => { try { window.close(); } catch {} document.querySelector('.pod').style.display='none'; });
 
