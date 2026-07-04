@@ -11,7 +11,7 @@
   },
   "files": [
     "bin/", "lib/", "mcp/", "panel/", "tools/", "desktop/",
-    "plugin.json", "serve.js", "toshi.bat",
+    "plugin.json", "serve.js", "toshi.bat", "server.json",
     "README.md", "LICENSE", "ATTRIBUTION.md"
   ],
   "scripts": {

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.philpof102-svg/toshi",
+  "description": "A floating terminal companion (GPL-3.0). Answers questions about the repo you're in — grounded in a code graph via codebase-memory-mcp, never invented. Tools: toshi_ask / toshi_status / toshi_mood / toshi_watch.",
+  "repository": {
+    "url": "https://github.com/philpof102-svg/toshi",
+    "source": "github"
+  },
+  "version": "0.2.0",
+  "websiteUrl": "https://github.com/philpof102-svg/toshi",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "toshi-companion",
+      "version": "0.2.0",
+      "transport": { "type": "stdio" },
+      "runtimeHint": "node",
+      "runtimeArguments": [
+        { "type": "positional", "value": "toshi-mcp", "description": "the MCP bin exposed by the package" }
+      ]
+    },
+    {
+      "registryType": "github",
+      "identifier": "philpof102-svg/toshi",
+      "version": "0.2.0",
+      "transport": { "type": "stdio" },
+      "runtimeHint": "node",
+      "runtimeArguments": [
+        { "type": "positional", "value": "mcp/toshi-mcp.mjs", "description": "path to the stdio MCP entry inside the repo" }
+      ]
+    }
+  ]
+}
