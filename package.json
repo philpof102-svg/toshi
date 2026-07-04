@@ -1,6 +1,6 @@
 {
   "name": "toshi-companion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A terminal companion — the community Toshi mascot beside your terminal, wired on gitlawb/zero. Talk to your session; token-cheap via codebase-memory-mcp.",
   "type": "module",
   "license": "GPL-3.0-only",
@@ -33,7 +33,7 @@
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "electron": "^43.0.0"
   }
 }

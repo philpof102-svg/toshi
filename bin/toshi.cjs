@@ -56,10 +56,20 @@ const sub = (process.argv[2] || '').toLowerCase();
     }
   } catch { /* no companion running — launch one */ }
 
-  let electron;
-  try { electron = require('electron'); } catch { console.error('Toshi needs Electron. Run `npm install` in', ROOT); process.exit(1); }
   const env = { ...process.env, TOSHI_REPO: repo };
-  const child = spawn(electron, ['.'], { cwd: ROOT, env, stdio: 'ignore', detached: true });
-  child.unref(); // don't block the terminal — Toshi floats independently
-  console.log('🐈  Toshi is floating — bottom-right, watching this repo. (drag it, or ✕ to hide)');
+  let electron = null;
+  try { electron = require('electron'); } catch { /* optional dep — fall back to the browser panel */ }
+  if (electron) {
+    const child = spawn(electron, ['.'], { cwd: ROOT, env, stdio: 'ignore', detached: true });
+    child.unref(); // don't block the terminal — Toshi floats independently
+    console.log('🐈  Toshi is floating — bottom-right, watching this repo. (drag it, or ✕ to hide)');
+  } else {
+    // Electron is an OPTIONAL dependency — without it Toshi still fully works in a browser tab:
+    // start the brain + the tiny static server, then point the user at the panel.
+    for (const script of [path.join(ROOT, 'mcp', 'toshi-mcp.mjs'), path.join(ROOT, 'serve.js')]) {
+      const c = spawn(process.execPath, [script], { cwd: ROOT, env, stdio: 'ignore', detached: true });
+      c.unref();
+    }
+    console.log('🐈  Toshi is up (no Electron here — browser mode):\n    open http://127.0.0.1:4821/panel/  ·  brain on :' + PORT);
+  }
 })();

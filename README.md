@@ -71,7 +71,7 @@ The same three files run on **Windows, macOS and Linux** (CI-proven on all three
 
 | Surface | How |
 |---|---|
-| **Any terminal** | `npm i -g .` once → type `toshi` in any repo. First call floats the companion; typing `toshi` in *another* terminal connects that repo to it (no second window). |
+| **Any terminal (everyone)** | `npm i -g github:philpof102-svg/toshi` — no registry needed. Then type `toshi` in any repo: first call floats the companion; typing `toshi` in *another* terminal connects that repo to it (no second window). Electron is **optional** — where it can't install, `toshi` runs the brain + a browser panel at `http://127.0.0.1:4821/panel/` instead. |
 | **[zero](https://github.com/gitlawb/zero) plugin** | drop this repo at `./.zero/plugins/toshi/` → zero gets `toshi_status` / `toshi_ask` / `toshi_mood` / `toshi_watch`. |
 | **Auto-float with zero** | `toshi setup` (or `npm run zero-hook`) once → a `sessionStart` hook makes Toshi appear (watching that repo) every time you launch zero. `toshi setup --remove` undoes it. |
 | **Summon / minimize** | `toshi show` · `toshi hide` · `toshi toggle` from any terminal (picked up in ~4s). The ─ button folds Toshi into a small floating head — click it to expand; ✕ quits. |
