@@ -120,24 +120,29 @@ const play = (a) => { try { rive && rive.play(a); } catch {} };
 const stop = (a) => { try { rive && rive.stop(a); } catch {} };
 const tag  = (t) => { if ($('pose-tag')) $('pose-tag').textContent = t; };
 
-// The mascot has NO state-machine inputs — we play named linear animations that LAYER over the idle loop.
-let poseTimer = null;
-function flourish(name, label, ms) {
+// The mascot has NO state-machine inputs — we play its named linear animations. CRUCIAL: body animations
+// (idle/wave/Dancing/…) keyframe the SAME skeleton, so two at once = a mangled pose (the "melted Toshi"
+// bug). Exactly ONE body animation plays at a time (swap, never layer). Eye/mouth clips only keyframe the
+// face, so they layer safely on top. confetti is a particle overlay — also safe.
+const BODY = ['idle','wave','look_around','pointing','Dancing','Celebrating','Jumping','walking','running','walking_side','neutral'];
+let bodyNow = 'idle', poseTimer = null;
+function setBody(name, label, ms) {
+  BODY.forEach((b) => { if (b !== name) stop(b); }); // hard-stop every other body clip first
+  play(name); bodyNow = name;
   tag((label || name).replace(/_/g,' '));
-  play(name);
   clearTimeout(poseTimer);
-  poseTimer = setTimeout(() => { stop(name); tag('idle'); }, ms || 1900);
+  if (name !== 'idle') poseTimer = setTimeout(() => setBody('idle'), ms || 1900);
 }
 function celebrate() {
-  play('Celebrating'); play('confetti'); tag('🎉 got it');
-  clearTimeout(poseTimer);
-  poseTimer = setTimeout(() => { stop('Celebrating'); stop('confetti'); tag('idle'); }, 2400);
+  setBody('Celebrating', '🎉 got it', 2400);
+  play('confetti'); setTimeout(() => stop('confetti'), 2400); // particle overlay — layers fine
 }
-const eyes = (name, ms) => { play(name); setTimeout(() => stop(name), ms || 300); };
-function talk(ms) { // lip-flap while answering
+const eyes = (name, ms) => { play(name); setTimeout(() => stop(name), ms || 300); }; // face-only, safe
+function talk(ms) { // lip-flap while answering — mouth-only clips, safe to layer
   if (reduce) return;
   let t = 0; const iv = setInterval(() => { const m = VISEMES[Math.floor(Math.random()*VISEMES.length)]; play(m); setTimeout(()=>stop(m),120); if ((t+=140) > (ms||1200)) clearInterval(iv); }, 140);
 }
+window.toshiDebug = () => { try { return { playing: rive.playingAnimationNames.slice(), body: bodyNow }; } catch { return null; } };
 function reactWiggle(cls) { const f = $('floaty'); if (reduce || !f) return; f.classList.remove('react','nope'); void f.offsetWidth; f.classList.add(cls); setTimeout(() => f.classList.remove(cls), 480); }
 function sparkle() {
   if (reduce) return; const st = document.querySelector('.stage');
@@ -149,7 +154,7 @@ function sparkle() {
 function startLife() {
   if (reduce) return;
   setInterval(() => eyes('eyes_blink', 240), 2600);                              // blink
-  setInterval(() => { const p = FLOURISH[Math.floor(Math.random()*FLOURISH.length)]; flourish(p[0], p[1], 1900); }, 7000); // idle flourishes
+  setInterval(() => { if (bodyNow !== 'idle') return; const p = FLOURISH[Math.floor(Math.random()*FLOURISH.length)]; setBody(p[0], p[1], 1900); }, 7000); // idle flourishes (skip if busy)
 }
 
 function bootRive() {
@@ -160,7 +165,7 @@ function bootRive() {
       onLoad() {
         $('loading').classList.add('gone');
         try { rive.resizeDrawingSurfaceToCanvas(); } catch {}
-        flourish('wave', 'hi 👋', 1700); reactWiggle('react');    // greet on arrival
+        setBody('wave', 'hi 👋', 1700); reactWiggle('react');    // greet on arrival
         startLife();
       },
       onLoadError() { $('loading').textContent = 'could not load Toshi (network)'; },
@@ -181,12 +186,12 @@ $('ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const q = $('q').value.trim(); if (!q) return;
   $('q').value=''; $('send').disabled=true;
-  flourish('look_around','thinking',6000); reactWiggle('react'); thinking();
+  setBody('look_around','thinking',6000); reactWiggle('react'); thinking();
   try {
     const r = await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q }) });
     if (!r.ok) throw new Error('mcp '+r.status);
     const j = await r.json();
-    if (j.grounded) { celebrate(); sparkle(); } else { flourish('pointing','heads-up',1900); }
+    if (j.grounded) { celebrate(); sparkle(); } else { setBody('pointing','heads-up',1900); }
     talk(Math.min(2200, ((j.answer||'').length)*22)); say(j.answer || '(no answer)', !!j.grounded);
   } catch {
     eyes('eyes_confused', 900); reactWiggle('nope'); tag('idle');
