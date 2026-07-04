@@ -46,6 +46,14 @@ jobs:
       - run: toshi version && toshi help
       - name: toshi → browser mode boots the brain + panel
         run: |
+          PKG="$(npm root -g)/toshi-companion"
+          echo "--- probe: the installed brain, foreground, with its own words ---"
+          (node "$PKG/mcp/toshi-mcp.mjs" > brain.log 2>&1 &)
+          sleep 3
+          cat brain.log || true
+          curl -s http://127.0.0.1:4820/health || echo "(foreground brain not answering)"
+          pkill -f toshi-mcp || true; sleep 1
+          echo "--- the real path: detached via the CLI ---"
           toshi
           sleep 4
           curl -sf http://127.0.0.1:4820/health | grep -q '"ok":true'
