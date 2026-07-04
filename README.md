@@ -1,5 +1,7 @@
 # Toshi — a terminal companion
 
+![Toshi answering from your repo](docs/toshi-panel.png)
+
 A tiny AI companion that lives **beside your terminal**, wearing the community-ready **Toshi** mascot from
 [tinyhumansai/mascots](https://github.com/tinyhumansai/mascots). It watches your [`gitlawb/zero`](https://github.com/gitlawb/zero)
 coding session and you can **talk to it about what's happening** — what changed, why a test is red, what to do next —
@@ -59,8 +61,21 @@ export CODEBASE_MEMORY_BIN=/abs/path/to/codebase-memory-mcp
 Until then Toshi runs in **honest demo mode** — the mascot is fully alive, and it *says* it can't read your
 session yet (with the exact index command) rather than inventing an answer.
 
-**Other surfaces:** `npm run brain` runs just the MCP (stdio + `/ask` on :4820) for any MCP client; `panel/index.html`
-opens standalone in a browser; `zero plugins add .` installs it as a [zero](https://github.com/gitlawb/zero) plugin.
+**Give Toshi a voice (optional)** — install [`zero`](https://github.com/gitlawb/zero) and run `zero setup` with any
+provider (free/local models like ollama work). Toshi then *speaks* its grounded answers in your language —
+1-3 warm sentences synthesized ONLY from what it retrieved, never invented. `TOSHI_LLM=off` disables it.
+
+## Put the CLI everywhere
+
+The same three files run on **Windows, macOS and Linux** (CI-proven on all three):
+
+| Surface | How |
+|---|---|
+| **Any terminal** | `npm i -g .` once → type `toshi` in any repo. First call floats the companion; typing `toshi` in *another* terminal connects that repo to it (no second window). |
+| **[zero](https://github.com/gitlawb/zero) plugin** | drop this repo at `./.zero/plugins/toshi/` → zero gets `toshi_status` / `toshi_ask` / `toshi_mood` / `toshi_watch`. |
+| **Claude Desktop / Cline / any MCP client** | register the stdio server: `{"command": "node", "args": ["/abs/path/toshi/mcp/toshi-mcp.mjs"]}` |
+| **Scripts / anything HTTP** | `POST http://127.0.0.1:4820/ask {"q":"…"}` · `POST /repo {"path":"…"}` · `GET /health` |
+| **Browser (no Electron)** | `node serve.js` → `http://127.0.0.1:4821/panel/` |
 
 ## Honest status
 

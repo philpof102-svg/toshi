@@ -35,6 +35,26 @@ function createWindow() {
   // focus (you couldn't type). Plain alwaysOnTop keeps it above normal windows AND typable.
   win.loadFile(path.join(ROOT, 'panel', 'index.html'));
   win.once('ready-to-show', () => { win.show(); win.focus(); });
+
+  // TOSHI_SHOT=/path/out.png → self-portrait mode: wait for Rive + greet, ask one real question,
+  // capture the actual window (the honest render, not a mockup), write the PNG, quit.
+  if (process.env.TOSHI_SHOT) {
+    const out = process.env.TOSHI_SHOT;
+    const q = process.env.TOSHI_SHOT_Q || 'qui appelle summarize ?';
+    setTimeout(async () => {
+      try {
+        await win.webContents.executeJavaScript(`(() => { const i=document.getElementById('q'); i.value=${JSON.stringify(q)}; document.getElementById('ask').dispatchEvent(new Event('submit',{cancelable:true})); return 1; })()`);
+      } catch (e) { console.error('[shot] ask failed:', e.message); }
+      setTimeout(async () => {
+        try {
+          const img = await win.webContents.capturePage();
+          require('node:fs').writeFileSync(out, img.toPNG());
+          console.log('[shot] saved', out);
+        } catch (e) { console.error('[shot] capture failed:', e.message); }
+        app.quit();
+      }, Number(process.env.TOSHI_SHOT_WAIT || 12000)); // leave time for the zero-voiced answer
+    }, 7000);
+  }
   return win;
 }
 

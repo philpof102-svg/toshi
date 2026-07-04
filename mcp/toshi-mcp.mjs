@@ -7,6 +7,19 @@
 import http from 'node:http';
 import readline from 'node:readline';
 import { ask, status, setRepo } from '../lib/session.mjs';
+import { speak, hasVoice } from '../lib/llm.mjs';
+
+// grounded voice: keep the structural `answer` intact (agents/tests rely on it) and ADD `spoken` —
+// a 1-3 sentence NL reply synthesized by the zero CLI from the retrieved facts only.
+async function askSpoken(q) {
+  const r = await ask(q);
+  if (hasVoice()) {
+    const base = status().repo.split(/[\\/]/).filter(Boolean).pop();
+    const spoken = await speak(q, r.answer, base);
+    if (spoken) r.spoken = spoken;
+  }
+  return r;
+}
 
 const PORT = Number(process.env.TOSHI_PORT || 4820);
 
@@ -30,7 +43,7 @@ async function handle(msg) {
     const n = params && params.name; const a = (params && params.arguments) || {};
     let out;
     if (n === 'toshi_status') out = { ...status(), mood };
-    else if (n === 'toshi_ask') out = await ask(String(a.q || ''));
+    else if (n === 'toshi_ask') out = await askSpoken(String(a.q || ''));
     else if (n === 'toshi_mood') { mood = String(a.pose || 'idle'); out = { mood }; }
     else if (n === 'toshi_watch') out = await setRepo(String(a.path || '.'));
     else return send({ jsonrpc: '2.0', id, error: { code: -32602, message: 'unknown tool: ' + n } });
@@ -63,7 +76,7 @@ http.createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/ask') {
     let b = ''; req.on('data', (c) => (b += c)); req.on('end', async () => {
       let q = ''; try { q = (JSON.parse(b || '{}').q || '').toString(); } catch {}
-      const out = await ask(q);
+      const out = await askSpoken(q);
       res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(out));
     });
     return;

@@ -149,7 +149,8 @@ async function runPlugin() {
 // ── HTTP: the panel → brain path (:4820) ───────────────────────────────────────────────────────────
 async function runHttp() {
   console.log(`\n${C.d}HTTP — spawn the brain, POST /ask like the panel${C.x}`);
-  const brain = spawn(process.execPath, [join('mcp', 'toshi-mcp.mjs')], { cwd: REPO, env: process.env, stdio: 'ignore' });
+  // TOSHI_LLM=off keeps this layer deterministic + fast; the VOICE layer tests the LLM path separately
+  const brain = spawn(process.execPath, [join('mcp', 'toshi-mcp.mjs')], { cwd: REPO, env: { ...process.env, TOSHI_LLM: 'off' }, stdio: 'ignore' });
   try {
     await new Promise((r) => setTimeout(r, 1800));
     const res = await fetch('http://127.0.0.1:4820/ask', {
@@ -174,6 +175,18 @@ async function runHttp() {
   finally { try { brain.kill(); } catch {} }
 }
 
+// ── VOICE: NL synthesis through the zero CLI (optional — skips when zero isn't installed) ──────────
+async function runVoice() {
+  console.log(`\n${C.d}VOICE — grounded NL synthesis via the zero CLI${C.x}`);
+  const { hasVoice, speak } = await import('../lib/llm.mjs');
+  if (!hasVoice()) { skipped('VOICE (1 case)', 'zero CLI not installed or TOSHI_LLM=off'); return; }
+  const out = await speak('qui appelle summarize ?',
+    'summarize:\ncallers →\n• ask (hop 1)\ncallees →\n• j (hop 1)', 'toshi');
+  check('speak() → short grounded reply (or honest null fallback)',
+    out === null || (typeof out === 'string' && out.length > 2 && /ask/i.test(out)),
+    JSON.stringify(out).slice(0, 140));
+}
+
 // ── main ────────────────────────────────────────────────────────────────────────────────────────
 (async () => {
   console.log(`Toshi use-case simulation\n${C.d}status: ${JSON.stringify(status())}${C.x}`);
@@ -186,6 +199,7 @@ async function runHttp() {
     skipped('HTTP', 'backend not installed/indexed');
     console.log(`  ${C.d}→ install: npm i -g codebase-memory-mcp && codebase-memory-mcp cli index_repository '{"repo_path":"${REPO.replace(/\\/g, '/')}"}'${C.x}`);
   }
+  await runVoice();   // optional layer — self-skips without the zero CLI
   await runDegrade(); // always runnable — it tests the no-backend path itself
 
   console.log(`\n${pass} passed · ${fail} failed · ${skip} skipped`);

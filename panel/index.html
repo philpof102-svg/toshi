@@ -14,7 +14,8 @@
 <script src="https://unpkg.com/@rive-app/canvas@2.38.4/rive.js"></script>
 <style>
   :root{
-    --line:#232c37; --ink:#e8eef6; --dim:#8a97a6; --faint:#59636e;
+    /* BASED palette — Toshi is Base's cat, the pod wears Base blue (#0052FF) */
+    --base:#0052FF; --base-soft:#4d7fff; --line:#162a5e; --ink:#e8eef6; --dim:#8ea0c4; --faint:#5a6a92;
     --teal:#4ec9b0; --amber:#e5b567;
     --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
   }
@@ -25,24 +26,27 @@
   .pod{
     width:min(300px,100vw); height:min(460px,100vh);
     display:flex; flex-direction:column;
-    background:linear-gradient(180deg,#161d26 0%, #11161d 100%);
+    background:linear-gradient(180deg,#0a1430 0%, #060b1c 100%);
     border:1px solid var(--line); border-radius:18px; overflow:hidden;
-    box-shadow:0 30px 70px -28px #000, 0 0 0 1px rgba(255,255,255,.02) inset;
+    box-shadow:0 30px 70px -28px #000, 0 0 44px -18px rgba(0,82,255,.45), 0 0 0 1px rgba(0,82,255,.06) inset;
     animation:pop .5s cubic-bezier(.2,1.3,.4,1) both;
   }
   @keyframes pop{from{opacity:0; transform:translateY(14px) scale(.94)} to{opacity:1; transform:none}}
 
-  .head{display:flex; align-items:center; gap:8px; padding:9px 12px; -webkit-app-region:drag; cursor:grab}
+  .head{display:flex; align-items:center; gap:8px; padding:9px 12px; -webkit-app-region:drag; cursor:grab;
+    background:linear-gradient(180deg, rgba(0,82,255,.16), rgba(0,82,255,.03)); border-bottom:1px solid rgba(0,82,255,.22)}
   .head:active{cursor:grabbing}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(78,201,176,.14); animation:pulse-dot 3s ease-in-out infinite}
-  @keyframes pulse-dot{50%{box-shadow:0 0 0 5px rgba(78,201,176,.05)}}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--base-soft);box-shadow:0 0 0 3px rgba(0,82,255,.22); animation:pulse-dot 3s ease-in-out infinite}
+  @keyframes pulse-dot{50%{box-shadow:0 0 0 6px rgba(0,82,255,.07)}}
   .logo{font-weight:800; letter-spacing:.16em; font-size:12px}
   .logo b{color:var(--amber)}
   .pose-tag{margin-left:auto; color:var(--faint); font-size:9px; letter-spacing:.12em; text-transform:uppercase}
   .x{-webkit-app-region:no-drag; margin-left:8px; color:var(--faint); background:none; border:0; font:inherit; font-size:14px; cursor:pointer; line-height:1; padding:2px 4px}
   .x:hover{color:var(--ink)}
 
-  .stage{position:relative; flex:1; min-height:0}
+  .stage{position:relative; flex:1; min-height:0; cursor:pointer}
+  .stage::before{content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(circle at 50% 44%, rgba(0,82,255,.20), transparent 62%)}
   .floaty{position:absolute; inset:0; animation:float 5.5s ease-in-out infinite; transform-origin:50% 80%}
   @keyframes float{0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)}}
   /* react/nope are transient overlays — JS removes the class so float always resumes */
@@ -74,11 +78,16 @@
   .dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
   @keyframes blink{0%,100%{opacity:.25} 50%{opacity:1}}
 
-  .ask{display:flex; gap:8px; padding:9px 11px; border-top:1px solid var(--line); background:rgba(9,12,16,.55); -webkit-app-region:no-drag}
-  .ask input{flex:1; min-width:0; background:#0a0e13; border:1px solid var(--line); border-radius:10px; color:var(--ink); font:inherit; font-size:12.5px; padding:9px 11px}
+  .chips{display:flex; gap:6px; padding:0 11px 7px; -webkit-app-region:no-drag}
+  .chips button{font:inherit; font-size:9.5px; letter-spacing:.04em; color:var(--dim); background:rgba(0,82,255,.10);
+    border:1px solid rgba(0,82,255,.28); border-radius:999px; padding:4px 9px; cursor:pointer}
+  .chips button:hover{color:var(--ink); background:rgba(0,82,255,.22)}
+  .ask{display:flex; gap:8px; padding:9px 11px; border-top:1px solid rgba(0,82,255,.22);
+    background:linear-gradient(180deg, rgba(0,82,255,.10), rgba(0,82,255,.02)); -webkit-app-region:no-drag}
+  .ask input{flex:1; min-width:0; background:#070d1e; border:1px solid var(--line); border-radius:10px; color:var(--ink); font:inherit; font-size:12.5px; padding:9px 11px}
   .ask input::placeholder{color:var(--faint)}
-  .ask input:focus{outline:none; border-color:var(--teal)}
-  .ask button{font:inherit; font-size:13px; font-weight:800; color:#08110e; background:var(--teal); border:0; border-radius:10px; padding:0 13px; cursor:pointer}
+  .ask input:focus{outline:none; border-color:var(--base-soft); box-shadow:0 0 0 3px rgba(0,82,255,.18)}
+  .ask button{font:inherit; font-size:13px; font-weight:800; color:#fff; background:var(--base); border:0; border-radius:10px; padding:0 13px; cursor:pointer; box-shadow:0 4px 14px -6px rgba(0,82,255,.8)}
   .ask button:disabled{opacity:.5}
   .foot{padding:5px 10px 8px; color:var(--faint); font-size:8px; letter-spacing:.03em; text-align:center; -webkit-app-region:no-drag}
   .foot a{color:var(--dim); text-decoration:none}
@@ -100,6 +109,11 @@
       <div class="bubble" id="bubble"><div class="who">toshi <span class="grounded" id="grounded" hidden>from your repo</span></div><div id="bubble-body"></div></div>
     </div>
 
+    <div class="chips" aria-label="quick asks">
+      <button type="button" data-q="quoi de neuf ?">quoi de neuf</button>
+      <button type="button" data-q="montre la structure">structure</button>
+      <button type="button" data-fill="trouve ">trouve…</button>
+    </div>
     <form class="ask" id="ask">
       <input id="q" autocomplete="off" placeholder="ask Toshi about your session…" aria-label="talk to Toshi" />
       <button type="submit" id="send">›</button>
@@ -199,9 +213,8 @@ function say(text, grounded, holdMs) {
 }
 function thinking() { $('grounded').hidden = true; $('bubble-body').innerHTML = '<span class="dots"><span>•</span><span>•</span><span>•</span></span>'; $('bubble').classList.add('on'); }
 
-$('ask').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const q = $('q').value.trim(); if (!q) return;
+async function submitQ(q) {
+  if (!q || busy) return;
   $('q').value=''; $('send').disabled=true; busy = true;
   setPose('look_around', 'thinking', 15000); setEnum(eyesEnum, 'thinking'); reactWiggle('react'); thinking();
   try {
@@ -210,14 +223,49 @@ $('ask').addEventListener('submit', async (e) => {
     const j = await r.json();
     setEnum(eyesEnum, 'NEUTRAL');
     if (j.grounded) { celebrate(); sparkle(); } else { setPose('pointing', 'heads-up', 2200); }
-    talk(Math.min(2200, ((j.answer||'').length)*22)); say(j.answer || '(no answer)', !!j.grounded);
+    const text = j.spoken || j.answer || '(no answer)'; // zero-voiced when available, structural otherwise
+    talk(Math.min(2600, text.length*22)); say(text, !!j.grounded, Math.max(9000, Math.min(20000, text.length*90)));
   } catch {
     setEnum(eyesEnum, 'confused'); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 1200);
     setPose('idle'); reactWiggle('nope');
     say("start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I read your real session (via codebase-memory-mcp).", false);
   }
   busy = false; $('send').disabled=false; $('q').focus();
+}
+$('ask').addEventListener('submit', (e) => { e.preventDefault(); submitQ($('q').value.trim()); });
+// quick chips: one tap = a real ask; "trouve…" pre-fills so you type just the symbol
+document.querySelectorAll('.chips button').forEach((b) => b.addEventListener('click', () => {
+  if (b.dataset.fill) { $('q').value = b.dataset.fill; $('q').focus(); return; }
+  submitQ(b.dataset.q);
+}));
+
+// pet the cat: click the mascot → a little flourish + a short companion quip (local, no tokens)
+const QUIPS = [
+  (r) => `je garde un œil sur ${r} 👀`, () => 'pense à commit 😼', () => 'hydrate-toi, dev 💧',
+  () => 'petit commit > gros regret', (r) => `${r} a l'air en forme`, () => 'ship it 🚀',
+  () => 'un test de plus, un bug de moins', () => 'prr prr',
+];
+document.querySelector('.stage').addEventListener('click', () => {
+  if (busy) return;
+  setPose(pick(['dancing','jumping','celebration','hand_wave']), '😺', 2200); reactWiggle('react');
+  say(pick(QUIPS)(watching || 'ton repo'), false, 4500);
 });
+
+// proactive companion pulse: every 2.5 min, quietly check "quoi de neuf" — if files changed since the
+// last look, Toshi waves at you with the delta (no LLM cost when idle: one graph call, spoken skipped server-side only if slow)
+let lastPulse = '';
+setInterval(async () => {
+  if (busy || document.hidden) return;
+  try {
+    const j = await (await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q: 'what changed?' }) })).json();
+    const a = j.answer || '';
+    if (j.grounded && /file\(s\) changed/.test(a) && a !== lastPulse) {
+      lastPulse = a;
+      setPose('hand_wave', 'du neuf 👀', 2400); reactWiggle('react');
+      say(j.spoken || a, true, 9000);
+    }
+  } catch {}
+}, 150000);
 $('x').addEventListener('click', () => { try { window.close(); } catch {} document.querySelector('.pod').style.display='none'; });
 
 // Stay connected to the user's terminal: poll the brain for the repo it watches. When `toshi` is run in
