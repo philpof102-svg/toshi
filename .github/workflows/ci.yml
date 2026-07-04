@@ -1,0 +1,51 @@
+name: ci
+
+# Proves the Toshi CLI works on every support. The matrix job runs the suite with NO backend on
+# Windows/macOS/Linux — the PORTABILITY + DEGRADE layers exercise binary resolution, the CLI entrypoints,
+# and honest degradation on each OS (CORE/PLUGIN/HTTP self-skip when the backend is absent). A second job
+# installs codebase-memory-mcp on Linux and indexes the repo so the full grounded suite runs end-to-end.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  portability:
+    name: cli / no backend (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+        # the suite never launches Electron — skip its ~200MB binary download (faster, less flaky)
+      - run: npm ci || npm install
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      # PORTABILITY (8) + DEGRADE (2) must pass on every OS; grounded layers self-skip without the backend.
+      - run: npm test
+
+  grounded:
+    name: grounded suite (linux, real backend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+        # the suite never launches Electron — skip its ~200MB binary download (faster, less flaky)
+      - run: npm ci || npm install
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - name: install codebase-memory-mcp (MIT) + index this repo
+        run: |
+          npm i -g codebase-memory-mcp
+          codebase-memory-mcp cli index_repository "{\"repo_path\":\"$GITHUB_WORKSPACE\"}"
+      - name: full suite (CORE + PLUGIN + HTTP + PORTABILITY + DEGRADE)
+        run: npm test
