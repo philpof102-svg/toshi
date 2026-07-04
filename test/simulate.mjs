@@ -5,11 +5,12 @@
 //   2. DEGRADE— subprocess with a bad BIN / unindexed repo: honest non-grounded messages, never a crash.
 //   3. PLUGIN — zero invokes `node ./tools/toshi.mjs <cmd>` with JSON on stdin (the zero-plugin surface).
 //   4. HTTP   — spawn the brain, POST /ask like the panel does (the :4820 origin path that regressed once).
+//   5. PORTABILITY — CLI entrypoints + binary resolution work on Windows/macOS/Linux (always runs).
 //
 // Run:  node test/simulate.mjs      (or npm test)
 // If the codebase-memory backend isn't installed/indexed, CORE+HTTP self-skip with a clear note; DEGRADE
 // still runs (it tests exactly the missing-backend path). Nothing here fabricates a pass.
-import { ask, status } from '../lib/session.mjs';
+import { ask, status, resolveBin } from '../lib/session.mjs';
 import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import { existsSync } from 'node:fs';
@@ -19,14 +20,6 @@ const pexec = promisify(execFile);
 
 const REPO = resolve(process.env.TOSHI_REPO || process.cwd());
 const norm = (p) => String(p || '').replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
-function resolveBin() {
-  if (process.env.CODEBASE_MEMORY_BIN) return process.env.CODEBASE_MEMORY_BIN;
-  if (process.platform === 'win32' && process.env.APPDATA) {
-    const exe = join(process.env.APPDATA, 'npm', 'node_modules', 'codebase-memory-mcp', 'bin', 'codebase-memory-mcp.exe');
-    if (existsSync(exe)) return exe;
-  }
-  return 'codebase-memory-mcp';
-}
 
 let pass = 0, fail = 0, skip = 0;
 const C = { g: '\x1b[32m', r: '\x1b[31m', y: '\x1b[33m', d: '\x1b[2m', x: '\x1b[0m' };
@@ -99,6 +92,32 @@ async function runDegrade() {
     okUnindexed || /demo mode/i.test(unindexed.answer || ''), JSON.stringify(unindexed).slice(0, 120));
 }
 
+// ── PORTABILITY: the CLI must work on every support (Windows / macOS / Linux) ───────────────────────
+async function runPortability() {
+  console.log(`\n${C.d}PORTABILITY — CLI entrypoints resolve on any platform${C.x}`);
+  // every cross-platform entrypoint the CLI exposes must exist as a file (no OS-specific launcher required)
+  for (const f of ['bin/toshi.cjs', 'tools/toshi.mjs', 'mcp/toshi-mcp.mjs', 'desktop/main.cjs']) {
+    check(`entrypoint ${f} present`, existsSync(join(REPO, f)));
+  }
+  // shebang so POSIX can exec `toshi` directly after `npm i -g` (chmod +x by npm)
+  const { readFileSync } = await import('node:fs');
+  check('bin/toshi.cjs has #!/usr/bin/env node shebang',
+    readFileSync(join(REPO, 'bin', 'toshi.cjs'), 'utf8').startsWith('#!/usr/bin/env node'));
+  // the binary resolver returns a usable target on THIS platform (either a real file or the PATH name)
+  const bin = resolveBin();
+  check('resolveBin() → existing file or bare PATH name',
+    typeof bin === 'string' && (existsSync(bin) || bin === 'codebase-memory-mcp'), `got ${bin}`);
+  // env override must always win (lets any platform / custom install point at its own binary)
+  const prev = process.env.CODEBASE_MEMORY_BIN;
+  process.env.CODEBASE_MEMORY_BIN = '/custom/path/cbm';
+  check('CODEBASE_MEMORY_BIN override honored', resolveBin() === '/custom/path/cbm');
+  if (prev === undefined) delete process.env.CODEBASE_MEMORY_BIN; else process.env.CODEBASE_MEMORY_BIN = prev;
+  // plugin.json command must be node (portable), not an OS-specific shell/exe
+  const pj = JSON.parse(readFileSync(join(REPO, 'plugin.json'), 'utf8'));
+  check('plugin.json tools use portable `node ...` commands',
+    pj.tools.every((t) => /^node\s/.test(t.command)), JSON.stringify(pj.tools.map((t) => t.command)));
+}
+
 // ── PLUGIN: zero calls the tool via `node ./tools/toshi.mjs <cmd>` with JSON on stdin ──────────────
 function pluginCall(cmd, stdinObj) {
   return new Promise((res) => {
@@ -139,6 +158,7 @@ async function runHttp() {
 (async () => {
   console.log(`Toshi use-case simulation\n${C.d}status: ${JSON.stringify(status())}${C.x}`);
   const ready = (await reindex()) && (await backendIndexed());
+  await runPortability(); // platform-only checks — always run, no backend needed
   if (ready) { await runCore(); await runPlugin(); await runHttp(); }
   else {
     skipped('CORE (12 cases)', 'backend not installed/indexed');

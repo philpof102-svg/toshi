@@ -41,9 +41,10 @@ npm install          # once
 npm run toshi        # a frameless, always-on-top Toshi floats bottom-right, over any terminal
 ```
 
-Windows: just double-click **`toshi.bat`**. Drag Toshi by its header; hide it with ✕. It greets you with a
-wave, floats + blinks on its own, reacts when you ask, and bursts into a celebration when it has a *grounded*
-answer from your repo.
+**Launch from anywhere** (Windows · macOS · Linux) — `npm i -g .` once, then just type `toshi` in any repo and
+it floats over that terminal, reading that repo. Windows also has a double-clickable **`toshi.bat`**. Drag Toshi
+by its header; hide it with ✕. It greets you with a wave, floats + blinks on its own, reacts when you ask, and
+bursts into a celebration when it has a *grounded* answer from your repo.
 
 **Make its answers real** — index your repo so `toshi_ask` reads the graph instead of guessing (token-cheap):
 
