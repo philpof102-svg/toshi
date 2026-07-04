@@ -9,6 +9,11 @@
     "toshi": "bin/toshi.cjs",
     "toshi-mcp": "mcp/toshi-mcp.mjs"
   },
+  "files": [
+    "bin/", "lib/", "mcp/", "panel/", "tools/", "desktop/",
+    "plugin.json", "serve.js", "toshi.bat",
+    "README.md", "LICENSE", "ATTRIBUTION.md"
+  ],
   "scripts": {
     "toshi": "electron .",
     "desktop": "electron .",
