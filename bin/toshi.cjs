@@ -25,7 +25,8 @@ const sub = (process.argv[2] || '').toLowerCase();
   toshi setup        auto-float whenever zero starts (--remove undoes, --project scopes)
   toshi version      print version
 grounded answers: npm i -g codebase-memory-mcp, then codebase-memory-mcp cli index_repository '{"repo_path":"<repo>"}'
-voice: install zero (github.com/gitlawb/zero) + zero setup — Toshi speaks through it. TOSHI_LLM=off disables.
+voice: install zero (github.com/gitlawb/zero) + zero setup — Toshi speaks through it.
+       no zero? set TOSHI_API_URL + TOSHI_API_KEY + TOSHI_API_MODEL (any OpenAI-compatible endpoint). TOSHI_LLM=off disables.
 docs: https://github.com/philpof102-svg/toshi`);
     return;
   }

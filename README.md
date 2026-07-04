@@ -65,7 +65,8 @@ session yet (with the exact index command) rather than inventing an answer.
 
 **Give Toshi a voice (optional)** — install [`zero`](https://github.com/gitlawb/zero) and run `zero setup` with any
 provider (free/local models like ollama work). Toshi then *speaks* its grounded answers in your language —
-1-3 warm sentences synthesized ONLY from what it retrieved, never invented. `TOSHI_LLM=off` disables it.
+1-3 warm sentences synthesized ONLY from what it retrieved, never invented. No zero? Point Toshi at any
+OpenAI-compatible endpoint instead: `TOSHI_API_URL` + `TOSHI_API_KEY` + `TOSHI_API_MODEL`. `TOSHI_LLM=off` disables.
 
 ## Put the CLI everywhere
 

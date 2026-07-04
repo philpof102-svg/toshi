@@ -7,7 +7,7 @@
 import http from 'node:http';
 import readline from 'node:readline';
 import { ask, status, setRepo, pulse, lastLang } from '../lib/session.mjs';
-import { speak, hasVoice } from '../lib/llm.mjs';
+import { speak, hasVoice, voiceKind } from '../lib/llm.mjs';
 
 // grounded voice: keep the structural `answer` intact (agents/tests rely on it) and ADD `spoken` —
 // a 1-3 sentence NL reply synthesized by the zero CLI from the retrieved facts only.
@@ -107,4 +107,4 @@ http.createServer(async (req, res) => {
     return;
   }
   res.writeHead(404, { 'content-type': 'application/json' }); res.end('{"error":"POST /ask | POST /repo | GET /health"}');
-}).listen(PORT, () => process.stderr.write(`toshi-mcp: /ask on :${PORT}, MCP on stdio, memory=${status().memoryBin}\n`));
+}).listen(PORT, () => process.stderr.write(`toshi-mcp: /ask on :${PORT}, MCP on stdio, memory=${status().memoryBin}, voice=${voiceKind()}${voiceKind() === 'none' ? ' (install zero — or set TOSHI_API_URL/KEY/MODEL — for spoken answers)' : ''}\n`));
