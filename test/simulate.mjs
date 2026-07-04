@@ -3,7 +3,8 @@
 // Three layers:
 //   1. CORE   — ask() against the live indexed graph: routing + backend contract (where the 6 fixes live).
 //   2. DEGRADE— subprocess with a bad BIN / unindexed repo: honest non-grounded messages, never a crash.
-//   3. HTTP   — spawn the brain, POST /ask like the panel does (the :4820 origin path that regressed once).
+//   3. PLUGIN — zero invokes `node ./tools/toshi.mjs <cmd>` with JSON on stdin (the zero-plugin surface).
+//   4. HTTP   — spawn the brain, POST /ask like the panel does (the :4820 origin path that regressed once).
 //
 // Run:  node test/simulate.mjs      (or npm test)
 // If the codebase-memory backend isn't installed/indexed, CORE+HTTP self-skip with a clear note; DEGRADE
@@ -98,6 +99,27 @@ async function runDegrade() {
     okUnindexed || /demo mode/i.test(unindexed.answer || ''), JSON.stringify(unindexed).slice(0, 120));
 }
 
+// ── PLUGIN: zero calls the tool via `node ./tools/toshi.mjs <cmd>` with JSON on stdin ──────────────
+function pluginCall(cmd, stdinObj) {
+  return new Promise((res) => {
+    const child = spawn(process.execPath, [join('tools', 'toshi.mjs'), cmd], { cwd: REPO, env: process.env });
+    let out = ''; child.stdout.on('data', (d) => (out += d)); child.stderr.on('data', () => {});
+    child.on('close', () => { try { res(JSON.parse(out)); } catch { res({ raw: out }); } });
+    child.stdin.write(JSON.stringify(stdinObj || {})); child.stdin.end();
+  });
+}
+async function runPlugin() {
+  console.log(`\n${C.d}PLUGIN — zero invokes node ./tools/toshi.mjs <cmd> (JSON on stdin)${C.x}`);
+  const asked = await pluginCall('ask', { q: 'who calls summarize?' });
+  check('tool "toshi_ask" → grounded trace', asked.grounded === true && /callers/.test(asked.answer || ''), JSON.stringify(asked).slice(0, 120));
+  const st = await pluginCall('status', {});
+  check('tool "toshi_status" → repo + memoryBin', !!st.repo && !!st.memoryBin, JSON.stringify(st).slice(0, 120));
+  const mood = await pluginCall('mood', { pose: 'dancing' });
+  check('tool "toshi_mood" → echoes pose', mood.mood === 'dancing', JSON.stringify(mood).slice(0, 120));
+  const unknown = await pluginCall('bogus_tool', {});
+  check('unknown tool → honest error, no crash', /unknown tool/.test(unknown.error || ''), JSON.stringify(unknown).slice(0, 120));
+}
+
 // ── HTTP: the panel → brain path (:4820) ───────────────────────────────────────────────────────────
 async function runHttp() {
   console.log(`\n${C.d}HTTP — spawn the brain, POST /ask like the panel${C.x}`);
@@ -117,9 +139,10 @@ async function runHttp() {
 (async () => {
   console.log(`Toshi use-case simulation\n${C.d}status: ${JSON.stringify(status())}${C.x}`);
   const ready = (await reindex()) && (await backendIndexed());
-  if (ready) { await runCore(); await runHttp(); }
+  if (ready) { await runCore(); await runPlugin(); await runHttp(); }
   else {
     skipped('CORE (12 cases)', 'backend not installed/indexed');
+    skipped('PLUGIN (4 cases)', 'backend not installed/indexed');
     skipped('HTTP', 'backend not installed/indexed');
     console.log(`  ${C.d}→ install: npm i -g codebase-memory-mcp && codebase-memory-mcp cli index_repository '{"repo_path":"${REPO.replace(/\\/g, '/')}"}'${C.x}`);
   }
