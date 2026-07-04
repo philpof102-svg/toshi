@@ -251,18 +251,18 @@ document.querySelector('.stage').addEventListener('click', () => {
   say(pick(QUIPS)(watching || 'ton repo'), false, 4500);
 });
 
-// proactive companion pulse: every 2.5 min, quietly check "quoi de neuf" — if files changed since the
-// last look, Toshi waves at you with the delta (no LLM cost when idle: one graph call, spoken skipped server-side only if slow)
+// companion pulse: every 2.5 min ask the brain for a kind, grounded comment about the session —
+// it only speaks on REAL new events (a fresh commit, files starting to move) or a rare gentle hello.
 let lastPulse = '';
 setInterval(async () => {
   if (busy || document.hidden) return;
   try {
-    const j = await (await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q: 'what changed?' }) })).json();
-    const a = j.answer || '';
-    if (j.grounded && /file\(s\) changed/.test(a) && a !== lastPulse) {
-      lastPulse = a;
-      setPose('hand_wave', 'du neuf 👀', 2400); reactWiggle('react');
-      say(j.spoken || a, true, 9000);
+    const p = await (await fetch('http://127.0.0.1:4820/pulse')).json();
+    if (p.comment && p.comment !== lastPulse) {
+      lastPulse = p.comment;
+      setPose(p.event === 'commit' ? 'celebration' : 'hand_wave', p.event === 'commit' ? '🎉' : '😺', 2600);
+      reactWiggle('react'); if (p.event === 'commit') sparkle();
+      say(p.comment, true, 9500);
     }
   } catch {}
 }, 150000);

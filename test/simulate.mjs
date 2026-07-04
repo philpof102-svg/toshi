@@ -171,6 +171,12 @@ async function runHttp() {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: REPO }),
     })).json();
     check('POST /repo back → grounded again', norm(back.repo) === norm(REPO) && back.indexed === true, JSON.stringify(back).slice(0, 120));
+
+    // companion pulse: kind grounded comments about the session (comment may be null when nothing new)
+    const pu = await (await fetch('http://127.0.0.1:4820/pulse')).json();
+    check('GET /pulse → event + honest comment shape',
+      typeof pu.event === 'string' && (pu.comment === null || typeof pu.comment === 'string'),
+      JSON.stringify(pu).slice(0, 140));
   } catch (e) { check('POST /ask', false, e.message); }
   finally { try { brain.kill(); } catch {} }
 }

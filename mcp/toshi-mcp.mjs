@@ -6,7 +6,7 @@
 // files, which is what keeps turns token-cheap. v0: the bridge is honest — it never fabricates session knowledge.
 import http from 'node:http';
 import readline from 'node:readline';
-import { ask, status, setRepo } from '../lib/session.mjs';
+import { ask, status, setRepo, pulse, lastLang } from '../lib/session.mjs';
 import { speak, hasVoice } from '../lib/llm.mjs';
 
 // grounded voice: keep the structural `answer` intact (agents/tests rely on it) and ADD `spoken` —
@@ -64,6 +64,19 @@ http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   if (req.method === 'GET' && req.url === '/health') { // who am I watching? (panel poll + `toshi` CLI probe)
     res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ ok: true, ...status(), mood }));
+  }
+  if (req.method === 'GET' && req.url === '/pulse') { // kind, grounded session comments (panel polls this)
+    const p = await pulse();
+    if (p.comment && hasVoice()) { // let zero phrase the kindness — still ONLY from the real facts
+      const base = status().repo.split(/[\\/]/).filter(Boolean).pop();
+      const spoken = await speak(
+        lastLang === 'fr'
+          ? 'Fais UN commentaire gentil et encourageant (1-2 phrases max) au développeur sur son activité, en français.'
+          : 'Give ONE kind, encouraging comment (max 2 sentences) to the developer about their activity, in English.',
+        p.facts, base);
+      if (spoken) p.comment = spoken;
+    }
+    res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify(p));
   }
   if (req.method === 'POST' && req.url === '/repo') { // connect a terminal: `toshi` in any repo points me there
     let b = ''; req.on('data', (c) => (b += c)); req.on('end', async () => {
