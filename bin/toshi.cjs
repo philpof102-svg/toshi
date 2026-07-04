@@ -13,7 +13,32 @@ const PORT = Number(process.env.TOSHI_PORT || 4820);
 // session fires the same hook — without this early exit it would re-point the watch mid-answer.
 if (process.env.TOSHI_HOOK_SKIP) process.exit(0);
 
+const sub = (process.argv[2] || '').toLowerCase();
+
 (async () => {
+  // ── subcommands ────────────────────────────────────────────────────────────────────────────────
+  if (sub === 'setup') {
+    // the "auto-float when your agent starts" option, offered to everyone installing the CLI
+    const extra = process.argv.slice(3); // pass --remove / --project through
+    const r = require('node:child_process').spawnSync(process.execPath,
+      [path.join(ROOT, 'tools', 'install-zero-hook.mjs'), ...extra], { stdio: 'inherit' });
+    console.log('\nother surfaces: toshi (float/connect) · toshi hide|show|toggle · npm run brain (MCP) · see README');
+    process.exit(r.status || 0);
+  }
+  if (['show', 'hide', 'toggle', 'collapse', 'expand'].includes(sub)) {
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 700);
+      const r = await fetch(`http://127.0.0.1:${PORT}/panel`, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: sub }), signal: ctl.signal,
+      });
+      clearTimeout(t);
+      if (r.ok) { console.log(`🐈  Toshi: ${sub} (picked up within ~4s)`); return; }
+    } catch {}
+    if (sub === 'show' || sub === 'toggle') { /* nothing floating — fall through and launch one */ }
+    else { console.log('🐈  Toshi is not running — launch it first by typing: toshi'); return; }
+  }
+
   // Is a Toshi brain already alive? Then just point it at this terminal's repo.
   try {
     const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 700);

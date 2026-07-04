@@ -177,6 +177,20 @@ async function runHttp() {
     check('GET /pulse → event + honest comment shape',
       typeof pu.event === 'string' && (pu.comment === null || typeof pu.comment === 'string'),
       JSON.stringify(pu).slice(0, 140));
+
+    // summon protocol: `toshi show|hide|toggle` queues a verb; /health delivers it exactly ONCE
+    const pc = await (await fetch('http://127.0.0.1:4820/panel', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'toggle' }),
+    })).json();
+    check('POST /panel toggle → accepted', pc.ok === true && pc.action === 'toggle', JSON.stringify(pc).slice(0, 100));
+    const d1 = await (await fetch('http://127.0.0.1:4820/health')).json();
+    const d2 = await (await fetch('http://127.0.0.1:4820/health')).json();
+    check('panelCmd delivered exactly once', d1.panelCmd === 'toggle' && d2.panelCmd === null,
+      `first=${d1.panelCmd} second=${d2.panelCmd}`);
+    const bad = await fetch('http://127.0.0.1:4820/panel', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'explode' }),
+    });
+    check('POST /panel invalid action → 400', bad.status === 400, `status=${bad.status}`);
   } catch (e) { check('POST /ask', false, e.message); }
   finally { try { brain.kill(); } catch {} }
 }

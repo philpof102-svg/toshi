@@ -91,6 +91,10 @@
   .ask button:disabled{opacity:.5}
   .foot{padding:5px 10px 8px; color:var(--faint); font-size:8px; letter-spacing:.03em; text-align:center; -webkit-app-region:no-drag}
   .foot a{color:var(--dim); text-decoration:none}
+  /* mini mode — the ─ button folds the pod into a small floating head (Toshi stays, click to expand) */
+  body.mini .pod{width:116px; height:116px; border-radius:26px; cursor:pointer}
+  body.mini .head, body.mini .chips, body.mini .ask, body.mini .foot, body.mini .bubble{display:none}
+  body.mini .stage::after{display:none}
   @media (prefers-reduced-motion:reduce){ .pod,.dot,.floaty,.spark{animation:none !important} }
 </style>
 </head>
@@ -100,7 +104,8 @@
       <span class="dot" title="watching your session"></span>
       <span class="logo"><b>tosh</b>i</span>
       <span class="pose-tag" id="pose-tag">idle</span>
-      <button class="x" id="x" title="hide" aria-label="hide Toshi">✕</button>
+      <button class="x" id="min" title="minimize (Toshi stays)" aria-label="minimize Toshi">─</button>
+      <button class="x" id="x" title="quit" aria-label="quit Toshi">✕</button>
     </div>
 
     <div class="stage">
@@ -246,10 +251,29 @@ const QUIPS = [
   () => 'un test de plus, un bug de moins', () => 'prr prr',
 ];
 document.querySelector('.stage').addEventListener('click', () => {
+  if (collapsed) { setCollapsed(false); return; } // mini head → click to expand
   if (busy) return;
   setPose(pick(['dancing','jumping','celebration','hand_wave']), '😺', 2200); reactWiggle('react');
   say(pick(QUIPS)(watching || 'ton repo'), false, 4500);
 });
+
+// ── minimize without quitting + summon from any terminal (`toshi show|hide|toggle`) ────────────────
+let collapsed = false;
+const desk = () => window.toshiDesktop; // present in Electron (preload), absent in a plain browser
+function setCollapsed(on) {
+  collapsed = on; document.body.classList.add('no-anim'); document.body.classList.toggle('mini', on);
+  try { desk() && desk()[on ? 'collapse' : 'expand'](); } catch {}
+  setTimeout(() => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} document.body.classList.remove('no-anim'); }, 380);
+}
+$('min').addEventListener('click', (e) => { e.stopPropagation(); setCollapsed(true); });
+function runPanelCmd(cmd) {
+  if (!cmd) return;
+  if (cmd === 'collapse') setCollapsed(true);
+  else if (cmd === 'expand') setCollapsed(false);
+  else if (cmd === 'hide') { try { desk() && desk().hide(); } catch {} }
+  else if (cmd === 'show') { setCollapsed(false); try { desk() && desk().show(); } catch {} setPose('hand_wave', '😺', 1800); }
+  else if (cmd === 'toggle') runPanelCmd(document.hidden ? 'show' : 'hide');
+}
 
 // companion pulse: every 2.5 min ask the brain for a kind, grounded comment about the session —
 // it only speaks on REAL new events (a fresh commit, files starting to move) or a rare gentle hello.
@@ -274,6 +298,7 @@ let watching = '';
 async function pollWatching() {
   try {
     const j = await (await fetch('http://127.0.0.1:4820/health')).json();
+    runPanelCmd(j.panelCmd); // one-shot window verb queued by the `toshi` CLI
     const base = String(j.repo || '').split(/[\\/]/).filter(Boolean).pop() || '';
     if (base && base !== watching) {
       const first = !watching; watching = base;

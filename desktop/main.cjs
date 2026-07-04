@@ -1,7 +1,7 @@
 // Toshi desktop — the floating companion (Clippy-energy). GPL-3.0.
 // A frameless, transparent, ALWAYS-ON-TOP window you drag over any terminal. It also spawns Toshi's brain
 // (mcp/toshi-mcp.mjs → /ask on :4820) so one launch = the face + the brain. Quit closes both.
-const { app, BrowserWindow, screen } = require('electron');
+const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
@@ -29,7 +29,20 @@ function createWindow() {
     frame: false, transparent: true, resizable: false, movable: true,
     alwaysOnTop: true,               // floats over the terminal — but stays focusable so you can TYPE
     focusable: true, skipTaskbar: true, hasShadow: false, fullscreenable: false,
-    webPreferences: { contextIsolation: true, nodeIntegration: false },
+    // backgroundThrottling:false — a hidden window must keep polling /health so `toshi show` answers in ~4s
+    webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(__dirname, 'preload.cjs'), backgroundThrottling: false },
+  });
+  // window verbs from the panel (─ button) and the `toshi show/hide/toggle` CLI (via brain /panel → poll).
+  // collapse keeps the mini head anchored where the pod's bottom-right corner was; expand restores.
+  const MINI = 116;
+  ipcMain.on('toshi:win', (_e, act) => {
+    try {
+      const b = win.getBounds();
+      if (act === 'collapse') win.setBounds({ x: b.x + b.width - MINI, y: b.y + b.height - MINI, width: MINI, height: MINI });
+      else if (act === 'expand') win.setBounds({ x: b.x + b.width - W, y: b.y + b.height - H, width: W, height: H });
+      else if (act === 'hide') win.hide();
+      else if (act === 'show') { win.show(); win.focus(); }
+    } catch {}
   });
   // Do NOT use the 'screen-saver' always-on-top level — on Windows it makes the window refuse keyboard
   // focus (you couldn't type). Plain alwaysOnTop keeps it above normal windows AND typable.

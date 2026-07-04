@@ -31,6 +31,7 @@ const TOOLS = [
 ];
 
 let mood = 'idle';
+let panelCmd = null; // one-shot window verb queued by `toshi show|hide|toggle` (POST /panel)
 
 // ── MCP over stdio (newline-delimited JSON-RPC) ──────────────────────────────────────────────────
 const send = (o) => process.stdout.write(JSON.stringify(o) + '\n');
@@ -63,7 +64,18 @@ http.createServer(async (req, res) => {
   res.setHeader('access-control-allow-headers', 'content-type');
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   if (req.method === 'GET' && req.url === '/health') { // who am I watching? (panel poll + `toshi` CLI probe)
-    res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ ok: true, ...status(), mood }));
+    const out = { ok: true, ...status(), mood, panelCmd }; panelCmd = null; // deliver a window verb once
+    res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify(out));
+  }
+  if (req.method === 'POST' && req.url === '/panel') { // `toshi show|hide|toggle` → the panel picks it up on poll
+    let b = ''; req.on('data', (c) => (b += c)); req.on('end', () => {
+      let a = ''; try { a = (JSON.parse(b || '{}').action || '').toString(); } catch {}
+      const ok = ['show', 'hide', 'toggle', 'collapse', 'expand'].includes(a);
+      if (ok) panelCmd = a;
+      res.writeHead(ok ? 200 : 400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify(ok ? { ok: true, action: a } : { error: 'action: show|hide|toggle|collapse|expand' }));
+    });
+    return;
   }
   if (req.method === 'GET' && req.url === '/pulse') { // kind, grounded session comments (panel polls this)
     const p = await pulse();
