@@ -46,18 +46,16 @@ jobs:
       - run: toshi version && toshi help
       - name: toshi → browser mode boots the brain + panel
         run: |
-          PKG="$(npm root -g)/toshi-companion"
-          echo "--- probe: the installed brain, foreground, with its own words ---"
-          (node "$PKG/mcp/toshi-mcp.mjs" > brain.log 2>&1 &)
-          sleep 3
-          cat brain.log || true
-          curl -s http://127.0.0.1:4820/health || echo "(foreground brain not answering)"
-          pkill -f toshi-mcp || true; sleep 1
-          echo "--- the real path: detached via the CLI ---"
           toshi
           sleep 4
-          curl -sf http://127.0.0.1:4820/health | grep -q '"ok":true'
-          curl -sf http://127.0.0.1:4821/panel/ | grep -qi toshi
+          ok=1
+          curl -sf http://127.0.0.1:4820/health | grep -q '"ok":true' || ok=0
+          curl -sf http://127.0.0.1:4821/panel/ | grep -qi toshi || ok=0
+          if [ "$ok" = 0 ]; then
+            echo "--- launch log (children stderr) ---"
+            cat "${TMPDIR:-/tmp}"/toshi-launch.log || true
+            exit 1
+          fi
           toshi hide   # summon protocol reachable on the live brain
           echo "global CLI verified end-to-end"
 

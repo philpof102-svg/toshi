@@ -86,11 +86,23 @@ docs: https://github.com/philpof102-svg/toshi`);
     console.log('🐈  Toshi is floating — bottom-right, watching this repo. (drag it, or ✕ to hide)');
   } else {
     // Electron is an OPTIONAL dependency — without it Toshi still fully works in a browser tab:
-    // start the brain + the tiny static server, then point the user at the panel.
+    // start the brain + the tiny static server, then point the user at the panel. Children write
+    // stderr to a log and we hold 700ms before declaring victory — a child that dies instantly gets
+    // REPORTED (with the log path), never a false "Toshi is up".
+    const os = require('node:os'); const fsx = require('node:fs');
+    const logPath = path.join(os.tmpdir(), 'toshi-launch.log');
+    const errFd = fsx.openSync(logPath, 'a');
+    let failed = null;
     for (const script of [path.join(ROOT, 'mcp', 'toshi-mcp.mjs'), path.join(ROOT, 'serve.js')]) {
-      const c = spawn(process.execPath, [script], { cwd: ROOT, env, stdio: 'ignore', detached: true });
+      const c = spawn(process.execPath, [script], { cwd: ROOT, env, stdio: ['ignore', 'ignore', errFd], detached: true });
+      c.on('exit', (code) => { if (code) failed = `${path.basename(script)} exited with code ${code}`; });
+      c.on('error', (e) => { failed = `${path.basename(script)}: ${e.message}`; });
       c.unref();
     }
-    console.log('🐈  Toshi is up (no Electron here — browser mode):\n    open http://127.0.0.1:4821/panel/  ·  brain on :' + PORT);
+    setTimeout(() => {
+      if (failed) { console.error(`🙀 Toshi could not start: ${failed}\n   details: ${logPath}`); process.exit(1); }
+      console.log('🐈  Toshi is up (no Electron here — browser mode):\n    open http://127.0.0.1:4821/panel/  ·  brain on :' + PORT);
+      process.exit(0);
+    }, 700);
   }
 })();
