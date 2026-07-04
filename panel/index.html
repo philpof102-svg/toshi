@@ -3,200 +3,126 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Toshi — terminal companion</title>
+<title>Toshi</title>
 <!--
-  Toshi side-panel (WebView). Loads the REAL, community-ready Toshi mascot (Rive) from tinyhumansai/mascots
-  and lets you talk to your terminal session. Wired on gitlawb/zero as a plugin + MCP.
-  GPL-3.0 (mascot is GPL-3.0 by tinyhumans). Rive runtime + the .riv load over the network in a real
-  browser/WebView (not sandboxed) — vendor them for offline use in a later pass.
+  Toshi — mini portable companion. ONE widget: the mascot, big and alive, + one text bar.
+  Drop it beside ANY terminal (WebView / small browser window). The brain is the stdio MCP
+  (mcp/toshi-mcp.mjs) — any MCP client can launch it: zero, Claude Desktop, Cline…
+  Mascot: the community-ready Toshi from tinyhumansai/mascots (GPL-3.0, attributed).
 -->
 <script src="https://unpkg.com/@rive-app/canvas@2.21.6/rive.js"></script>
 <style>
   :root{
-    --bg:#0d1117; --panel:#141a22; --panel-2:#1a212b; --line:#242d38;
-    --ink:#e8eef6; --dim:#8a97a6; --faint:#5c6773;
-    --teal:#4ec9b0;        /* the one accent — a terminal/zero cool tone */
-    --amber:#e5b567;       /* Toshi's warmth, used sparingly */
-    --ok:#7bd88f; --warn:#e5b567; --live:#4ec9b0;
+    --bg:#0d1117; --line:#232c37; --ink:#e8eef6; --dim:#8a97a6; --faint:#59636e;
+    --teal:#4ec9b0; --amber:#e5b567;
     --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
-    --stage:radial-gradient(120% 90% at 50% 25%, #1c2531 0%, #121821 60%, #0e141c 100%);
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
+    background:var(--bg); color:var(--ink); font-family:var(--mono); font-size:13px;
+    display:grid; place-items:center; -webkit-font-smoothing:antialiased;
+  }
+  /* the whole app IS one small widget — portable, resizable, nothing else on the page */
+  .pod{
+    width:min(360px, 100vw); height:min(560px, 100vh);
+    display:flex; flex-direction:column;
     background:
-      radial-gradient(80% 60% at 80% -10%, rgba(78,201,176,.07), transparent 60%),
-      var(--bg);
-    color:var(--ink); font-family:var(--mono); font-size:13px; line-height:1.5;
-    display:grid; place-items:center; padding:24px; -webkit-font-smoothing:antialiased;
+      radial-gradient(130% 75% at 50% 18%, #1b2430 0%, #121821 58%, var(--bg) 100%);
+    border:1px solid var(--line); border-radius:16px; overflow:hidden;
+    box-shadow:0 30px 70px -35px #000;
   }
-  /* framing so the standalone preview reads as "beside your terminal" */
-  .frame{display:flex; gap:18px; align-items:stretch; width:min(920px,100%)}
-  .term{
-    flex:1.35; min-width:0; background:#0a0e13; border:1px solid var(--line); border-radius:12px;
-    padding:16px 18px; overflow:hidden; box-shadow:0 24px 60px -30px #000;
-    display:none; /* shown on wide screens */
-  }
-  @media(min-width:720px){ .term{display:block} }
-  .term .bar{display:flex; gap:6px; margin:-2px 0 12px}
-  .term .bar i{width:11px;height:11px;border-radius:50%;background:#2b3440;display:block}
-  .term .bar i:first-child{background:#3a2b2b}
-  .term pre{margin:0; font-size:12px; color:#aeb9c6; white-space:pre-wrap; word-break:break-word}
-  .term .g{color:var(--dim)} .term .t{color:var(--teal)} .term .a{color:var(--amber)} .term .k{color:#8ab4ff}
-  .term .cur{display:inline-block;width:8px;height:15px;background:var(--teal);vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
-  @keyframes blink{50%{opacity:0}}
-
-  /* the panel — the reusable component */
-  .toshi{
-    width:340px; flex:none; background:linear-gradient(180deg,var(--panel),#11161d);
-    border:1px solid var(--line); border-radius:14px; overflow:hidden;
-    display:flex; flex-direction:column; box-shadow:0 24px 60px -30px #000;
-  }
-  .head{display:flex; align-items:center; gap:9px; padding:12px 14px; border-bottom:1px solid var(--line)}
-  .logo{font-weight:800; letter-spacing:.14em; font-size:12px}
+  .head{display:flex; align-items:center; gap:8px; padding:10px 14px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(78,201,176,.14)}
+  .logo{font-weight:800; letter-spacing:.16em; font-size:12px}
   .logo b{color:var(--amber)}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px rgba(78,201,176,.15)}
-  .head .env{margin-left:auto; color:var(--faint); font-size:10px; letter-spacing:.08em; text-transform:uppercase}
+  .pose-tag{margin-left:auto; color:var(--faint); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase}
 
-  .stage{position:relative; height:210px; background:var(--stage); border-bottom:1px solid var(--line)}
-  .stage::after{ /* faint scanlines for terminal atmosphere */
-    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
-    background:repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 3px);
-  }
-  #toshi{width:100%; height:100%; display:block}
-  .loading{position:absolute; inset:0; display:grid; place-items:center; color:var(--dim); font-size:11px; letter-spacing:.06em}
+  /* the star — the mascot takes almost everything */
+  .stage{position:relative; flex:1; min-height:0}
+  #toshi{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .stage::after{content:""; position:absolute; inset:0; pointer-events:none; opacity:.45;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.016) 0 1px, transparent 1px 3px)}
+  .loading{position:absolute; inset:0; display:grid; place-items:center; color:var(--dim); font-size:11px}
   .loading.gone{display:none}
-  .think{ /* the "…" bubble above Toshi when working */
-    position:absolute; top:14px; left:50%; transform:translateX(-50%);
-    color:var(--teal); font-size:15px; letter-spacing:.15em; opacity:0; transition:opacity .2s
+
+  /* one floating reply bubble — appears over the stage, fades out; no chat log */
+  .bubble{
+    position:absolute; left:12px; right:12px; bottom:10px;
+    background:rgba(10,14,19,.92); border:1px solid var(--line); border-radius:12px;
+    padding:9px 12px; font-size:12px; line-height:1.5; color:var(--ink);
+    opacity:0; transform:translateY(6px); transition:.25s; pointer-events:none;
+    max-height:46%; overflow:hidden; white-space:pre-wrap;
   }
-  .toshi[data-mood="thinking"] .think{opacity:1; animation:pulse 1.2s ease-in-out infinite}
-  @keyframes pulse{50%{opacity:.35}}
+  .bubble.on{opacity:1; transform:none}
+  .bubble .who{color:var(--amber); font-size:9px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px}
 
-  .statusline{display:flex; align-items:center; gap:8px; padding:9px 14px; border-bottom:1px solid var(--line); color:var(--dim); font-size:11px}
-  .statusline .prompt{color:var(--teal)}
-  .statusline .ctx{margin-left:auto; font-variant-numeric:tabular-nums; color:var(--faint)}
-
-  .poses{display:flex; flex-wrap:wrap; gap:6px; padding:10px 14px; border-bottom:1px solid var(--line)}
-  .poses:empty{display:none}
-  .chip{
-    font:inherit; font-size:10.5px; letter-spacing:.03em; color:var(--dim);
-    background:var(--panel-2); border:1px solid var(--line); border-radius:999px;
-    padding:4px 10px; cursor:pointer; transition:.15s
-  }
-  .chip:hover{color:var(--ink); border-color:#33404e}
-  .chip:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
-
-  .talk{flex:1; display:flex; flex-direction:column; min-height:150px}
-  .log{flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:10px}
-  .msg{font-size:12px; max-width:100%}
-  .msg .who{font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-bottom:2px}
-  .msg.toshi-msg .who{color:var(--amber)}
-  .msg.you .who{color:var(--teal)}
-  .msg .body{color:var(--ink); white-space:pre-wrap}
-  .msg.demo .body{color:var(--dim)}
-  .msg .body code{background:#0a0e13; padding:1px 5px; border-radius:4px; color:#8ab4ff; font-size:11px}
-  .ask{display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--line)}
+  /* the one text bar */
+  .ask{display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--line); background:rgba(9,12,16,.6)}
   .ask input{
-    flex:1; min-width:0; background:#0a0e13; border:1px solid var(--line); border-radius:8px;
-    color:var(--ink); font:inherit; font-size:12px; padding:8px 10px
+    flex:1; min-width:0; background:#0a0e13; border:1px solid var(--line); border-radius:10px;
+    color:var(--ink); font:inherit; font-size:12.5px; padding:10px 12px
   }
   .ask input::placeholder{color:var(--faint)}
   .ask input:focus{outline:none; border-color:var(--teal)}
   .ask button{
-    font:inherit; font-size:12px; font-weight:700; color:#08110e; background:var(--teal);
-    border:0; border-radius:8px; padding:8px 12px; cursor:pointer
+    font:inherit; font-size:12px; font-weight:800; color:#08110e; background:var(--teal);
+    border:0; border-radius:10px; padding:0 14px; cursor:pointer
   }
-  .ask button:disabled{opacity:.5; cursor:default}
-
-  .foot{padding:9px 14px; border-top:1px solid var(--line); color:var(--faint); font-size:9.5px; line-height:1.7; letter-spacing:.02em}
-  .foot a{color:var(--dim); text-decoration:none; border-bottom:1px dotted #33404e}
-  .foot a:hover{color:var(--ink)}
+  .ask button:disabled{opacity:.5}
+  .foot{padding:6px 12px 9px; color:var(--faint); font-size:8.5px; letter-spacing:.03em; text-align:center}
+  .foot a{color:var(--dim); text-decoration:none}
   @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
 <body>
-<div class="frame">
-
-  <!-- left: a mock zero session Toshi is watching (preview framing only) -->
-  <div class="term" aria-hidden="true">
-    <div class="bar"><i></i><i></i><i></i></div>
-    <pre><span class="g">❯</span> <span class="t">zero</span>  <span class="g"># terminal coding agent · gitlawb/zero</span>
-
-<span class="g">›</span> refactor the auth session timeout
-<span class="k">edit</span>  src/auth/session.ts  <span class="a">+14 −6</span>
-<span class="k">edit</span>  src/auth/session.test.ts  <span class="a">+22 −0</span>
-<span class="k">run</span>   npm test -- auth
-  <span class="g">✓ 11 passed</span>  <span class="a">✗ 2 failed</span>  <span class="g">(session.expiry, refresh.race)</span>
-
-<span class="g">›</span> mcp  toshi_watch  <span class="g"># the companion is following along</span>
-<span class="t">❯</span> <span class="cur"></span></pre>
-  </div>
-
-  <!-- right: Toshi — the reusable side-panel -->
-  <aside class="toshi" id="panel" data-mood="idle" aria-label="Toshi terminal companion">
+  <div class="pod" role="application" aria-label="Toshi companion">
     <div class="head">
-      <span class="dot" title="watching"></span>
+      <span class="dot" title="watching your session"></span>
       <span class="logo"><b>tosh</b>i</span>
-      <span class="env">wired on zero</span>
+      <span class="pose-tag" id="pose-tag">idle</span>
     </div>
 
     <div class="stage">
-      <div class="think" aria-hidden="true">• • •</div>
-      <canvas id="toshi" width="680" height="420"></canvas>
+      <canvas id="toshi" width="720" height="880"></canvas>
       <div class="loading" id="loading">waking Toshi…</div>
+      <div class="bubble" id="bubble"><div class="who">toshi</div><div id="bubble-body"></div></div>
     </div>
 
-    <div class="statusline">
-      <span class="prompt">❯</span>
-      <span id="watching">watching · ~/auth</span>
-      <span class="ctx" id="ctx">ctx 2.1k</span>
-    </div>
-
-    <div class="poses" id="poses"><!-- pose chips injected from the mascot's real state machine --></div>
-
-    <div class="talk">
-      <div class="log" id="log" aria-live="polite">
-        <div class="msg toshi-msg">
-          <div class="who">toshi</div>
-          <div class="body">hey — I'm following your <code>zero</code> session. ask me what changed, why a test is red, or what to do next.</div>
-        </div>
-      </div>
-      <form class="ask" id="ask">
-        <input id="q" autocomplete="off" placeholder="ask about this session…" aria-label="ask Toshi about your session" />
-        <button type="submit" id="send">ask</button>
-      </form>
-    </div>
-
+    <form class="ask" id="ask">
+      <input id="q" autocomplete="off" placeholder="talk to Toshi about your session…" aria-label="talk to Toshi" />
+      <button type="submit" id="send">›</button>
+    </form>
     <div class="foot">
-      mascot <a href="https://github.com/tinyhumansai/mascots" target="_blank" rel="noopener">tinyhumans</a> · GPL-3.0 &nbsp;·&nbsp;
-      session memory <a href="https://github.com/DeusData/codebase-memory-mcp" target="_blank" rel="noopener">codebase-memory-mcp</a> · MIT<br/>
-      descriptor-only on money — Toshi prepares, you sign. testnet mindset: v0, unaudited.
+      mascot <a href="https://github.com/tinyhumansai/mascots" target="_blank" rel="noopener">tinyhumans</a> · GPL-3.0 · wired on zero via MCP
     </div>
-  </aside>
-</div>
+  </div>
 
 <script>
-/* ── Toshi panel logic ──────────────────────────────────────────────────────────────────────────
- * 1) load the REAL Toshi mascot (.riv) from the tinyhumans manifest,
- * 2) discover its state-machine inputs at runtime and drive eyes + poses (defensive — never assume),
- * 3) talk-to-your-session: POST to the local Toshi MCP; honest demo fallback if it isn't running yet. */
+/* Toshi mini — load the real mascot, keep it ALIVE (auto pose+eye cycles per the tinyhumans
+ * state engine), one text bar to talk to the session via the local MCP (/ask). */
 const RIV_URL = 'https://raw.githubusercontent.com/tinyhumansai/mascots/main/mascots/toshi/toshi.riv';
 const EYES = ['look_up','look_down','look_left','look_right','blink','squinting','confused','thinking'];
-const POSES = ['idle','look_around','pointing','hand_wave','dancing','celebration'];
+const POSES = ['idle','look_around','pointing','hand_wave','dancing','celebration']; // manifest idlePoseCycle
 const MCP_ASK = (location.protocol === 'file:' ? 'http://127.0.0.1:4820' : '') + '/ask';
 
 const $ = (id) => document.getElementById(id);
-const panel = $('panel');
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-let mood = 'idle';
-const setMood = (m) => { mood = m; panel.dataset.mood = m; };
-
 let rive = null, smName = null, inputs = [];
 const findInput = (re) => inputs.find((i) => re.test(i.name || ''));
 
+function setPose(name, idx){
+  $('pose-tag').textContent = name.replace(/_/g,' ');
+  const trig = findInput(new RegExp('^'+name+'$','i'));
+  const pose = findInput(/pose|state|anim/i);
+  try {
+    if (trig && typeof trig.fire === 'function') trig.fire();
+    else if (pose) { if (typeof pose.value === 'number') pose.value = idx; else pose.value = name; }
+  } catch {}
+}
+
 function bootRive(){
-  if (!window.rive) { $('loading').textContent = 'rive runtime blocked (offline) — mascot needs network'; return; }
+  if (!window.rive) { $('loading').textContent = 'rive runtime blocked — needs network'; return; }
   try {
     rive = new window.rive.Rive({
       src: RIV_URL, canvas: $('toshi'), autoplay: true, fit: 'contain', alignment: 'center',
@@ -207,71 +133,51 @@ function bootRive(){
           const c = rive.contents; const ab = c && c.artboards && c.artboards[0];
           const sm = ab && ab.stateMachines && ab.stateMachines[0];
           if (sm) { smName = sm.name; rive.play(smName); inputs = rive.stateMachineInputs(smName) || []; }
-        } catch(e){ /* no SM — the default animation still plays */ }
-        wirePoses(); startEyes();
+        } catch {}
+        if (!reduce) {
+          // eyes on the manifest cadence (2600ms, random) — the tiny-terminal liveliness
+          const eye = findInput(/eye/i);
+          if (eye) setInterval(() => { const k = Math.floor(Math.random()*EYES.length);
+            try { if (typeof eye.value === 'number') eye.value = k; else eye.value = EYES[k]; } catch {} }, 2600);
+          // idle pose cycle — Toshi acts on its own: mostly idle, sometimes a flourish
+          let i = 0;
+          setInterval(() => {
+            i = (Math.random() < 0.55) ? 0 : 1 + Math.floor(Math.random() * (POSES.length - 1));
+            setPose(POSES[i], i);
+          }, 6500);
+        }
       },
       onLoadError(){ $('loading').textContent = 'could not load Toshi (network)'; },
     });
-  } catch(e){ $('loading').textContent = 'rive init failed'; }
+  } catch { $('loading').textContent = 'rive init failed'; }
+}
+window.addEventListener('resize', () => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} });
+
+/* one bubble, no log — mini */
+let bubbleTimer = null;
+function say(text, holdMs){
+  $('bubble-body').textContent = text;
+  $('bubble').classList.add('on');
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => $('bubble').classList.remove('on'), holdMs || 9000);
 }
 
-// eyes: set the "eyes" enum/number input to a random value on the manifest's 2600ms cadence
-function startEyes(){
-  const eye = findInput(/eye/i);
-  if (!eye || reduce) return;
-  setInterval(() => {
-    const idx = Math.floor(Math.random() * EYES.length);
-    try { if (typeof eye.value === 'number') eye.value = idx; else eye.value = EYES[idx]; } catch {}
-  }, 2600);
-}
-
-// poses: render a chip per pose the manifest declares; clicking drives the real state machine
-function wirePoses(){
-  const pose = findInput(/pose|state|anim/i);
-  const wrap = $('poses');
-  POSES.forEach((name, idx) => {
-    const b = document.createElement('button');
-    b.className = 'chip'; b.type = 'button'; b.textContent = name.replace(/_/g,' ');
-    b.onclick = () => {
-      setMood(name === 'idle' ? 'idle' : 'thinking');
-      // try a matching trigger input first (e.g. "pointing"), else set the pose index
-      const trig = findInput(new RegExp('^'+name+'$','i'));
-      try {
-        if (trig && typeof trig.fire === 'function') trig.fire();
-        else if (pose) { if (typeof pose.value === 'number') pose.value = idx; else pose.value = name; }
-      } catch {}
-      if (name === 'idle') setTimeout(() => setMood('idle'), 400);
-    };
-    wrap.appendChild(b);
-  });
-}
-
-// ── talk to your session ──
-const log = $('log');
-function bubble(who, text, cls){
-  const d = document.createElement('div'); d.className = 'msg ' + (cls || (who==='toshi'?'toshi-msg':'you'));
-  d.innerHTML = '<div class="who">'+who+'</div><div class="body"></div>';
-  d.querySelector('.body').textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight;
-  return d;
-}
 $('ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const q = $('q').value.trim(); if (!q) return;
-  $('q').value=''; $('send').disabled = true;
-  bubble('you', q); setMood('thinking');
-  const trig = findInput(/look_around|thinking|point/i); try{ trig && trig.fire && trig.fire(); }catch{}
+  $('q').value = ''; $('send').disabled = true;
+  setPose('look_around', 1); say('…', 20000);
   try {
     const r = await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q }) });
-    if (!r.ok) throw new Error('mcp '+r.status);
+    if (!r.ok) throw new Error('mcp ' + r.status);
     const j = await r.json();
-    bubble('toshi', j.answer || '(no answer)');
+    setPose(j.grounded ? 'celebration' : 'idle', j.grounded ? 5 : 0);
+    say(j.answer || '(no answer)');
   } catch {
-    // honest fallback — no fabricated session knowledge when the backend isn't wired
-    bubble('toshi',
-      'demo mode — I can\'t read your session yet. Start the Toshi MCP + codebase-memory-mcp and I\'ll answer for real:\n  npx codebase-memory-mcp   # indexes the repo, ~99% fewer tokens\n  node mcp/toshi-mcp.mjs     # this panel talks to it',
-      'demo');
+    setPose('confused' in {} ? 'idle' : 'idle', 0);
+    say("demo mode — start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I answer about your real session (via codebase-memory-mcp).");
   }
-  setMood('idle'); $('send').disabled = false; $('q').focus();
+  $('send').disabled = false; $('q').focus();
 });
 
 bootRive();

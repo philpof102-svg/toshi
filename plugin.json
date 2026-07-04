@@ -1,0 +1,13 @@
+{
+  "id": "toshi",
+  "name": "Toshi",
+  "description": "A terminal companion — the Toshi mascot on the side, watching your session. Ask it what changed, why a test is red, or what to do next. Session memory via codebase-memory-mcp (token-cheap).",
+  "version": "0.1.0",
+  "tools": [
+    { "name": "toshi_status", "command": "node ./tools/toshi.mjs status" },
+    { "name": "toshi_ask", "command": "node ./tools/toshi.mjs ask" },
+    { "name": "toshi_mood", "command": "node ./tools/toshi.mjs mood" }
+  ],
+  "hooks": [],
+  "skills": []
+}
