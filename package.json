@@ -14,6 +14,7 @@
     "desktop": "electron .",
     "brain": "node mcp/toshi-mcp.mjs",
     "ask": "node tools/toshi.mjs ask",
+    "zero-hook": "node tools/install-zero-hook.mjs",
     "test": "node test/simulate.mjs"
   },
   "repository": {

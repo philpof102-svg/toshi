@@ -9,6 +9,10 @@ const ROOT = path.join(__dirname, '..');
 const repo = path.resolve(process.env.TOSHI_REPO || process.cwd());
 const PORT = Number(process.env.TOSHI_PORT || 4820);
 
+// Guard for the zero sessionStart hook: when Toshi itself SPEAKS through `zero -p`, that inner zero
+// session fires the same hook — without this early exit it would re-point the watch mid-answer.
+if (process.env.TOSHI_HOOK_SKIP) process.exit(0);
+
 (async () => {
   // Is a Toshi brain already alive? Then just point it at this terminal's repo.
   try {

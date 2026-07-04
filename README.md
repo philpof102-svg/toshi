@@ -73,6 +73,7 @@ The same three files run on **Windows, macOS and Linux** (CI-proven on all three
 |---|---|
 | **Any terminal** | `npm i -g .` once → type `toshi` in any repo. First call floats the companion; typing `toshi` in *another* terminal connects that repo to it (no second window). |
 | **[zero](https://github.com/gitlawb/zero) plugin** | drop this repo at `./.zero/plugins/toshi/` → zero gets `toshi_status` / `toshi_ask` / `toshi_mood` / `toshi_watch`. |
+| **Auto-float with zero** | `npm run zero-hook` once → a `sessionStart` hook makes Toshi appear (watching that repo) every time you launch zero. `npm run zero-hook -- --remove` undoes it. |
 | **Claude Desktop / Cline / any MCP client** | register the stdio server: `{"command": "node", "args": ["/abs/path/toshi/mcp/toshi-mcp.mjs"]}` |
 | **Scripts / anything HTTP** | `POST http://127.0.0.1:4820/ask {"q":"…"}` · `POST /repo {"path":"…"}` · `GET /health` |
 | **Browser (no Electron)** | `node serve.js` → `http://127.0.0.1:4821/panel/` |
