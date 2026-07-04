@@ -27,13 +27,14 @@ function createWindow() {
     x: wa.x + wa.width - W - GAP,
     y: wa.y + wa.height - H - GAP,   // bottom-right, over the terminal
     frame: false, transparent: true, resizable: false, movable: true,
-    alwaysOnTop: true, skipTaskbar: true, hasShadow: false, fullscreenable: false,
+    alwaysOnTop: true,               // floats over the terminal — but stays focusable so you can TYPE
+    focusable: true, skipTaskbar: true, hasShadow: false, fullscreenable: false,
     webPreferences: { contextIsolation: true, nodeIntegration: false },
   });
-  win.setAlwaysOnTop(true, 'screen-saver'); // stay above even fullscreen terminals
-  win.setVisibleOnAllWorkspaces(true);
+  // Do NOT use the 'screen-saver' always-on-top level — on Windows it makes the window refuse keyboard
+  // focus (you couldn't type). Plain alwaysOnTop keeps it above normal windows AND typable.
   win.loadFile(path.join(ROOT, 'panel', 'index.html'));
-  // click the ✕ in the panel closes the window (window.close), which quits the app below
+  win.once('ready-to-show', () => { win.show(); win.focus(); });
   return win;
 }
 

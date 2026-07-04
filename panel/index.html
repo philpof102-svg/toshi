@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Toshi</title>
 <!--
-  Toshi — a floating desktop companion (Clippy-energy). ONE widget: the mascot, big + alive, and one
-  text bar. In Electron it's a frameless, transparent, always-on-top window you drag over any terminal.
-  Mascot: the community-ready Toshi from tinyhumansai/mascots (GPL-3.0, attributed). Brain: the local
-  Toshi MCP (/ask on :4820) → codebase-memory-mcp. Nothing invented.
+  Toshi — a floating desktop companion (Clippy-energy). In Electron it's a frameless, transparent,
+  always-on-top window you drag over any terminal. Mascot: the community-ready Toshi from
+  tinyhumansai/mascots (GPL-3.0, attributed) — its Rive state machine has NO inputs, so we drive it by
+  playing its named LINEAR animations (idle / wave / Dancing / Celebrating / eyes_* / mouth_*). Brain: the
+  local Toshi MCP (/ask :4820) → codebase-memory-mcp. Nothing invented.
 -->
 <script src="https://unpkg.com/@rive-app/canvas@2.21.6/rive.js"></script>
 <style>
@@ -21,7 +22,6 @@
   html,body{margin:0;height:100%;background:transparent}
   body{color:var(--ink); font-family:var(--mono); font-size:13px; display:grid; place-items:center; -webkit-font-smoothing:antialiased; overflow:hidden}
 
-  /* the floating card — the whole app */
   .pod{
     width:min(300px,100vw); height:min(460px,100vh);
     display:flex; flex-direction:column;
@@ -42,10 +42,10 @@
   .x{-webkit-app-region:no-drag; margin-left:8px; color:var(--faint); background:none; border:0; font:inherit; font-size:14px; cursor:pointer; line-height:1; padding:2px 4px}
   .x:hover{color:var(--ink)}
 
-  /* the star — mascot fills the card, gently floating + reacting */
   .stage{position:relative; flex:1; min-height:0}
   .floaty{position:absolute; inset:0; animation:float 5.5s ease-in-out infinite; transform-origin:50% 80%}
   @keyframes float{0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)}}
+  /* react/nope are transient overlays — JS removes the class so float always resumes */
   .floaty.react{animation:react .5s ease}
   @keyframes react{0%{transform:translateY(0) rotate(0)} 30%{transform:translateY(-4px) rotate(-3deg)} 60%{transform:translateY(-2px) rotate(2deg)} 100%{transform:none}}
   .floaty.nope{animation:nope .45s ease}
@@ -56,12 +56,10 @@
   .loading{position:absolute; inset:0; display:grid; place-items:center; color:var(--dim); font-size:11px}
   .loading.gone{display:none}
 
-  /* sparkles on a grounded (real) answer */
   .spark{position:absolute; width:5px;height:5px;border-radius:50%;background:var(--amber);opacity:0;pointer-events:none;filter:blur(.3px)}
   .spark.go{animation:spark .9s ease-out forwards}
   @keyframes spark{0%{opacity:1; transform:translate(0,0) scale(1)} 100%{opacity:0; transform:translate(var(--dx),var(--dy)) scale(.2)}}
 
-  /* one floating reply bubble */
   .bubble{
     position:absolute; left:10px; right:10px; bottom:8px;
     background:rgba(10,14,19,.94); border:1px solid var(--line); border-radius:12px;
@@ -84,7 +82,7 @@
   .ask button:disabled{opacity:.5}
   .foot{padding:5px 10px 8px; color:var(--faint); font-size:8px; letter-spacing:.03em; text-align:center; -webkit-app-region:no-drag}
   .foot a{color:var(--dim); text-decoration:none}
-  @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important} }
+  @media (prefers-reduced-motion:reduce){ .pod,.dot,.floaty,.spark{animation:none !important} }
 </style>
 </head>
 <body>
@@ -97,9 +95,7 @@
     </div>
 
     <div class="stage">
-      <div class="floaty" id="floaty">
-        <canvas id="toshi" width="620" height="820"></canvas>
-      </div>
+      <div class="floaty" id="floaty"><canvas id="toshi" width="620" height="820"></canvas></div>
       <div class="loading" id="loading">waking Toshi…</div>
       <div class="bubble" id="bubble"><div class="who">toshi <span class="grounded" id="grounded" hidden>from your repo</span></div><div id="bubble-body"></div></div>
     </div>
@@ -113,93 +109,91 @@
 
 <script>
 const RIV_URL = 'https://raw.githubusercontent.com/tinyhumansai/mascots/main/mascots/toshi/toshi.riv';
-const EYES = ['look_up','look_down','look_left','look_right','blink','squinting','confused','thinking'];
-const POSES = ['idle','look_around','pointing','hand_wave','dancing','celebration'];
+const VISEMES = ['mouth_AA','mouth_EE','mouth_OH','mouth_OU','mouth_PP'];
+const FLOURISH = [['look_around','looking'],['pointing','pointing'],['Dancing','dancing'],['Jumping','jumping']];
 const MCP_ASK = (location.protocol === 'file:' ? 'http://127.0.0.1:4820' : '') + '/ask';
 const $ = (id) => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-let rive = null, smName = null, inputs = [], idleTimer = null;
-const findInput = (re) => inputs.find((i) => re.test(i.name || ''));
 
-function setPose(name, idx){
-  if ($('pose-tag')) $('pose-tag').textContent = name.replace(/_/g,' ');
-  const trig = findInput(new RegExp('^'+name+'$','i'));
-  const pose = findInput(/pose|state|anim/i);
-  try { if (trig && typeof trig.fire === 'function') trig.fire();
-        else if (pose) { if (typeof pose.value === 'number') pose.value = idx; else pose.value = name; } } catch {}
+let rive = null;
+const play = (a) => { try { rive && rive.play(a); } catch {} };
+const stop = (a) => { try { rive && rive.stop(a); } catch {} };
+const tag  = (t) => { if ($('pose-tag')) $('pose-tag').textContent = t; };
+
+// The mascot has NO state-machine inputs — we play named linear animations that LAYER over the idle loop.
+let poseTimer = null;
+function flourish(name, label, ms) {
+  tag((label || name).replace(/_/g,' '));
+  play(name);
+  clearTimeout(poseTimer);
+  poseTimer = setTimeout(() => { stop(name); tag('idle'); }, ms || 1900);
 }
-function reactWiggle(cls){ const f = $('floaty'); if (reduce||!f) return; f.classList.remove('react','nope'); void f.offsetWidth; f.classList.add(cls); }
-function sparkle(){
+function celebrate() {
+  play('Celebrating'); play('confetti'); tag('🎉 got it');
+  clearTimeout(poseTimer);
+  poseTimer = setTimeout(() => { stop('Celebrating'); stop('confetti'); tag('idle'); }, 2400);
+}
+const eyes = (name, ms) => { play(name); setTimeout(() => stop(name), ms || 300); };
+function talk(ms) { // lip-flap while answering
   if (reduce) return;
-  const st = $('stage') || document.querySelector('.stage');
-  for (let i=0;i<10;i++){ const s=document.createElement('div'); s.className='spark';
-    const a=Math.random()*6.28, r=40+Math.random()*60;
+  let t = 0; const iv = setInterval(() => { const m = VISEMES[Math.floor(Math.random()*VISEMES.length)]; play(m); setTimeout(()=>stop(m),120); if ((t+=140) > (ms||1200)) clearInterval(iv); }, 140);
+}
+function reactWiggle(cls) { const f = $('floaty'); if (reduce || !f) return; f.classList.remove('react','nope'); void f.offsetWidth; f.classList.add(cls); setTimeout(() => f.classList.remove(cls), 480); }
+function sparkle() {
+  if (reduce) return; const st = document.querySelector('.stage');
+  for (let i=0;i<10;i++){ const s=document.createElement('div'); s.className='spark'; const a=Math.random()*6.28, r=40+Math.random()*60;
     s.style.left='50%'; s.style.top='42%'; s.style.setProperty('--dx',Math.cos(a)*r+'px'); s.style.setProperty('--dy',Math.sin(a)*r+'px');
-    document.querySelector('.stage').appendChild(s); requestAnimationFrame(()=>s.classList.add('go'));
-    setTimeout(()=>s.remove(),950); }
+    st.appendChild(s); requestAnimationFrame(()=>s.classList.add('go')); setTimeout(()=>s.remove(),950); }
 }
 
-function startIdleCycle(){
+function startLife() {
   if (reduce) return;
-  const eye = findInput(/eye/i);
-  if (eye) setInterval(() => { const k=Math.floor(Math.random()*EYES.length);
-    try { if (typeof eye.value==='number') eye.value=k; else eye.value=EYES[k]; } catch {} }, 2600);
-  // Toshi acts on its own: mostly idle, sometimes a flourish (the tiny idlePoseCycle)
-  idleTimer = setInterval(() => { const i = (Math.random()<0.6)?0:1+Math.floor(Math.random()*(POSES.length-1)); setPose(POSES[i],i); }, 6500);
+  setInterval(() => eyes('eyes_blink', 240), 2600);                              // blink
+  setInterval(() => { const p = FLOURISH[Math.floor(Math.random()*FLOURISH.length)]; flourish(p[0], p[1], 1900); }, 7000); // idle flourishes
 }
 
-function bootRive(){
+function bootRive() {
   if (!window.rive) { $('loading').textContent = 'rive runtime blocked — needs network'; return; }
   try {
     rive = new window.rive.Rive({
-      src: RIV_URL, canvas: $('toshi'), autoplay: true, fit: 'contain', alignment: 'center',
-      onLoad(){
+      src: RIV_URL, canvas: $('toshi'), autoplay: true, animations: ['idle'], fit: 'contain', alignment: 'center',
+      onLoad() {
         $('loading').classList.add('gone');
         try { rive.resizeDrawingSurfaceToCanvas(); } catch {}
-        try { const c=rive.contents, ab=c&&c.artboards&&c.artboards[0], sm=ab&&ab.stateMachines&&ab.stateMachines[0];
-              if (sm){ smName=sm.name; rive.play(smName); inputs=rive.stateMachineInputs(smName)||[]; } } catch {}
-        setPose('hand_wave',3); reactWiggle('react');        // greet on arrival
-        setTimeout(()=>setPose('idle',0), 1500);
-        startIdleCycle();
+        flourish('wave', 'hi 👋', 1700); reactWiggle('react');    // greet on arrival
+        startLife();
       },
-      onLoadError(){ $('loading').textContent='could not load Toshi (network)'; },
+      onLoadError() { $('loading').textContent = 'could not load Toshi (network)'; },
     });
-  } catch { $('loading').textContent='rive init failed'; }
+  } catch { $('loading').textContent = 'rive init failed'; }
 }
 window.addEventListener('resize', () => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} });
 
-/* one bubble, no log */
-let bubbleTimer=null;
-function say(text, grounded, holdMs){
+let bubbleTimer = null;
+function say(text, grounded, holdMs) {
   $('grounded').hidden = !grounded;
-  $('bubble-body').textContent = text;
-  $('bubble').classList.add('on');
-  clearTimeout(bubbleTimer); bubbleTimer=setTimeout(()=>$('bubble').classList.remove('on'), holdMs||10000);
+  $('bubble-body').textContent = text; $('bubble').classList.add('on');
+  clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => $('bubble').classList.remove('on'), holdMs || 11000);
 }
-function thinking(){
-  $('grounded').hidden = true;
-  $('bubble-body').innerHTML = '<span class="dots"><span>•</span><span>•</span><span>•</span></span>';
-  $('bubble').classList.add('on');
-}
+function thinking() { $('grounded').hidden = true; $('bubble-body').innerHTML = '<span class="dots"><span>•</span><span>•</span><span>•</span></span>'; $('bubble').classList.add('on'); }
 
 $('ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const q = $('q').value.trim(); if (!q) return;
   $('q').value=''; $('send').disabled=true;
-  setPose('look_around',1); reactWiggle('react'); thinking();
+  flourish('look_around','thinking',6000); reactWiggle('react'); thinking();
   try {
     const r = await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q }) });
     if (!r.ok) throw new Error('mcp '+r.status);
     const j = await r.json();
-    if (j.grounded){ setPose('celebration',5); sparkle(); } else { setPose('pointing',2); }
-    say(j.answer || '(no answer)', !!j.grounded);
+    if (j.grounded) { celebrate(); sparkle(); } else { flourish('pointing','heads-up',1900); }
+    talk(Math.min(2200, ((j.answer||'').length)*22)); say(j.answer || '(no answer)', !!j.grounded);
   } catch {
-    setPose('idle',0); reactWiggle('nope');
+    eyes('eyes_confused', 900); reactWiggle('nope'); tag('idle');
     say("start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I read your real session (via codebase-memory-mcp).", false);
   }
   $('send').disabled=false; $('q').focus();
 });
-
 $('x').addEventListener('click', () => { try { window.close(); } catch {} document.querySelector('.pod').style.display='none'; });
 
 bootRive();
