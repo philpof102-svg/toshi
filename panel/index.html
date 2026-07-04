@@ -115,9 +115,9 @@
     </div>
 
     <div class="chips" aria-label="quick asks">
-      <button type="button" data-q="quoi de neuf ?">quoi de neuf</button>
-      <button type="button" data-q="montre la structure">structure</button>
-      <button type="button" data-fill="trouve ">trouve…</button>
+      <button type="button" data-q="what changed?">what's new</button>
+      <button type="button" data-q="show the architecture">structure</button>
+      <button type="button" data-fill="find ">find…</button>
     </div>
     <form class="ask" id="ask">
       <input id="q" autocomplete="off" placeholder="ask Toshi about your session…" aria-label="talk to Toshi" />
@@ -246,15 +246,15 @@ document.querySelectorAll('.chips button').forEach((b) => b.addEventListener('cl
 
 // pet the cat: click the mascot → a little flourish + a short companion quip (local, no tokens)
 const QUIPS = [
-  (r) => `je garde un œil sur ${r} 👀`, () => 'pense à commit 😼', () => 'hydrate-toi, dev 💧',
-  () => 'petit commit > gros regret', (r) => `${r} a l'air en forme`, () => 'ship it 🚀',
-  () => 'un test de plus, un bug de moins', () => 'prr prr',
+  (r) => `keeping an eye on ${r} 👀`, () => 'remember to commit 😼', () => 'stay hydrated, dev 💧',
+  () => 'small commits > big regrets', (r) => `${r} is looking good`, () => 'ship it 🚀',
+  () => 'one more test, one less bug', () => 'prr prr',
 ];
 document.querySelector('.stage').addEventListener('click', () => {
   if (collapsed) { setCollapsed(false); return; } // mini head → click to expand
   if (busy) return;
   setPose(pick(['dancing','jumping','celebration','hand_wave']), '😺', 2200); reactWiggle('react');
-  say(pick(QUIPS)(watching || 'ton repo'), false, 4500);
+  say(pick(QUIPS)(watching || 'your repo'), false, 4500);
 });
 
 // ── minimize without quitting + summon from any terminal (`toshi show|hide|toggle`) ────────────────

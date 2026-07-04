@@ -58,14 +58,25 @@ function createWindow() {
       try {
         await win.webContents.executeJavaScript(`(() => { const i=document.getElementById('q'); i.value=${JSON.stringify(q)}; document.getElementById('ask').dispatchEvent(new Event('submit',{cancelable:true})); return 1; })()`);
       } catch (e) { console.error('[shot] ask failed:', e.message); }
-      setTimeout(async () => {
+      // capture the moment the grounded answer is actually ON SCREEN (voice latency varies), with a
+      // hard deadline fallback so the shot never hangs
+      const deadline = Date.now() + Number(process.env.TOSHI_SHOT_WAIT || 30000);
+      const snap = async () => {
         try {
           const img = await win.webContents.capturePage();
           require('node:fs').writeFileSync(out, img.toPNG());
           console.log('[shot] saved', out);
         } catch (e) { console.error('[shot] capture failed:', e.message); }
         app.quit();
-      }, Number(process.env.TOSHI_SHOT_WAIT || 12000)); // leave time for the zero-voiced answer
+      };
+      const tick = async () => {
+        let on = false;
+        try { on = await win.webContents.executeJavaScript("!document.getElementById('grounded').hidden && document.getElementById('bubble').classList.contains('on')"); } catch {}
+        if (on) return setTimeout(snap, 600); // let the celebration land
+        if (Date.now() > deadline) return snap();
+        setTimeout(tick, 700);
+      };
+      setTimeout(tick, 1500);
     }, 7000);
   }
   return win;
