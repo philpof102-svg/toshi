@@ -149,8 +149,9 @@ async function runPlugin() {
 // ── HTTP: the panel → brain path (:4820) ───────────────────────────────────────────────────────────
 async function runHttp() {
   console.log(`\n${C.d}HTTP — spawn the brain, POST /ask like the panel${C.x}`);
-  // TOSHI_LLM=off keeps this layer deterministic + fast; the VOICE layer tests the LLM path separately
-  const brain = spawn(process.execPath, [join('mcp', 'toshi-mcp.mjs')], { cwd: REPO, env: { ...process.env, TOSHI_LLM: 'off' }, stdio: 'ignore' });
+  // TOSHI_LLM=off keeps this layer deterministic + fast (VOICE tests the LLM path separately);
+  // TOSHI_AUTOINDEX=off so the tmpdir watch-switch below stays honestly indexed:false
+  const brain = spawn(process.execPath, [join('mcp', 'toshi-mcp.mjs')], { cwd: REPO, env: { ...process.env, TOSHI_LLM: 'off', TOSHI_AUTOINDEX: 'off' }, stdio: 'ignore' });
   try {
     await new Promise((r) => setTimeout(r, 1800));
     const res = await fetch('http://127.0.0.1:4820/ask', {

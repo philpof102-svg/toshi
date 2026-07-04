@@ -20,6 +20,7 @@ const sub = (process.argv[2] || '').toLowerCase();
   if (['help', '--help', '-h'].includes(sub)) {
     console.log(`🐈  toshi — a companion beside your terminal (GPL-3.0)
   toshi              float the companion watching this repo (or connect this repo to it)
+  toshi ask "q"      answer about THIS repo right in the terminal (no window needed)
   toshi show|hide    summon / hide the floating window     toshi toggle     flip it
   toshi collapse     fold into a small head                toshi expand     unfold
   toshi setup        integrate: zero auto-float hook + register the MCP in openclaude
@@ -33,6 +34,37 @@ docs: https://github.com/philpof102-svg/toshi`);
   }
   if (['version', '--version', '-v'].includes(sub)) {
     console.log('toshi-companion ' + require(path.join(ROOT, 'package.json')).version);
+    return;
+  }
+  if (sub === 'ask') {
+    // ask from ANY terminal — no window needed. Uses the floating companion's brain when it's up
+    // (same repo-watching state), else answers one-shot right here (auto-indexes this repo if needed).
+    const q = process.argv.slice(3).join(' ').trim();
+    if (!q) { console.log('usage: toshi ask "what changed?"'); process.exit(1); }
+    let out = null;
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 800);
+      const r0 = await fetch(`http://127.0.0.1:${PORT}/repo`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: repo }), signal: ctl.signal });
+      clearTimeout(t);
+      if (r0.ok) {
+        const r = await fetch(`http://127.0.0.1:${PORT}/ask`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ q }) });
+        if (r.ok) out = await r.json();
+      }
+    } catch { /* no companion — answer locally */ }
+    if (!out) {
+      process.env.TOSHI_REPO = repo;
+      const { ask, setRepo } = await import(require('node:url').pathToFileURL(path.join(ROOT, 'lib', 'session.mjs')).href);
+      const w = await setRepo(repo);
+      if (w.autoIndexed) console.log(`(indexed ${repo} on the fly)`);
+      out = await ask(q);
+      if (out.grounded) {
+        try {
+          const { speak, hasVoice } = await import(require('node:url').pathToFileURL(path.join(ROOT, 'lib', 'llm.mjs')).href);
+          if (hasVoice()) { const s = await speak(q, out.answer, path.basename(repo)); if (s) out.spoken = s; }
+        } catch {}
+      }
+    }
+    console.log((out.spoken || out.answer || '(no answer)') + (out.grounded ? '\n— from your repo ✅' : ''));
     return;
   }
   if (sub === 'setup') {
