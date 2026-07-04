@@ -6,6 +6,7 @@
   "license": "GPL-3.0-only",
   "main": "desktop/main.cjs",
   "bin": {
+    "toshi": "bin/toshi.cjs",
     "toshi-mcp": "mcp/toshi-mcp.mjs"
   },
   "scripts": {
@@ -30,7 +31,7 @@
   "engines": {
     "node": ">=18"
   },
-  "devDependencies": {
+  "dependencies": {
     "electron": "^43.0.0"
   }
 }
