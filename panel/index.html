@@ -109,7 +109,7 @@
 
 <script>
 const RIV_URL = 'https://raw.githubusercontent.com/tinyhumansai/mascots/main/mascots/toshi/toshi.riv';
-const MCP_ASK = (location.protocol === 'file:' ? 'http://127.0.0.1:4820' : '') + '/ask';
+const MCP_ASK = 'http://127.0.0.1:4820/ask'; // the brain (CORS open) — same target from file:// (Electron) or http (dev)
 const $ = (id) => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
 const rand = (a, b) => a + Math.random() * (b - a);
