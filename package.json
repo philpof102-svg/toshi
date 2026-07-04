@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github:philpof102-svg/toshi"
+    "url": "git+https://github.com/philpof102-svg/toshi.git"
   },
   "keywords": [
     "mcp",
