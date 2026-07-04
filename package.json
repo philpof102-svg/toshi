@@ -13,7 +13,8 @@
     "toshi": "electron .",
     "desktop": "electron .",
     "brain": "node mcp/toshi-mcp.mjs",
-    "ask": "node tools/toshi.mjs ask"
+    "ask": "node tools/toshi.mjs ask",
+    "test": "node test/simulate.mjs"
   },
   "repository": {
     "type": "git",
