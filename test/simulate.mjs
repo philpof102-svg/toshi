@@ -163,7 +163,10 @@ async function runHttp() {
     // terminal connection: the `toshi` CLI POSTs /repo so the floating companion watches THAT terminal
     const h1 = await (await fetch('http://127.0.0.1:4820/health')).json();
     check('GET /health → reports watched repo', h1.ok === true && norm(h1.repo) === norm(REPO), JSON.stringify(h1).slice(0, 120));
-    const other = tmpdir(); // any other existing dir = "another terminal's repo"
+    // a UNIQUE fresh dir = "another terminal's repo" — never pre-indexed (tmpdir root once leaked into
+    // the graph via auto-index and made indexed:true honest-but-unexpected here)
+    const { mkdtempSync } = await import('node:fs');
+    const other = mkdtempSync(join(tmpdir(), 'toshi-watch-'));
     const sw = await (await fetch('http://127.0.0.1:4820/repo', {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: other }),
     })).json();
