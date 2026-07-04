@@ -22,7 +22,8 @@ const sub = (process.argv[2] || '').toLowerCase();
   toshi              float the companion watching this repo (or connect this repo to it)
   toshi show|hide    summon / hide the floating window     toshi toggle     flip it
   toshi collapse     fold into a small head                toshi expand     unfold
-  toshi setup        auto-float whenever zero starts (--remove undoes, --project scopes)
+  toshi setup        integrate: zero auto-float hook + register the MCP in openclaude
+                     (--mcp only · --hook only · --file <path> for Claude Desktop/Cline · --remove undoes)
   toshi version      print version
 grounded answers: npm i -g codebase-memory-mcp, then codebase-memory-mcp cli index_repository '{"repo_path":"<repo>"}'
 voice: install zero (github.com/gitlawb/zero) + zero setup — Toshi speaks through it.
@@ -35,12 +36,20 @@ docs: https://github.com/philpof102-svg/toshi`);
     return;
   }
   if (sub === 'setup') {
-    // the "auto-float when your agent starts" option, offered to everyone installing the CLI
-    const extra = process.argv.slice(3); // pass --remove / --project through
-    const r = require('node:child_process').spawnSync(process.execPath,
-      [path.join(ROOT, 'tools', 'install-zero-hook.mjs'), ...extra], { stdio: 'inherit' });
+    // one-command integration, offered to everyone installing the CLI:
+    //   toshi setup          → zero auto-float hook + register Toshi's MCP in openclaude (~/.openclaude.json)
+    //   toshi setup --mcp    → MCP registration only (--file <path> targets Claude Desktop / Cline / etc.)
+    //   toshi setup --hook   → zero sessionStart hook only
+    //   add --remove to undo either
+    const extra = process.argv.slice(3).filter((a) => a !== '--mcp' && a !== '--hook');
+    const onlyMcp = process.argv.includes('--mcp'), onlyHook = process.argv.includes('--hook');
+    const run = (script) => require('node:child_process').spawnSync(process.execPath,
+      [path.join(ROOT, 'tools', script), ...extra], { stdio: 'inherit' }).status || 0;
+    let code = 0;
+    if (!onlyMcp) code = run('install-zero-hook.mjs') || code;   // zero (github.com/gitlawb/zero)
+    if (!onlyHook) code = run('install-mcp.mjs') || code;         // openclaude + any Claude-Desktop-shape client
     console.log('\nother surfaces: toshi (float/connect) · toshi hide|show|toggle · npm run brain (MCP) · see README');
-    process.exit(r.status || 0);
+    process.exit(code);
   }
   if (['show', 'hide', 'toggle', 'collapse', 'expand'].includes(sub)) {
     try {
