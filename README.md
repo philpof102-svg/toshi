@@ -32,22 +32,34 @@ toshi/
 └── LICENSE                GPL-3.0 (the Toshi mascot is GPL-3.0, so this is too)
 ```
 
-## Run it (v0)
+## Run it
+
+**The floating companion (Clippy-energy)** — one command launches the mascot window *and* its brain:
 
 ```bash
-# 1. index your repo so Toshi can answer cheaply (MIT, local, no telemetry)
-npx codebase-memory-mcp            # or point Toshi at an already-running instance
-
-# 2. start Toshi's MCP + the /ask bridge the panel talks to
-node mcp/toshi-mcp.mjs             # serves POST /ask on :4820 and speaks MCP over stdio
-
-# 3. open the panel (as a WebView beside your terminal, or just in a browser)
-#    serves the real mascot from the tinyhumans manifest over the network
-open panel/index.html
+npm install          # once
+npm run toshi        # a frameless, always-on-top Toshi floats bottom-right, over any terminal
 ```
 
-Without step 1–2 the panel still renders the live mascot and runs in **honest demo mode** — it will *say* it can't
-read your session yet rather than invent an answer.
+Windows: just double-click **`toshi.bat`**. Drag Toshi by its header; hide it with ✕. It greets you with a
+wave, floats + blinks on its own, reacts when you ask, and bursts into a celebration when it has a *grounded*
+answer from your repo.
+
+**Make its answers real** — index your repo so `toshi_ask` reads the graph instead of guessing (token-cheap):
+
+```bash
+# get codebase-memory-mcp (MIT, local, no telemetry), then:
+codebase-memory-mcp cli index_repository '{"repo_path":"/abs/path/to/your/repo"}'
+# tell Toshi where the repo + binary are (optional; defaults to cwd / PATH):
+export TOSHI_REPO=/abs/path/to/your/repo
+export CODEBASE_MEMORY_BIN=/abs/path/to/codebase-memory-mcp
+```
+
+Until then Toshi runs in **honest demo mode** — the mascot is fully alive, and it *says* it can't read your
+session yet (with the exact index command) rather than inventing an answer.
+
+**Other surfaces:** `npm run brain` runs just the MCP (stdio + `/ask` on :4820) for any MCP client; `panel/index.html`
+opens standalone in a browser; `zero plugins add .` installs it as a [zero](https://github.com/gitlawb/zero) plugin.
 
 ## Honest status
 
