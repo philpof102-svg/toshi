@@ -97,6 +97,17 @@ function createWindow() {
           const img = await win.webContents.capturePage();
           require('node:fs').writeFileSync(out, img.toPNG());
           console.log('[shot] saved', out);
+          // TOSHI_SHOT_MINI=/path2.png → also capture the folded mini head (shows the mini bubble talking)
+          if (process.env.TOSHI_SHOT_MINI) {
+            await win.webContents.executeJavaScript('document.getElementById("min").click(), 1');
+            await new Promise((r) => setTimeout(r, 900)); // let the fold + canvas resize land
+            // show a short clean quip for the portrait (the leftover long answer clips badly at 116px)
+            await win.webContents.executeJavaScript('window.__toshi && window.__toshi.say ? (window.__toshi.say("👀 watching toshi", false, 6000), 1) : 1');
+            await new Promise((r) => setTimeout(r, 700));
+            const img2 = await win.webContents.capturePage();
+            require('node:fs').writeFileSync(process.env.TOSHI_SHOT_MINI, img2.toPNG());
+            console.log('[shot] saved mini', process.env.TOSHI_SHOT_MINI);
+          }
         } catch (e) { console.error('[shot] capture failed:', e.message); }
         app.quit();
       };

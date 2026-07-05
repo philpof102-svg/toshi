@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/philpof102-svg/toshi/actions/workflows/ci.yml/badge.svg)](https://github.com/philpof102-svg/toshi/actions/workflows/ci.yml)
 
-![Toshi answering from your repo](https://raw.githubusercontent.com/philpof102-svg/toshi/master/docs/toshi-panel.png)
+![Toshi answering from your repo — a real window capture, grounded answer "FROM YOUR REPO"](https://raw.githubusercontent.com/philpof102-svg/toshi/master/docs/toshi-answer.png)
 
 A tiny AI companion that lives **beside your terminal**, wearing the community-ready **Toshi** mascot from
 [tinyhumansai/mascots](https://github.com/tinyhumansai/mascots). It watches your [`gitlawb/zero`](https://github.com/gitlawb/zero)
