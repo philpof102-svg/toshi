@@ -7,4 +7,5 @@ contextBridge.exposeInMainWorld('toshiDesktop', {
   expand: () => ipcRenderer.send('toshi:win', 'expand'),
   hide: () => ipcRenderer.send('toshi:win', 'hide'),
   show: () => ipcRenderer.send('toshi:win', 'show'),
+  resize: (w, h) => ipcRenderer.send('toshi:resize', w, h),
 });

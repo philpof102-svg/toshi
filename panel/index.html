@@ -283,13 +283,14 @@ function setCollapsed(on) {
   setTimeout(() => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} document.body.classList.remove('no-anim'); }, 380);
 }
 $('min').addEventListener('click', (e) => { e.stopPropagation(); setCollapsed(true); });
-function runPanelCmd(cmd) {
+function runPanelCmd(cmd, size) {
   if (!cmd) return;
   if (cmd === 'collapse') setCollapsed(true);
   else if (cmd === 'expand') setCollapsed(false);
   else if (cmd === 'hide') { try { desk() && desk().hide(); } catch {} }
   else if (cmd === 'show') { setCollapsed(false); try { desk() && desk().show(); } catch {} setPose('hand_wave', '😺', 1800); }
   else if (cmd === 'toggle') runPanelCmd(document.hidden ? 'show' : 'hide');
+  else if (cmd === 'resize' && size) { try { desk() && desk().resize(size.w, size.h); } catch {} }
 }
 
 // companion pulse: every 2.5 min ask the brain for a kind, grounded comment about the session —
@@ -315,7 +316,7 @@ let watching = '';
 async function pollWatching() {
   try {
     const j = await (await fetch('http://127.0.0.1:4820/health')).json();
-    runPanelCmd(j.panelCmd); // one-shot window verb queued by the `toshi` CLI
+    runPanelCmd(j.panelCmd, j.panelSize); // one-shot window verb queued by the `toshi` CLI
     const base = String(j.repo || '').split(/[\\/]/).filter(Boolean).pop() || '';
     if (base && base !== watching) {
       const first = !watching; watching = base;

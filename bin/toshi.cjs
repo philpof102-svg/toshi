@@ -23,6 +23,7 @@ const sub = (process.argv[2] || '').toLowerCase();
   toshi ask "q"      answer about THIS repo right in the terminal (no window needed)
   toshi show|hide    summon / hide the floating window     toshi toggle     flip it
   toshi collapse     fold into a small head                toshi expand     unfold
+  toshi size <s>     resize: small | normal | large | xl | 340x520 (live if running)
   toshi setup        integrate: zero auto-float hook + register the MCP in openclaude
                      (--mcp only · --hook only · --file <path> for Claude Desktop/Cline · --remove undoes)
   toshi version      print version
@@ -34,6 +35,27 @@ docs: https://github.com/philpof102-svg/toshi`);
   }
   if (['version', '--version', '-v'].includes(sub)) {
     console.log('toshi-companion ' + require(path.join(ROOT, 'package.json')).version);
+    return;
+  }
+  if (sub === 'size') {
+    // toshi size small|normal|large|xl  |  toshi size 340x520  — persists to ~/.toshi.json + resizes live
+    const PRESETS = { small: [244, 372], normal: [300, 460], large: [372, 568], xl: [456, 700] };
+    const arg = (process.argv[3] || '').toLowerCase();
+    let w, h, out = {};
+    if (PRESETS[arg]) { [w, h] = PRESETS[arg]; out = { size: arg }; }
+    else { const m = arg.match(/^(\d{2,4})[x×](\d{2,4})$/); if (m) { w = +m[1]; h = +m[2]; out = { width: w, height: h }; } }
+    if (!w) { console.log('usage: toshi size small|normal|large|xl  |  toshi size 340x520'); process.exit(1); }
+    const cfgPath = path.join(require('node:os').homedir(), '.toshi.json');
+    let cur = {}; try { cur = JSON.parse(require('node:fs').readFileSync(cfgPath, 'utf8')) || {}; } catch {}
+    delete cur.size; delete cur.width; delete cur.height; // one size source wins
+    require('node:fs').writeFileSync(cfgPath, JSON.stringify({ ...cur, ...out }, null, 2));
+    // resize the running companion now (else it applies on next launch)
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 700);
+      const r = await fetch(`http://127.0.0.1:${PORT}/panel`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'resize', w, h }), signal: ctl.signal });
+      clearTimeout(t);
+      console.log(`🐈  Toshi size → ${w}×${h}` + (r.ok ? ' (applied live)' : ' (saved — applies next launch)'));
+    } catch { console.log(`🐈  Toshi size → ${w}×${h} (saved — applies next launch)`); }
     return;
   }
   if (sub === 'ask') {

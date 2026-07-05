@@ -3,10 +3,25 @@
 // (mcp/toshi-mcp.mjs → /ask on :4820) so one launch = the face + the brain. Quit closes both.
 const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const path = require('node:path');
+const os = require('node:os');
+const fs = require('node:fs');
 const { spawn } = require('node:child_process');
 
 const ROOT = path.join(__dirname, '..');
 let brain = null;
+
+// ── window size: presets or custom WxH, persisted to ~/.toshi.json, env-overridable ────────────────
+const CFG_PATH = path.join(os.homedir(), '.toshi.json');
+const PRESETS = { small: [244, 372], normal: [300, 460], large: [372, 568], xl: [456, 700] };
+const clamp = (w, h) => [Math.max(180, Math.min(960, Math.round(w))), Math.max(260, Math.min(1280, Math.round(h)))];
+function readCfg() { try { return JSON.parse(fs.readFileSync(CFG_PATH, 'utf8')) || {}; } catch { return {}; } }
+function resolveSize() {
+  const c = readCfg(); let w = 300, h = 460;
+  if (c.size && PRESETS[c.size]) [w, h] = PRESETS[c.size];
+  if (Number(c.width) && Number(c.height)) { w = Number(c.width); h = Number(c.height); }
+  if (Number(process.env.TOSHI_W) && Number(process.env.TOSHI_H)) { w = Number(process.env.TOSHI_W); h = Number(process.env.TOSHI_H); }
+  return clamp(w, h);
+}
 
 function startBrain() {
   try {
@@ -20,7 +35,7 @@ function startBrain() {
 }
 
 function createWindow() {
-  const W = 300, H = 460, GAP = 20;
+  let [W, H] = resolveSize(); const GAP = 20;
   const wa = screen.getPrimaryDisplay().workArea;
   const win = new BrowserWindow({
     width: W, height: H,
@@ -43,6 +58,11 @@ function createWindow() {
       else if (act === 'hide') win.hide();
       else if (act === 'show') { win.show(); win.focus(); }
     } catch {}
+  });
+  // live resize (from `toshi size …` / the panel size buttons) — re-anchor to the bottom-right corner
+  ipcMain.on('toshi:resize', (_e, w, h) => {
+    try { [W, H] = clamp(w, h); const b = win.getBounds();
+      win.setBounds({ x: b.x + b.width - W, y: b.y + b.height - H, width: W, height: H }); } catch {}
   });
   // Do NOT use the 'screen-saver' always-on-top level — on Windows it makes the window refuse keyboard
   // focus (you couldn't type). Plain alwaysOnTop keeps it above normal windows AND typable.
