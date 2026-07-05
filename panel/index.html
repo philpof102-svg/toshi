@@ -104,10 +104,17 @@
   .ask button:disabled{opacity:.5; transform:none}
   .foot{padding:5px 10px 8px; color:var(--faint); font-size:8px; letter-spacing:.03em; text-align:center; -webkit-app-region:no-drag}
   .foot a{color:var(--dim); text-decoration:none}
-  /* mini mode — the ─ button folds the pod into a small floating head (Toshi stays, click to expand) */
-  body.mini .pod{width:116px; height:116px; border-radius:26px; cursor:pointer}
+  /* mini mode — the ─ button folds the pod into a small floating head. Draggable (whole head moves the
+     window), with a tiny no-drag ⤢ button to expand (a drag region swallows clicks, so expand needs its own). */
+  body.mini .pod{width:116px; height:116px; border-radius:26px; cursor:grab; -webkit-app-region:drag}
+  body.mini .pod:active{cursor:grabbing}
   body.mini .head, body.mini .chips, body.mini .ask, body.mini .foot, body.mini .bubble{display:none}
   body.mini .stage::after{display:none}
+  .mexp{display:none}
+  body.mini .mexp{display:grid; place-items:center; position:absolute; top:5px; right:5px; z-index:5;
+    width:22px; height:22px; border-radius:7px; border:1px solid rgba(0,82,255,.4); background:rgba(7,11,25,.75);
+    color:#cbd5e1; font-size:12px; line-height:1; cursor:pointer; -webkit-app-region:no-drag; padding:0}
+  body.mini .mexp:hover{color:#fff; background:var(--base)}
   @media (prefers-reduced-motion:reduce){ .pod,.dot,.floaty,.spark{animation:none !important} }
 </style>
 </head>
@@ -121,6 +128,7 @@
       <button class="x" id="x" title="quit" aria-label="quit Toshi">✕</button>
     </div>
 
+    <button class="mexp" id="mexp" title="expand" aria-label="expand Toshi">⤢</button>
     <div class="stage">
       <div class="floaty" id="floaty"><canvas id="toshi" width="620" height="820"></canvas></div>
       <div class="loading" id="loading">waking Toshi…</div>
@@ -283,6 +291,7 @@ function setCollapsed(on) {
   setTimeout(() => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} document.body.classList.remove('no-anim'); }, 380);
 }
 $('min').addEventListener('click', (e) => { e.stopPropagation(); setCollapsed(true); });
+$('mexp').addEventListener('click', (e) => { e.stopPropagation(); setCollapsed(false); }); // no-drag expand in mini mode
 function runPanelCmd(cmd, size) {
   if (!cmd) return;
   if (cmd === 'collapse') setCollapsed(true);
