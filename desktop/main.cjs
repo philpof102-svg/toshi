@@ -47,14 +47,25 @@ function createWindow() {
     // backgroundThrottling:false — a hidden window must keep polling /health so `toshi show` answers in ~4s
     webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(__dirname, 'preload.cjs'), backgroundThrottling: false },
   });
+  // Keep a window fully ON-SCREEN. Without this, collapse/expand/resize re-anchor to a corner and can push
+  // the window (and its only drag handle — the header) off the top/left edge, stranding it (Phil hit this:
+  // minimized near the top → expand computed a negative Y → header above the screen, un-draggable).
+  const fitOnScreen = (bx) => {
+    const wa = screen.getDisplayMatching(win.getBounds()).workArea;
+    return {
+      width: bx.width, height: bx.height,
+      x: Math.max(wa.x, Math.min(bx.x, wa.x + wa.width - bx.width)),
+      y: Math.max(wa.y, Math.min(bx.y, wa.y + wa.height - bx.height)),
+    };
+  };
   // window verbs from the panel (─ button) and the `toshi show/hide/toggle` CLI (via brain /panel → poll).
   // collapse keeps the mini head anchored where the pod's bottom-right corner was; expand restores.
   const MINI = 116;
   ipcMain.on('toshi:win', (_e, act) => {
     try {
       const b = win.getBounds();
-      if (act === 'collapse') win.setBounds({ x: b.x + b.width - MINI, y: b.y + b.height - MINI, width: MINI, height: MINI });
-      else if (act === 'expand') win.setBounds({ x: b.x + b.width - W, y: b.y + b.height - H, width: W, height: H });
+      if (act === 'collapse') win.setBounds(fitOnScreen({ x: b.x + b.width - MINI, y: b.y + b.height - MINI, width: MINI, height: MINI }));
+      else if (act === 'expand') win.setBounds(fitOnScreen({ x: b.x + b.width - W, y: b.y + b.height - H, width: W, height: H }));
       else if (act === 'hide') win.hide();
       else if (act === 'show') { win.show(); win.focus(); }
     } catch {}
@@ -62,7 +73,7 @@ function createWindow() {
   // live resize (from `toshi size …` / the panel size buttons) — re-anchor to the bottom-right corner
   ipcMain.on('toshi:resize', (_e, w, h) => {
     try { [W, H] = clamp(w, h); const b = win.getBounds();
-      win.setBounds({ x: b.x + b.width - W, y: b.y + b.height - H, width: W, height: H }); } catch {}
+      win.setBounds(fitOnScreen({ x: b.x + b.width - W, y: b.y + b.height - H, width: W, height: H })); } catch {}
   });
   // Do NOT use the 'screen-saver' always-on-top level — on Windows it makes the window refuse keyboard
   // focus (you couldn't type). Plain alwaysOnTop keeps it above normal windows AND typable.
