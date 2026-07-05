@@ -11,7 +11,7 @@
   },
   "files": [
     "bin/", "lib/", "mcp/", "panel/", "tools/", "desktop/",
-    "plugin.json", "serve.js", "toshi.bat", "server.json",
+    "plugin.json", "serve.js", "toshi.bat", "server.json", "smithery.yaml",
     "README.md", "LICENSE", "ATTRIBUTION.md"
   ],
   "scripts": {

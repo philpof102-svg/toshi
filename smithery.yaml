@@ -1,0 +1,35 @@
+version: 1
+type: stdio
+runtime: node
+
+startCommand:
+  type: stdio
+  command: npx
+  args:
+    - -y
+    - toshi-companion
+    - toshi-mcp
+
+metadata:
+  displayName: Toshi — terminal companion
+  description: |
+    A floating companion that answers questions about the repo you're in — grounded in a code graph
+    (via codebase-memory-mcp), never invented. Registers as an MCP server so any client (openclaude,
+    Claude Code, Cline) gets its tools.
+
+    Tools:
+      - toshi_ask     — ask about the current repo/session (grounded; honest when it can't answer)
+      - toshi_status  — what repo Toshi is watching + its backend
+      - toshi_mood    — set the mascot expression (cosmetic)
+      - toshi_watch   — point Toshi at a repo (auto-indexes it on connect)
+
+    GPL-3.0. Mascot by tinyhumans. Optional voice via the zero CLI or any OpenAI-compatible endpoint.
+  homepage: https://github.com/philpof102-svg/toshi
+  repository: https://github.com/philpof102-svg/toshi
+  license: GPL-3.0-only
+  keywords:
+    - terminal
+    - companion
+    - codebase-memory
+    - mascot
+    - zero
