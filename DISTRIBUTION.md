@@ -26,9 +26,12 @@ npx @modelcontextprotocol/publisher publish   # or the current mcp-publisher; fo
 
 **3. X / Farcaster** — the launch post + tags are drafted (see the tweet drafts). Manual publish.
 
-**4. (optional) A gitlawb mirror** — no gitlawb git remote exists yet and `git.gitlawb.com` doesn't resolve.
-   If you have a gitlawb-hosted git URL, add it and I'll push a mirror:
-   `git remote add gitlawb <url> && git push gitlawb master --tags`
+**4. gitlawb — the loop-closer** — Toshi rides zero (`@gitlawb/zero`) so its code should live on the
+   gitlawb network too (DID identity, signed pushes, `gitlawb://` transport — see gitlawb.com/start).
+   Everything is scripted: `tools/publish-gitlawb.sh` (installs gl, creates/reuses the DID, registers,
+   creates the `toshi` repo, mirrors master). ⚠️ The gl CLI is **macOS/Linux only** (the npm package
+   refuses win32) — on Windows run it inside WSL: `wsl bash tools/publish-gitlawb.sh`. The DID keypair
+   lands in `~/.gitlawb/identity.pem` — **back it up**; it IS the account.
 
 ## Do NOT
 - Open issues/PRs announcing Toshi on other people's repos (reads as spam — already happened once).
