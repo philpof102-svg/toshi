@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# ./toshi — run Toshi straight from the repo without a global install. GPL-3.0.
+# Same CLI as the installed `toshi` (float / ask / show / size / setup …). Windows: use toshi.cmd.
+exec node "$(dirname "$0")/bin/toshi.cjs" "$@"

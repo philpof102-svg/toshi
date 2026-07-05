@@ -108,8 +108,13 @@
      window), with a tiny no-drag ⤢ button to expand (a drag region swallows clicks, so expand needs its own). */
   body.mini .pod{width:116px; height:116px; border-radius:26px; cursor:grab; -webkit-app-region:drag}
   body.mini .pod:active{cursor:grabbing}
-  body.mini .head, body.mini .chips, body.mini .ask, body.mini .foot, body.mini .bubble{display:none}
+  body.mini .head, body.mini .chips, body.mini .ask, body.mini .foot{display:none}
   body.mini .stage::after{display:none}
+  /* mini can still SPEAK — a compact bubble overlays the top of the little head (fits inside 116×116).
+     Hidden until say() adds .on, so it only appears when Toshi actually has something to say. */
+  body.mini .bubble{left:5px; right:31px; top:5px; bottom:auto; max-height:74%; font-size:8.5px; line-height:1.3;
+    padding:5px 7px; border-radius:12px; background:rgba(7,11,25,.94); -webkit-app-region:no-drag; z-index:4}
+  body.mini .bubble .who{display:none}
   .mexp{display:none}
   body.mini .mexp{display:grid; place-items:center; position:absolute; top:5px; right:5px; z-index:5;
     width:22px; height:22px; border-radius:7px; border:1px solid rgba(0,82,255,.4); background:rgba(7,11,25,.75);
@@ -289,7 +294,16 @@ function setCollapsed(on) {
   collapsed = on; document.body.classList.add('no-anim'); document.body.classList.toggle('mini', on);
   try { desk() && desk()[on ? 'collapse' : 'expand'](); } catch {}
   setTimeout(() => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} document.body.classList.remove('no-anim'); }, 380);
+  // mini can talk now — greet on fold so you see the bubble works; expanding clears it
+  if (on) setTimeout(() => say(pick(MINI_HELLOS)(watching || 'your repo'), false, 4200), 420);
+  else { const b = $('bubble'); if (b) b.classList.remove('on'); }
 }
+// short things Toshi says from the little head (local, no tokens) — pulse comments still show here too
+const MINI_HELLOS = [
+  (r) => `👀 watching ${r}`, () => 'still here 😺', () => 'tap ⤢ to open me', (r) => `${r} looks good`, () => 'prr prr 🐾',
+];
+// every few minutes while minimized & idle, a tiny quip so the mini head feels alive (pulse handles real events)
+setInterval(() => { if (collapsed && !busy && !document.hidden) say(pick(MINI_HELLOS)(watching || 'your repo'), false, 4000); }, 210000);
 $('min').addEventListener('click', (e) => { e.stopPropagation(); setCollapsed(true); });
 $('mexp').addEventListener('click', (e) => { e.stopPropagation(); setCollapsed(false); }); // no-drag expand in mini mode
 function runPanelCmd(cmd, size) {
