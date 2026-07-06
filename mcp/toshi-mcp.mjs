@@ -33,6 +33,7 @@ const TOOLS = [
 let mood = 'idle';
 let panelCmd = null; // one-shot window verb queued by `toshi show|hide|toggle|resize` (POST /panel)
 let panelSize = null; // {w,h} paired with a 'resize' panelCmd
+let lastWindowPing = 0; // last time the electron panel polled /health?w=1 — distinguishes a live popup from a headless brain
 
 // ── MCP over stdio (newline-delimited JSON-RPC) ──────────────────────────────────────────────────
 const send = (o) => process.stdout.write(JSON.stringify(o) + '\n');
@@ -64,8 +65,13 @@ const httpServer = http.createServer(async (req, res) => {
   res.setHeader('access-control-allow-origin', '*');
   res.setHeader('access-control-allow-headers', 'content-type');
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-  if (req.method === 'GET' && req.url === '/health') { // who am I watching? (panel poll + `toshi` CLI probe)
-    const out = { ok: true, ...status(), mood, panelCmd, panelSize }; panelCmd = null; panelSize = null; // deliver once
+  if (req.method === 'GET' && req.url.startsWith('/health')) { // who am I watching? (panel poll + `toshi` CLI probe)
+    // The panel polls with ?w=1 → that's a live WINDOW heartbeat. The brain (this MCP) can run headless
+    // (spawned by zero/openclaude) with NO popup, so `toshi` must tell "brain up" from "window up": if no
+    // window pinged in the last ~9s, `toshi` floats the electron popup instead of assuming one exists.
+    if (/[?&]w=1/.test(req.url)) lastWindowPing = Date.now();
+    const windowAlive = Date.now() - lastWindowPing < 9000;
+    const out = { ok: true, ...status(), mood, panelCmd, panelSize, windowAlive }; panelCmd = null; panelSize = null; // deliver once
     res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify(out));
   }
   if (req.method === 'POST' && req.url === '/panel') { // `toshi show|hide|toggle|resize` → panel picks it up on poll

@@ -341,7 +341,7 @@ $('x').addEventListener('click', () => { try { window.close(); } catch {} docume
 let watching = '';
 async function pollWatching() {
   try {
-    const j = await (await fetch('http://127.0.0.1:4820/health')).json();
+    const j = await (await fetch('http://127.0.0.1:4820/health?w=1')).json(); // ?w=1 = "a popup window is alive"
     runPanelCmd(j.panelCmd, j.panelSize); // one-shot window verb queued by the `toshi` CLI
     const base = String(j.repo || '').split(/[\\/]/).filter(Boolean).pop() || '';
     if (base && base !== watching) {

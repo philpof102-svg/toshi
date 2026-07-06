@@ -157,7 +157,10 @@ docs: https://github.com/philpof102-svg/toshi`);
       console.log(`🐈  Toshi is now watching ${j.repo}` + (j.indexed
         ? ' — grounded ✨'
         : `\n    (not indexed yet — for grounded answers run: codebase-memory-mcp cli index_repository '{"repo_path":"${repo.replace(/\\/g, '/')}"}')`));
-      return;
+      // brain up AND a popup window is alive → done. But the brain can run HEADLESS (spawned by
+      // zero/openclaude as an MCP) with no window — then still float the electron popup so the user sees it.
+      if (j.windowAlive) return;
+      console.log('    (brain was headless — floating the popup window now…)');
     }
   } catch { /* no companion running — launch one */ }
 
