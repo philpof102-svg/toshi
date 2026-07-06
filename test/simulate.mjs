@@ -21,6 +21,12 @@ const pexec = promisify(execFile);
 const REPO = resolve(process.env.TOSHI_REPO || process.cwd());
 const norm = (p) => String(p || '').replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
 
+// Grounded-layer tests assert the STRUCTURAL answer (routing + retrieved facts) — that must be deterministic,
+// independent of whether the dev machine happens to have a live provider key/model. So force the LLM voice
+// OFF here (speak()/chat() paraphrase non-deterministically and would break substring assertions the moment
+// a working model like minimax is configured). The dedicated VOICE test re-enables voice for its own case.
+if (!process.env.TOSHI_LLM) process.env.TOSHI_LLM = 'off';
+
 let pass = 0, fail = 0, skip = 0;
 const C = { g: '\x1b[32m', r: '\x1b[31m', y: '\x1b[33m', d: '\x1b[2m', x: '\x1b[0m' };
 function check(label, cond, detail = '') {
@@ -237,13 +243,17 @@ async function runMcp() {
 // ── VOICE: NL synthesis through the zero CLI (optional — skips when zero isn't installed) ──────────
 async function runVoice() {
   console.log(`\n${C.d}VOICE — grounded NL synthesis via the zero CLI${C.x}`);
-  const { hasVoice, speak } = await import('../lib/llm.mjs');
-  if (!hasVoice()) { skipped('VOICE (1 case)', 'zero CLI not installed or TOSHI_LLM=off'); return; }
-  const out = await speak('qui appelle summarize ?',
-    'summarize:\ncallers →\n• ask (hop 1)\ncallees →\n• j (hop 1)', 'toshi');
-  check('speak() → short grounded reply (or honest null fallback)',
-    out === null || (typeof out === 'string' && out.length > 2 && /ask/i.test(out)),
-    JSON.stringify(out).slice(0, 140));
+  // Re-enable voice for THIS test only (the module forced it off for deterministic grounded assertions).
+  const savedLLM = process.env.TOSHI_LLM; delete process.env.TOSHI_LLM;
+  try {
+    const { hasVoice, speak } = await import('../lib/llm.mjs');
+    if (!hasVoice()) { skipped('VOICE (1 case)', 'no provider key / zero not installed'); return; }
+    const out = await speak('qui appelle summarize ?',
+      'summarize:\ncallers →\n• ask (hop 1)\ncallees →\n• j (hop 1)', 'toshi');
+    check('speak() → short grounded reply (or honest null fallback)',
+      out === null || (typeof out === 'string' && out.length > 2 && /ask/i.test(out)),
+      JSON.stringify(out).slice(0, 140));
+  } finally { if (savedLLM !== undefined) process.env.TOSHI_LLM = savedLLM; }
 }
 
 // ── CHAT: the free-conversation fallback (lib/llm.mjs chat) — must degrade gracefully ──────────────
