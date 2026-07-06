@@ -24,7 +24,7 @@ const sub = (process.argv[2] || '').toLowerCase();
   toshi show|hide    summon / hide the floating window     toshi toggle     flip it
   toshi collapse     fold into a small head                toshi expand     unfold
   toshi size <s>     resize: small | normal | large | xl | 340x520 (live if running)
-  toshi setup        integrate: zero auto-float hook + register the MCP in openclaude
+  toshi setup        ONE-COMMAND onboarding: install the brain + index THIS repo + wire zero/openclaude/Claude Code + float the popup (--no-float to skip · --remove to undo)
                      (--mcp only · --hook only · --file <path> for Claude Desktop/Cline · --remove undoes)
   toshi version      print version
 grounded answers: npm i -g codebase-memory-mcp, then codebase-memory-mcp cli index_repository '{"repo_path":"<repo>"}'
@@ -90,20 +90,45 @@ docs: https://github.com/philpof102-svg/toshi`);
     return;
   }
   if (sub === 'setup') {
-    // one-command integration, offered to everyone installing the CLI:
-    //   toshi setup          → zero auto-float hook + register Toshi's MCP in openclaude (~/.openclaude.json)
+    // THE one-command onboarding for a brand-new user (any terminal, any model):
+    //   toshi setup          → install the grounded brain + index THIS repo + wire zero/openclaude/Claude Code
+    //                          + FLOAT the popup so you see it working immediately ("setup → working").
     //   toshi setup --mcp    → MCP registration only (--file <path> targets Claude Desktop / Cline / etc.)
     //   toshi setup --hook   → zero sessionStart hook only
-    //   add --remove to undo either
-    const extra = process.argv.slice(3).filter((a) => a !== '--mcp' && a !== '--hook');
+    //   toshi setup --no-float → wire everything but don't launch the popup (headless/CI)
+    //   add --remove to undo the hook + MCP
+    const cp = require('node:child_process');
+    const extra = process.argv.slice(3).filter((a) => !['--mcp', '--hook', '--no-float'].includes(a));
     const onlyMcp = process.argv.includes('--mcp'), onlyHook = process.argv.includes('--hook');
-    const run = (script) => require('node:child_process').spawnSync(process.execPath,
-      [path.join(ROOT, 'tools', script), ...extra], { stdio: 'inherit' }).status || 0;
+    const removing = process.argv.includes('--remove');
+    const noFloat = process.argv.includes('--no-float') || removing;
+    const run = (script) => cp.spawnSync(process.execPath, [path.join(ROOT, 'tools', script), ...extra], { stdio: 'inherit' }).status || 0;
     let code = 0;
+    // 1. the grounded brain: install codebase-memory-mcp if missing (best-effort), then index THIS repo so
+    //    Toshi answers from real code on the very first question — the difference between grounded and guessing.
+    if (!removing && !onlyMcp && !onlyHook) {
+      const have = cp.spawnSync(process.execPath, ['-e', "require.resolve('codebase-memory-mcp')"], { stdio: 'ignore' }).status === 0
+        || cp.spawnSync('codebase-memory-mcp', ['--version'], { stdio: 'ignore', shell: true }).status === 0;
+      if (!have) { console.log('🐈  installing the grounded brain (codebase-memory-mcp)…'); cp.spawnSync('npm', ['i', '-g', 'codebase-memory-mcp'], { stdio: 'inherit', shell: true }); }
+      // resolve the real binary (execFile can't run the .cmd shim on Windows; PATH shim works on POSIX) and
+      // pass the JSON as ONE arg with a forward-slash path — no shell, or Windows cmd mangles the quotes.
+      const isWin = process.platform === 'win32';
+      const exeName = isWin ? 'codebase-memory-mcp.exe' : 'codebase-memory-mcp';
+      const roots = [process.env.npm_config_prefix, isWin && process.env.APPDATA && path.join(process.env.APPDATA, 'npm'), '/usr/local', '/opt/homebrew', process.env.HOME && path.join(process.env.HOME, '.npm-global')].filter(Boolean);
+      let bin = 'codebase-memory-mcp';
+      for (const r of roots) for (const rel of [['node_modules'], ['lib', 'node_modules']]) { const p = path.join(r, ...rel, 'codebase-memory-mcp', 'bin', exeName); if (require('node:fs').existsSync(p)) { bin = p; break; } }
+      console.log(`🐈  indexing ${repo} for grounded answers…`);
+      try { cp.spawnSync(bin, ['cli', 'index_repository', JSON.stringify({ repo_path: repo.replace(/\\/g, '/') })], { stdio: 'inherit', timeout: 120000 }); } catch {}
+    }
+    // 2. wire the surfaces: zero auto-float hook + MCP in openclaude/Claude Code/zero
     if (!onlyMcp) code = run('install-zero-hook.mjs') || code;   // zero (github.com/gitlawb/zero)
-    if (!onlyHook) code = run('install-mcp.mjs') || code;         // openclaude + any Claude-Desktop-shape client
-    console.log('\nother surfaces: toshi (float/connect) · toshi hide|show|toggle · npm run brain (MCP) · see README');
-    process.exit(code);
+    if (!onlyHook) code = run('install-mcp.mjs') || code;         // openclaude + Claude Code + zero (via its CLI)
+    if (removing) { console.log('🐈  Toshi unwired (zero hook + MCP removed).'); process.exit(code); }
+    console.log(`\n🐈  SETUP DONE — Toshi is wired into zero + openclaude + Claude Code, grounded on ${repo}.`);
+    console.log('    ask from anywhere: toshi ask "what changed?"  ·  in zero it auto-floats on session start');
+    if (noFloat) { console.log('    (skipped the popup — run `toshi` to float it)'); process.exit(code); }
+    console.log('    launching the floating companion now…\n');
+    // fall through → the launch flow below floats the popup on THIS repo (the "working" state)
   }
   if (['show', 'hide', 'toggle', 'collapse', 'expand'].includes(sub)) {
     try {
