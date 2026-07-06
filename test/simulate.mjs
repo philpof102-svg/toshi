@@ -61,18 +61,20 @@ const CORE = [
   ['qui appelle summarize ?',          'trace_call_path', (a) => /callers/.test(a), 'FR: qui appelle → trace'],
   ['montre-moi la structure du projet','get_architecture',(a) => /nodes?/i.test(a), 'FR: structure → architecture'],
   // robustness — unmatched questions get a HELP answer (what Toshi can do), not a repeated silent default
-  ['',                                 'help',            (a) => /demande|what changed/i.test(a), 'empty query → help, no crash'],
-  ['where is fooBarDoesNotExist9000?', 'search_graph',    (a) => /nothing/i.test(a), 'unknown symbol → honest "nothing"'],
-  ['zzqq random noise words here',     'help',            (a) => /demande|what changed/i.test(a), 'garbage → help (no more looped default)'],
-  ['salut toshi',                      'help',            (a) => /où est|where is/i.test(a), 'greeting → help lists abilities'],
+  ['',                                 'help',            (a) => /demande|what changed/i.test(a), 'empty query → help greeting, no crash'],
+  ['where is fooBarDoesNotExist9000?', 'search_graph',    (a) => /nothing/i.test(a), 'unknown symbol → honest "nothing" (grounded, NOT chat)'],
+  // conversational / unmatched → the chat fallback (lib/session ask → llm chat) when a model is reachable,
+  // else the honest abilities greeting. Either is correct; both stay grounded:false + tool:'help'.
+  ['zzqq random noise words here',     'help',            (a, r) => r.chat === true || /demande|what changed/i.test(a), 'garbage → chat OR help greeting'],
+  ['salut toshi',                      'help',            (a, r) => r.chat === true || /où est|where is/i.test(a), 'greeting → chat OR help greeting'],
 ];
 
 async function runCore() {
   console.log(`\n${C.d}CORE — ask() against the live graph (${REPO})${C.x}`);
   for (const [q, tool, pred, label] of CORE) {
     let r; try { r = await ask(q); } catch (e) { check(label, false, 'threw: ' + e.message); continue; }
-    const wantGrounded = tool !== 'help'; // help is honestly non-grounded (no graph call)
-    const ok = r.grounded === wantGrounded && r.tool === tool && pred(r.answer);
+    const wantGrounded = tool !== 'help'; // help is honestly non-grounded (greeting or chat fallback)
+    const ok = r.grounded === wantGrounded && r.tool === tool && pred(r.answer, r);
     check(label, ok, `got tool=${r.tool} grounded=${r.grounded} · ${JSON.stringify(r.answer).slice(0, 90)}`);
   }
 }
@@ -244,6 +246,26 @@ async function runVoice() {
     JSON.stringify(out).slice(0, 140));
 }
 
+// ── CHAT: the free-conversation fallback (lib/llm.mjs chat) — must degrade gracefully ──────────────
+async function runChat() {
+  console.log(`\n${C.d}CHAT — free-conversation fallback (lib/llm.mjs chat)${C.x}`);
+  const { chat } = await import('../lib/llm.mjs');
+  check('chat() is exported', typeof chat === 'function');
+  // graceful degradation: with the voice turned off (no usable model), chat MUST return null — never throw.
+  // Run it isolated with TOSHI_LLM=off so the result is deterministic regardless of the machine's keys/zero.
+  const off = await new Promise((res) => {
+    const code = `import('./lib/llm.mjs').then(async m => { let r; try { r = await m.chat('salut, ça va ?'); } catch (e) { return process.stdout.write('THREW:' + e.message); } process.stdout.write(JSON.stringify(r)); }).catch(e => process.stdout.write('THREW:' + e.message));`;
+    const child = spawn(process.execPath, ['--input-type=module', '-e', code],
+      { cwd: REPO, env: { ...process.env, TOSHI_LLM: 'off' } });
+    let out = ''; child.stdout.on('data', (d) => (out += d)); child.stderr.on('data', () => {});
+    child.on('close', () => res(out));
+  });
+  check('chat() with no voice → null, never throws', off === 'null', off.slice(0, 80));
+  // empty query short-circuits to null without touching the network (guarded in chat())
+  const empty = await chat('   ');
+  check('chat("   ") → null (empty guarded)', empty === null, JSON.stringify(empty));
+}
+
 // ── main ────────────────────────────────────────────────────────────────────────────────────────
 (async () => {
   console.log(`Toshi use-case simulation\n${C.d}status: ${JSON.stringify(status())}${C.x}`);
@@ -258,6 +280,7 @@ async function runVoice() {
   }
   await runMcp();     // stdio MCP contract (the openclaude / Claude Code load path) — always runnable
   await runVoice();   // optional layer — self-skips without the zero CLI
+  await runChat();    // free-conversation fallback — always runnable (tests the no-voice degrade path)
   await runDegrade(); // always runnable — it tests the no-backend path itself
 
   console.log(`\n${pass} passed · ${fail} failed · ${skip} skipped`);

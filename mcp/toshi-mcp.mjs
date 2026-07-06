@@ -13,7 +13,11 @@ import { speak, hasVoice, voiceKind } from '../lib/llm.mjs';
 // a 1-3 sentence NL reply synthesized by the zero CLI from the retrieved facts only.
 async function askSpoken(q) {
   const r = await ask(q);
-  if (hasVoice()) {
+  // Only re-synthesize GROUNDED answers (turn the retrieved facts into a warm NL reply). A chat reply
+  // (r.chat) is ALREADY natural language straight from lib/llm.mjs chat() — running it back through the
+  // grounded speak() would wrongly re-constrain it to "FACTS" and flatten it to "I don't have that in
+  // view". Leave chat/greeting answers exactly as ask() produced them.
+  if (r.grounded && hasVoice()) {
     const base = status().repo.split(/[\\/]/).filter(Boolean).pop();
     const spoken = await speak(q, r.answer, base);
     if (spoken) r.spoken = spoken;

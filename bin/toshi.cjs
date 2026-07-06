@@ -24,12 +24,14 @@ const sub = (process.argv[2] || '').toLowerCase();
   toshi show|hide    summon / hide the floating window     toshi toggle     flip it
   toshi collapse     fold into a small head                toshi expand     unfold
   toshi size <s>     resize: small | normal | large | xl | 340x520 (live if running)
+  toshi model <id>   pick Toshi's brain model, persisted to ~/.toshi.json (e.g. minimax/minimax-m3). No arg = show current · --clear = provider default
   toshi setup        ONE-COMMAND onboarding: install the brain + index THIS repo + wire zero/openclaude/Claude Code + float the popup (--no-float to skip · --remove to undo)
                      (--mcp only · --hook only · --file <path> for Claude Desktop/Cline · --remove undoes)
   toshi version      print version
 grounded answers: npm i -g codebase-memory-mcp, then codebase-memory-mcp cli index_repository '{"repo_path":"<repo>"}'
-voice: install zero (github.com/gitlawb/zero) + zero setup — Toshi speaks through it.
-       no zero? set TOSHI_API_URL + TOSHI_API_KEY + TOSHI_API_MODEL (any OpenAI-compatible endpoint). TOSHI_LLM=off disables.
+voice + chat: install zero (github.com/gitlawb/zero) + zero setup — Toshi speaks AND free-chats through it.
+       no zero? set a provider key (OPENROUTER_API_KEY / XAI / GROQ / OPENAI) or TOSHI_API_URL + TOSHI_API_KEY (any OpenAI-compatible endpoint).
+       pick the model with:  toshi model <id>  (e.g. minimax/minimax-m3). TOSHI_LLM=off disables voice + chat.
 docs: https://github.com/philpof102-svg/toshi`);
     return;
   }
@@ -56,6 +58,34 @@ docs: https://github.com/philpof102-svg/toshi`);
       clearTimeout(t);
       console.log(`🐈  Toshi size → ${w}×${h}` + (r.ok ? ' (applied live)' : ' (saved — applies next launch)'));
     } catch { console.log(`🐈  Toshi size → ${w}×${h} (saved — applies next launch)`); }
+    return;
+  }
+  if (sub === 'model') {
+    // toshi model <id>  — persist the brain model to ~/.toshi.json (read by lib/llm.mjs when TOSHI_API_MODEL
+    // isn't set). Works with any provider key (OPENROUTER_API_KEY, …) or a full TOSHI_API_URL+KEY config.
+    //   toshi model                 → show the current model (or that none is set)
+    //   toshi model minimax/minimax-m3   → use MiniMax M3 (via OpenRouter, the exact id from openrouter.ai/models)
+    //   toshi model --clear         → back to each provider's built-in default
+    const cfgPath = path.join(require('node:os').homedir(), '.toshi.json');
+    let cur = {}; try { cur = JSON.parse(require('node:fs').readFileSync(cfgPath, 'utf8')) || {}; } catch {}
+    const arg = (process.argv[3] || '').trim();
+    if (!arg) {
+      console.log(cur.model
+        ? `🐈  Toshi brain model: ${cur.model}  (from ~/.toshi.json)`
+        : '🐈  no model set — using the TOSHI_API_MODEL env or the provider default.\n    set one:  toshi model minimax/minimax-m3');
+      return;
+    }
+    if (['--clear', 'clear', 'none', 'default', 'reset'].includes(arg.toLowerCase())) {
+      delete cur.model;
+      require('node:fs').writeFileSync(cfgPath, JSON.stringify(cur, null, 2));
+      console.log('🐈  Toshi model cleared — back to the env / provider default.');
+      return;
+    }
+    cur.model = arg;
+    require('node:fs').writeFileSync(cfgPath, JSON.stringify(cur, null, 2));
+    console.log(`🐈  Toshi brain model → ${arg}  (saved to ~/.toshi.json)`);
+    console.log('    make sure a provider key is set — e.g. OPENROUTER_API_KEY, or TOSHI_API_URL + TOSHI_API_KEY.');
+    console.log('    (TOSHI_API_MODEL in the environment still overrides this if set.)');
     return;
   }
   if (sub === 'ask') {

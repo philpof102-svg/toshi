@@ -63,10 +63,52 @@ export CODEBASE_MEMORY_BIN=/abs/path/to/codebase-memory-mcp
 Until then Toshi runs in **honest demo mode** — the mascot is fully alive, and it *says* it can't read your
 session yet (with the exact index command) rather than inventing an answer.
 
-**Give Toshi a voice (optional)** — install [`zero`](https://github.com/gitlawb/zero) and run `zero setup` with any
+**Give Toshi a voice + chat (optional)** — install [`zero`](https://github.com/gitlawb/zero) and run `zero setup` with any
 provider (free/local models like ollama work). Toshi then *speaks* its grounded answers in your language —
-1-3 warm sentences synthesized ONLY from what it retrieved, never invented. No zero? Point Toshi at any
-OpenAI-compatible endpoint instead: `TOSHI_API_URL` + `TOSHI_API_KEY` + `TOSHI_API_MODEL`. `TOSHI_LLM=off` disables.
+1-3 warm sentences synthesized ONLY from what it retrieved, never invented — **and it can just chat** like a
+normal assistant when your message isn't a repo question (a greeting, small talk, a general "how do I…"). Chat
+replies are clearly conversation, not invented repo facts. No zero? Point Toshi at any OpenAI-compatible endpoint
+instead (see below). `TOSHI_LLM=off` disables both voice and chat.
+
+### Change Toshi's brain model
+
+Toshi talks through any **OpenAI-compatible** chat endpoint. Two ways to wire it — env vars, or the `toshi model` command.
+
+**1. Point it at a provider.** Either give a full explicit endpoint, or just drop in a provider key you already
+have and Toshi auto-maps it:
+
+| Env | What it does |
+|---|---|
+| `TOSHI_API_URL` + `TOSHI_API_KEY` + `TOSHI_API_MODEL` | Explicit endpoint — any OpenAI-compatible `/chat/completions` URL. Highest priority. |
+| `OPENROUTER_API_KEY` | Auto → `https://openrouter.ai/api/v1` (default model `deepseek/deepseek-r1:free`). |
+| `XAI_API_KEY` / `GROK_API_KEY` | Auto → x.ai (default `grok-2-latest`). |
+| `GROQ_API_KEY` | Auto → Groq (default `llama-3.3-70b-versatile`). |
+| `OPENAI_API_KEY` | Auto → OpenAI (default `gpt-4o-mini`). |
+
+Keys are read from your environment and from a local `.env` — **they never leave the process**, and are never
+committed.
+
+**2. Choose the model** — persisted to `~/.toshi.json`, no env editing needed:
+
+```bash
+toshi model minimax/minimax-m3   # pick a model (saved to ~/.toshi.json)
+toshi model                      # show the current model
+toshi model --clear              # back to the provider default
+```
+
+Model resolution order: `TOSHI_API_MODEL` (env) **→** `toshi model` (`~/.toshi.json`) **→** the provider default above.
+
+**Example — MiniMax M3 via OpenRouter** (what Phil runs):
+
+```bash
+export OPENROUTER_API_KEY=sk-or-...     # your OpenRouter key
+toshi model minimax/minimax-m3          # the exact OpenRouter model id
+```
+
+> The model id must be the **exact slug OpenRouter lists** on the model's page at
+> [openrouter.ai/models](https://openrouter.ai/models) — copy it verbatim (e.g. `minimax/minimax-m3`,
+> `minimax/minimax-m2`, `deepseek/deepseek-r1:free`). A wrong slug just makes the model call fail and Toshi
+> falls back to its structural/greeting answer, so nothing breaks — it just won't speak.
 
 ## Put the CLI everywhere
 

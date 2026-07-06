@@ -10,6 +10,17 @@ const { spawn } = require('node:child_process');
 const ROOT = path.join(__dirname, '..');
 let brain = null;
 
+// GPU-crash guard. Toshi is a tiny transparent frameless always-on-top window — it needs ZERO GPU muscle,
+// and on real machines (esp. Windows with flaky/virtualised GPU drivers) a transparent overlay is exactly
+// what makes Chromium's GPU process die with "GPU process exited unexpectedly", taking the popup with it —
+// Phil saw the launch "crash" for this reason. Software compositing still renders the window (and its
+// transparency) fine; a visible software-rendered companion beats a crashed GPU process and NO window.
+// Opt back into hardware acceleration with TOSHI_GPU=1 if a given machine prefers it.
+if (process.env.TOSHI_GPU !== '1') {
+  try { app.disableHardwareAcceleration(); } catch {} // the canonical fix; software compositing keeps transparency
+  app.commandLine.appendSwitch('disable-gpu');         // stronger guarantee the GPU process never becomes the crasher
+}
+
 // ── window size: presets or custom WxH, persisted to ~/.toshi.json, env-overridable ────────────────
 const CFG_PATH = path.join(os.homedir(), '.toshi.json');
 const PRESETS = { small: [244, 372], normal: [300, 460], large: [372, 568], xl: [456, 700] };
@@ -79,6 +90,12 @@ function createWindow() {
   // focus (you couldn't type). Plain alwaysOnTop keeps it above normal windows AND typable.
   win.loadFile(path.join(ROOT, 'panel', 'index.html'));
   win.once('ready-to-show', () => { win.show(); win.focus(); });
+  // If the renderer ever dies (a one-off GPU/driver blip), reload once instead of leaving a blank ghost
+  // window — the companion recovers itself rather than looking "crashed".
+  win.webContents.on('render-process-gone', (_e, d) => {
+    console.error('[toshi] renderer gone:', d && d.reason, '— reloading the panel');
+    if (!win.isDestroyed()) { try { win.reload(); } catch {} }
+  });
 
   // TOSHI_SHOT=/path/out.png → self-portrait mode: wait for Rive + greet, ask one real question,
   // capture the actual window (the honest render, not a mockup), write the PNG, quit.
