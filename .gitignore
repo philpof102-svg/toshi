@@ -12,3 +12,14 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# --- Toshi diag/scratch (never track) ---
+# local diag scripts that pre-date the live dev harness (tools/verify-toshi.cjs, tools/launch-toshi.cjs).
+# These probe paths we know are dead or one-off (mirror P2P iCaptcha, WSL shims, ad-hoc ping).
+tools/diag-bin.cjs
+tools/diag-bin2.cjs
+tools/diag-env.ps1
+tools/mirror-probe.cjs
+tools/wsl-*.sh
+.check-*.cjs
+.ping-*.cjs
