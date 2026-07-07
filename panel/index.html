@@ -53,13 +53,52 @@
   .stage::before{content:""; position:absolute; inset:0; pointer-events:none;
     background:radial-gradient(circle at 50% 44%, rgba(0,82,255,.20), transparent 62%)}
   /* the head divider is chrome — keep it a whisper so it doesn't read as a box edge under the mascot */
-  .floaty{position:absolute; inset:0; animation:float 5.5s ease-in-out infinite; transform-origin:50% 80%}
-  @keyframes float{0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)}}
+  .floaty{position:absolute; inset:0; animation:float 6.2s ease-in-out infinite; transform-origin:50% 80%}
+  /* smoother float: slow ramp up to the apex, a held "breath" at the top, slow return. The old curve
+     was a single sine — same shape both ways — which read as a metronome. This one spends ~30% of
+     the cycle at the apex, so the mascot actually rests between rises. Closer to a real breathing
+     cadence than a mechanical ping-pong. */
+  @keyframes float{
+    0%   { transform:translateY(0)    }
+    35%  { transform:translateY(-7px) }
+    50%  { transform:translateY(-7.5px) }
+    65%  { transform:translateY(-7px) }
+    100% { transform:translateY(0)    }
+  }
   /* react/nope are transient overlays — JS removes the class so float always resumes */
-  .floaty.react{animation:react .5s ease}
-  @keyframes react{0%{transform:translateY(0) rotate(0)} 30%{transform:translateY(-4px) rotate(-3deg)} 60%{transform:translateY(-2px) rotate(2deg)} 100%{transform:none}}
-  .floaty.nope{animation:nope .45s ease}
-  @keyframes nope{0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
+  /* react: was .5s of pure oscillation. Now it INHERITS the float position first (no jolt), and
+     lands with a small bounce + overshoot at the end so the body settles back into float cleanly.
+     Easing: cubic-bezier that starts slow (no instant whip-snap) and ends with a soft overshoot. */
+  .floaty.react{animation:react .68s cubic-bezier(.22,.7,.25,1.05)}
+  @keyframes react{
+    0%   { transform:translateY(0)    rotate(0) }
+    25%  { transform:translateY(-5px) rotate(-3deg) }
+    55%  { transform:translateY(-3px) rotate(2deg) }
+    80%  { transform:translateY(-1px) rotate(-1deg) }
+    100% { transform:translateY(0)    rotate(0) }
+  }
+  /* nope: a single gentle side-to-side, not the old two-bounce "shaking head no" (which read as
+     anxious). One soft lean left, hold, lean right, settle. */
+  .floaty.nope{animation:nope .55s ease}
+  @keyframes nope{
+    0%,100% { transform:translateX(0)   rotate(0) }
+    30%     { transform:translateX(-4px) rotate(-1.5deg) }
+    70%     { transform:translateX(4px)  rotate(1.5deg) }
+  }
+  /* SIGH — a 1.2s settle of the floaty: tiny downward dip (the cat exhales) + a -0.8° head roll
+     (a "letting go" beat). Then returns. `animation-composition: add` composes the sigh OVER the
+     running float keyframe (single-value `add` applies to BOTH animations — the 2-comma per-animation
+     form `add, replace` was the bug that froze the float briefly during the sigh). */
+  .floaty.x-sigh{
+    animation: float 6.2s ease-in-out infinite, sigh 1.5s ease-in-out both;
+    animation-composition: add;
+  }
+  @keyframes sigh{
+    0%   { transform:translateY(0)    rotate(0) }
+    35%  { transform:translateY(2px)  rotate(-.8deg) }
+    70%  { transform:translateY(.5px) rotate(-.3deg) }
+    100% { transform:translateY(0)    rotate(0) }
+  }
   #toshi{position:absolute; inset:0; width:100%; height:100%; display:block}
   /* faint scanline texture — softened and radially masked so it fades out before the panel walls, i.e. no
      hard rectangle framing the mascot (the "on voit les bords" edge). Mascot now reads as floating. */
@@ -71,8 +110,16 @@
   .loading.gone{display:none}
 
   .spark{position:absolute; width:5px;height:5px;border-radius:50%;background:var(--amber);opacity:0;pointer-events:none;filter:blur(.3px)}
-  .spark.go{animation:spark .9s ease-out forwards}
-  @keyframes spark{0%{opacity:1; transform:translate(0,0) scale(1)} 100%{opacity:0; transform:translate(var(--dx),var(--dy)) scale(.2)}}
+  .spark.go{animation:spark 1.1s cubic-bezier(.18,.7,.3,1) forwards}
+  /* slower + smoother: the old .9s ease-out was a straight fade with a fly-out, which felt like a
+     camera flash. Now the spark accelerates gently, holds its peak size for a beat (10% plateau),
+     then fades with an ease-in tail — the particle reads as a living thing, not a fired bullet. */
+  @keyframes spark{
+    0%   {opacity:0; transform:translate(0,0) scale(.4)}
+    18%  {opacity:1; transform:translate(calc(var(--dx)*.4),calc(var(--dy)*.4)) scale(1.15)}
+    28%  {opacity:1; transform:translate(calc(var(--dx)*.55),calc(var(--dy)*.55)) scale(1)}
+    100% {opacity:0; transform:translate(var(--dx),var(--dy)) scale(.15)}
+  }
 
   .bubble{
     position:absolute; left:10px; right:10px; bottom:8px;
@@ -233,7 +280,16 @@ function poseUsesObject() { return OBJECT_POSES.has(poseEnum && poseEnum.value);
 function setPose(name, label, holdMs, opts) {
   setEnum(poseEnum, name); tag((label || name).replace(/_/g, ' '));
   clearTimeout(poseTimer);
-  if (name !== 'idle') poseTimer = setTimeout(() => { setEnum(poseEnum, 'idle'); tag('idle'); }, holdMs || 2600);
+  if (name !== 'idle') {
+    // the Rive SM blends a pose→idle transition over a few hundred ms. The old code snapped back
+    // to idle at exactly `holdMs`, which clipped the tail of the flourish (especially `dancing`
+    // and `celebration` whose last frame is a held pose, not a wind-down). Now we schedule the
+    // actual reset at `holdMs + 200` so the SM has a beat to ease out — the result reads as
+    // "the cat finishes the move" instead of "the cat was teleported". 200ms is short enough that
+    // the user doesn't perceive a dead gap, long enough that the SM blend is visible.
+    const total = (holdMs || 2600) + 200;
+    poseTimer = setTimeout(() => { setEnum(poseEnum, 'idle'); tag('idle'); }, total);
+  }
   // surface the object-in-hand hint on the stage so the CSS layer can
   // also dim ambient particles (motes) if it ever wants to. No visual
   // effect today — wiring only — but it's the right hook point.
@@ -245,7 +301,16 @@ function talk(ms) { // lip-flap via viseme codes; 'sil' closes the mouth at rest
   let t = 0; const iv = setInterval(() => { setEnum(mouthEnum, pick(VISEMES));
     if ((t += 150) > (ms || 1200)) { clearInterval(iv); setEnum(mouthEnum, 'sil'); } }, 150);
 }
-function reactWiggle(cls) { const f = $('floaty'); if (reduce || !f) return; f.classList.remove('react','nope'); void f.offsetWidth; f.classList.add(cls); setTimeout(() => f.classList.remove(cls), 480); }
+// reactWiggle: 680ms for `.react` (.68s keyframe), 550ms for `.nope` (.55s keyframe). The setTimeout
+// MUST outlive the keyframe, otherwise the animation gets cut off mid-frame and the cat teleports
+// back. (The old fixed 480ms was a leftover from the .5s keyframe — silent bug, visible as a snap.)
+function reactWiggle(cls) {
+  const f = $('floaty'); if (reduce || !f) return;
+  f.classList.remove('react', 'nope', 'x-sigh'); void f.offsetWidth; // reflow — restart
+  f.classList.add(cls);
+  const dur = cls === 'nope' ? 580 : 720; // 30ms breathing room past the keyframe end
+  setTimeout(() => f.classList.remove(cls), dur);
+}
 // `sparkle` (the radial .spark confetti burst) is gated on `poseUsesObject()`:
 // if Toshi is currently waving / pointing / holding a prop, the burst is
 // suppressed — the object's own animation IS the celebration. Callers can
@@ -264,12 +329,127 @@ function sparkle(opts) {
 // ambient life, the openhuman way: rest 6–12s → one flourish held 2.5–5s → back to idle. Eyes cycle on the
 // manifest cadence (2600ms, random), returning to NEUTRAL between glances so blinks stay momentary.
 let busy = false;
+/* ── ANTI-SPAM RHYTHM (2026-07-07) ─────────────────────────────────────────
+ * The old code ran two timers in parallel: an eye-channel on 2600ms AND an ambient flourish on
+ * 6–12s. They overlapped 2-3 times per minute, so the mascot would *blink AND flourish* at the
+ * same time, which read as nervous twitching rather than ambient life.
+ *
+ * The fix is a single nervous-system clock with three organic states:
+ *   - REST   (3–8s of pure idle, just the slow float + a possible blink)
+ *   - GLANCE (a single eye glance held 700–1100ms, then back to NEUTRAL)
+ *   - FLOURISH (a body pose held 2.4–4.8s, then back to idle)
+ *
+ * The cycle always goes REST → (GLANCE | FLOURISH) → REST. We never schedule a GLANCE during a
+ * FLOURISH and vice-versa. The cadence is jittered (rand()) so two Toshi sessions never tick
+ * in sync. There is also a hard cooldown after a FLOURISH (4s of guaranteed REST) so the
+ * mascot actually settles. */
+const GLANCE_VALUES = ['look_up','look_down','look_left','look_right','blink','squinting']; // 'confused' and 'thinking' are reserved for the brain — never ambient
+// FLOURISH + VISEMES are already declared above (line ~245) — we just re-use them here.
+// (Re-declaring with `const` would throw — a const block is single-declaration.)
+let _lifeState = 'REST';       // 'REST' | 'GLANCE' | 'FLOURISH'
+let _lastFlourishAt = 0;       // wall clock; gates FLOURISH
+let _flourishCount = 0;        // session counter — every 3rd flourish is a longer "moment"
+function _sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+async function _lifeLoop() {
+  while (!reduce) {
+    // ── REST phase — guaranteed minimum 3s, then 0–5s more (so it never feels periodic)
+    await _sleep(rand(3000, 8000));
+    if (busy || !poseEnum) continue;
+
+    // ── pick the next beat — 30% GLANCE, 70% FLOURISH, but every 3rd flourish is special
+    const wantFlourish = (Math.random() < 0.7) && (Date.now() - _lastFlourishAt > 4000);
+    if (wantFlourish) {
+      _lifeState = 'FLOURISH';
+      _lastFlourishAt = Date.now();
+      _flourishCount++;
+      // every 3rd flourish: longer hold + a small paired eye glance in the middle (cat looking around)
+      const long = (_flourishCount % 3 === 0);
+      const hold = long ? rand(3800, 5200) : rand(2400, 3400);
+      const pose = pick(FLOURISH);
+      setPose(pose, null, hold); // schedules its own idle-revert via setPose's internal timer (+200ms blend)
+      if (long) {
+        setTimeout(() => {
+          if (!busy && eyesEnum) { setEnum(eyesEnum, pick(GLANCE_VALUES)); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 800); }
+        }, Math.floor(hold * 0.45));
+      }
+      // wait hold + 200ms blend buffer before considering the lifecycle "back to REST".
+      // This is the only place we sleep — the actual setEnum(poseEnum,'idle') is owned by setPose.
+      await _sleep(hold + 200);
+      _lifeState = 'REST';
+    } else {
+      // ── GLANCE phase — short, sweet, never collides with a flourish
+      _lifeState = 'GLANCE';
+      if (eyesEnum) { setEnum(eyesEnum, pick(GLANCE_VALUES)); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), rand(700, 1100)); }
+      await _sleep(rand(1100, 1500));
+      _lifeState = 'REST';
+    }
+  }
+}
 function startLife() {
   if (reduce) return;
-  (function ambient(){ setTimeout(() => {
-    if (!busy && poseEnum && poseEnum.value === 'idle') setPose(pick(FLOURISH), null, rand(2500, 5000));
-    ambient(); }, rand(6000, 12000)); })();
-  setInterval(() => { if (busy) return; setEnum(eyesEnum, pick(EYE_CYCLE)); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 650); }, 2600);
+  _lifeLoop();
+  // a tiny independent blink — humans don't only blink when they "glance", and the GLANCE timer
+  // above can go 8s without one. So a 4–7s jittered blink keeps the face alive without overlapping
+  // with the main life loop. We use the 'blink' enum (not random — eyes only blink closed).
+  setInterval(() => {
+    if (busy || !eyesEnum || _lifeState !== 'REST') return; // never blink during a flourish
+    setEnum(eyesEnum, 'blink');
+    setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 180);
+  }, rand(4000, 7000));
+
+  // ── NATURAL EMOTES (2026-07-07) ──────────────────────────────────────
+  // Beyond the openhuman-style flourish cycle, cats do small physical things humans never notice
+  // they're doing: a slow "sigh" (eyes closed + micro-tilt for 1.2s), a thoughtful squint that
+  // drifts, a double-blink after a long pause, a soft head-tilt while "considering". These are
+  // NOT flourishes (no body pose change) — they layer on top of idle and on top of the eye
+  // channel. They fire rarely (12–22s) and never during a flourish or a glance.
+  //
+  // This is what makes a Toshi session feel like a living cat instead of a clockwork doll:
+  // these micro-emotes are the small, unmotivated gestures that real animals do between
+  // purposeful actions.
+  const NATURAL = [
+    // 1. SIGH — eyes close, head dips slightly, returns. The "I just exhaled" beat.
+    async () => {
+      if (busy || _lifeState !== 'REST' || !eyesEnum) return;
+      setEnum(eyesEnum, 'closed');
+      const f = $('floaty'); if (f) { f.classList.remove('x-sigh'); void f.offsetWidth; f.classList.add('x-sigh'); }
+      await _sleep(1200);
+      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL');
+      if (f) setTimeout(() => f.classList.remove('x-sigh'), 1500);
+    },
+    // 2. DOUBLE-BLINK — two quick blinks, ~120ms apart. The "yes I see you" beat.
+    async () => {
+      if (busy || _lifeState !== 'REST' || !eyesEnum) return;
+      setEnum(eyesEnum, 'blink'); await _sleep(160);
+      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL'); await _sleep(120);
+      if (!busy && eyesEnum) { setEnum(eyesEnum, 'blink'); await _sleep(160); setEnum(eyesEnum, 'NEUTRAL'); }
+    },
+    // 3. THINKING DRIFT — slow squint that lingers. Toshi is "considering" something.
+    async () => {
+      if (busy || _lifeState !== 'REST' || !eyesEnum) return;
+      setEnum(eyesEnum, 'thinking');
+      await _sleep(1800);
+      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL');
+    },
+    // 4. SLOW GLANCE — one eye direction held longer than a normal glance (1.6s vs 700ms).
+    //    The "huh, what's that over there" beat.
+    async () => {
+      if (busy || _lifeState !== 'REST' || !eyesEnum) return;
+      setEnum(eyesEnum, pick(['look_up', 'look_left', 'look_right']));
+      await _sleep(1600);
+      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL');
+    },
+  ];
+  // pick a random natural emote, wait 12–22s, repeat. We DON'T use setInterval — we await between
+  // calls, so the next emote only schedules after the previous one is fully done. This way a long
+  // sigh can't be cut off by a quick blink.
+  (async function naturalLoop() {
+    while (!reduce) {
+      await _sleep(rand(12000, 22000));
+      if (busy || _lifeState !== 'REST' || document.hidden) continue;
+      try { await pick(NATURAL)(); } catch {}
+    }
+  })();
 }
 
 function bootRive() {
