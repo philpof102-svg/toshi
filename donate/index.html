@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Support Toshi 🐈 — donate USDC on Base</title>
+<meta name="description" content="Toshi is free + open-source (GPL-3.0). If it saves you time, chip in USDC on Base — you sign every transfer in your own wallet; the page holds no keys." />
+<style>
+  :root{
+    --bg:#070b16; --panel:#0d1426; --ink:#e8edf7; --dim:#93a1bd; --faint:#5f6f8f;
+    --line:#1b2740; --base:#0052ff; --base-soft:#3b74ff; --ok:#31d0aa; --warn:#ffb020;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 50% -10%, #0e1730, var(--bg)) fixed; color:var(--ink);
+    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:26px}
+  .card{width:100%; max-width:440px; background:linear-gradient(180deg,#0f1830,#0b1122); border:1px solid var(--line);
+    border-radius:20px; padding:26px 24px 20px; box-shadow:0 30px 80px -30px #000, inset 0 1px 0 #ffffff0a}
+  .cat{width:64px;height:64px;margin:0 auto 12px;display:block;border-radius:16px;
+    background:radial-gradient(circle at 50% 42%, #14224a, #0a1122); border:1px solid var(--line); position:relative}
+  .cat::before{content:"🐈"; position:absolute; inset:0; display:grid; place-items:center; font-size:30px}
+  h1{margin:2px 0 4px; text-align:center; font-size:20px; letter-spacing:.2px}
+  .sub{margin:0 auto 18px; text-align:center; color:var(--dim); font-size:13.5px; max-width:340px}
+  .sub b{color:var(--ink); font-weight:600}
+  .amts{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:6px 0 10px}
+  .amt{background:#0a1226; border:1px solid var(--line); color:var(--ink);
+    border-radius:12px; padding:12px 0; font-size:15px; font-weight:600; cursor:pointer; transition:.15s}
+  .amt:hover{border-color:var(--base-soft)}
+  .amt.on{border-color:var(--base); background:#0d1c40; box-shadow:0 0 0 3px #0052ff22}
+  .custom{display:flex; align-items:center; gap:8px; background:#0a1226; border:1px solid var(--line); border-radius:12px; padding:0 12px; margin-bottom:14px}
+  .custom span{color:var(--faint); font-weight:600}
+  .custom input{flex:1; min-width:0; background:none; border:none; color:var(--ink); font:inherit; font-size:16px; padding:12px 0; outline:none}
+  .btn{width:100%; border:none; border-radius:13px; padding:14px; font:inherit; font-size:15px; font-weight:700; cursor:pointer;
+    background:linear-gradient(180deg,var(--base-soft),var(--base)); color:#fff; transition:.15s}
+  .btn:hover{filter:brightness(1.07)} .btn:disabled{opacity:.5; cursor:not-allowed; filter:none}
+  .btn.ghost{background:#0c1730; color:var(--ink); border:1px solid var(--line); font-weight:600}
+  .status{margin:12px 2px 0; min-height:18px; font-size:13px; color:var(--dim); text-align:center; word-break:break-word}
+  .status a{color:var(--base-soft)}
+  .to{margin:14px 0 2px; padding:11px 12px; background:#0a1226; border:1px solid var(--line); border-radius:12px; font-size:12px; color:var(--dim)}
+  .to b{color:var(--ink)} .to .addr{font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--ink); word-break:break-all}
+  .to .copy{float:right; margin-left:8px; color:var(--base-soft); cursor:pointer; font-weight:600}
+  .foot{margin-top:16px; text-align:center; color:var(--faint); font-size:11.5px; line-height:1.6}
+  .foot a{color:var(--dim)}
+  .pill{display:inline-block; padding:2px 8px; border:1px solid var(--line); border-radius:999px; color:var(--dim); font-size:11px}
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="cat" aria-hidden="true"></div>
+    <h1>Support Toshi</h1>
+    <p class="sub"><b>Toshi is free and open-source</b> (GPL-3.0) — a floating terminal companion, local-first,
+      no cloud. If it saves you time, chip in <b>USDC on Base</b>. This buys you nothing extra (no token, no perks) —
+      just a thank-you from the cat. 🐈</p>
+
+    <div class="amts" id="amts">
+      <button class="amt" data-a="1">$1</button>
+      <button class="amt on" data-a="5">$5</button>
+      <button class="amt" data-a="20">$20</button>
+    </div>
+    <label class="custom"><span>$</span><input id="custom" inputmode="decimal" placeholder="other amount" /></label>
+
+    <button class="btn" id="cta">Connect wallet</button>
+    <button class="btn ghost" id="copytx" style="display:none;margin-top:8px">Copy the transfer details instead</button>
+    <div class="status" id="status">Base mainnet · USDC · you sign it yourself</div>
+
+    <div class="to">
+      donating to <span class="copy" id="copyaddr">copy</span><br/>
+      <b>Toshi</b> · <span class="addr" id="addr"></span>
+    </div>
+
+    <div class="foot">
+      <span class="pill">descriptor-only · we hold no keys</span><br/>
+      the transfer is signed <b>in your wallet</b>; this page never sees a key and never moves funds on its own.<br/>
+      <a href="https://github.com/philpof102-svg/toshi" target="_blank" rel="noopener">github.com/philpof102-svg/toshi</a>
+    </div>
+  </main>
+
+<script>
+// ── CONFIG — set these before publishing ─────────────────────────────────────────────────────────
+const CONFIG = {
+  // ⚠️ Toshi donations land HERE. Default = Phil's verified Base address (mcpbase). Change to a
+  //    dedicated donation wallet if you want; it MUST be a Base address you control.
+  DONATE_TO: '0xa6cF99D35949c6cB911adB910078F4Ca46F0f5d4',
+  USDC:      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // canonical Circle USDC on Base (6 decimals)
+  CHAIN_ID:  '0x2105',                                     // Base mainnet = 8453
+  CHAIN: { chainId:'0x2105', chainName:'Base', nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},
+           rpcUrls:['https://mainnet.base.org'], blockExplorerUrls:['https://basescan.org'] },
+};
+// ─────────────────────────────────────────────────────────────────────────────────────────────────
+
+const $ = (id) => document.getElementById(id);
+let amount = 5, account = null;
+$('addr').textContent = CONFIG.DONATE_TO;
+
+// amount selection (chips + custom)
+$('amts').addEventListener('click', (e) => {
+  const b = e.target.closest('.amt'); if (!b) return;
+  [...document.querySelectorAll('.amt')].forEach((x) => x.classList.remove('on'));
+  b.classList.add('on'); amount = parseFloat(b.dataset.a); $('custom').value = '';
+});
+$('custom').addEventListener('input', (e) => {
+  const v = parseFloat(e.target.value);
+  if (v > 0) { amount = v; [...document.querySelectorAll('.amt')].forEach((x) => x.classList.remove('on')); }
+});
+
+$('copyaddr').onclick = () => { navigator.clipboard?.writeText(CONFIG.DONATE_TO); flash('address copied'); };
+
+function flash(msg, link) {
+  $('status').innerHTML = link ? `${msg} <a href="${link}" target="_blank" rel="noopener">view ↗</a>` : msg;
+}
+
+// 6-decimal USDC amount → hex; encode transfer(address,uint256) with no library (self-contained, no CDN).
+function encodeTransfer(to, usdc) {
+  const units = BigInt(Math.round(usdc * 1e6));                       // USDC has 6 decimals
+  const addr = to.toLowerCase().replace(/^0x/, '').padStart(64, '0');
+  const amt = units.toString(16).padStart(64, '0');
+  return '0xa9059cbb' + addr + amt;                                   // selector for transfer(address,uint256)
+}
+
+async function ensureBase(eth) {
+  const cur = await eth.request({ method: 'eth_chainId' });
+  if (cur === CONFIG.CHAIN_ID) return;
+  try { await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CONFIG.CHAIN_ID }] }); }
+  catch (e) {
+    if (e && e.code === 4902) await eth.request({ method: 'wallet_addEthereumChain', params: [CONFIG.CHAIN] });
+    else throw e;
+  }
+}
+
+async function connect(eth) {
+  const accts = await eth.request({ method: 'eth_requestAccounts' });
+  account = accts && accts[0];
+  return account;
+}
+
+$('cta').onclick = async () => {
+  const eth = window.ethereum;
+  if (!eth) { // no injected wallet — fall back to the honest manual path
+    flash('no browser wallet found — use "Copy the transfer details" and send from any wallet.');
+    $('copytx').style.display = 'block';
+    return;
+  }
+  try {
+    $('cta').disabled = true;
+    if (!(amount > 0)) { flash('pick an amount first 🐈'); $('cta').disabled = false; return; }
+    if (!account) { flash('connecting…'); await connect(eth); }
+    $('cta').textContent = `Donate $${amount} USDC`;
+    flash('switching to Base…'); await ensureBase(eth);
+    flash('confirm the transfer in your wallet…');
+    const data = encodeTransfer(CONFIG.DONATE_TO, amount);
+    const tx = await eth.request({ method: 'eth_sendTransaction',
+      params: [{ from: account, to: CONFIG.USDC, data }] });
+    flash(`thank you 🐈 — donation sent`, `https://basescan.org/tx/${tx}`);
+    $('cta').textContent = 'Donate again';
+  } catch (e) {
+    const m = (e && (e.message || e.code)) || 'failed';
+    flash(String(m).includes('4001') || /reject/i.test(String(m)) ? 'transfer cancelled — no worries.' : ('couldn’t send: ' + m));
+    $('cta').textContent = account ? `Donate $${amount} USDC` : 'Connect wallet';
+  } finally { $('cta').disabled = false; }
+};
+
+// manual fallback: hand the user everything to send from any wallet, nothing hidden
+$('copytx').onclick = () => {
+  const txt = `Send ${amount} USDC on Base to:\n${CONFIG.DONATE_TO}\n(USDC contract ${CONFIG.USDC}, Base mainnet / chainId 8453)`;
+  navigator.clipboard?.writeText(txt); flash('transfer details copied — send from any Base wallet');
+};
+</script>
+</body>
+</html>
