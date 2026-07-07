@@ -109,6 +109,9 @@ toshi model minimax/minimax-m3          # the exact OpenRouter model id
 > [openrouter.ai/models](https://openrouter.ai/models) — copy it verbatim (e.g. `minimax/minimax-m3`,
 > `minimax/minimax-m2`, `deepseek/deepseek-r1:free`). A wrong slug just makes the model call fail and Toshi
 > falls back to its structural/greeting answer, so nothing breaks — it just won't speak.
+>
+> **New to OpenRouter?** Step-by-step first-key guide (get a key → place it → verify it → pick a model,
+> with copy-paste for Windows / mac / Linux and a troubleshooting table): **[docs/openrouter-key.md](docs/openrouter-key.md)**.
 
 ## Put the CLI everywhere
 
