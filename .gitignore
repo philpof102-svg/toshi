@@ -1,3 +1,9 @@
 node_modules/
 *.log
 .cbm/
+
+# session scratch (commit-msg drafts, one-off popup runners/smokes) — never tracked
+.commit-msg-*.txt
+.run-*.cmd
+.smoke-*.cjs
+.spawn-*.cjs
