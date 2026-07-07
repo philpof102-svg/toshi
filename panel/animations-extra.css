@@ -1,0 +1,175 @@
+/* ───────────────────────────────────────────────────────────────────────────
+ * toshi — extra animations (panel/animations-extra.css)
+ * Add-on pack. Loaded AFTER panel/index.html's <style> (no overwrite of the
+ * original). 8 new animations that follow the principles already coded in
+ * panel/index.html (CSS keyframes + transient class + JS cleanup):
+ *
+ *   - 1 body pose at a time (we never fight setPose / the Rive enum)
+ *   - face layers (eyes_*, mouth_*) stay free
+ *   - every transient class is removed by JS after its run
+ *   - prefers-reduced-motion: reduce short-circuits everything
+ *   - CSS variables (--dx/--dy/--angle) for parametric sparkles/tilt
+ *   - never add a hard box edge: glows/halos use radial-gradient
+ *   - idle is still owned by @keyframes float; extras only layer on top
+ *
+ * Budget: $0 runtime, 0 token, 0 binary, 0 new dependency. The CSS file is
+ * < 4 KB, the JS file is < 3 KB. Loads from disk in Electron and from the
+ * static server in browser mode (serve.js).
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. TILT — curiosity, follows the eye channel ───────────────────────────
+ * Subtle head tilt (±2°). Triggered when the eye channel looks up/down/left/
+ * right. JS adds .x-tilt + sets --angle, then removes the class when the
+ * glance ends. Floats above the base .floaty float (composes, not replaces). */
+.x-tilt{
+  animation:tilt var(--tilt-dur, 1300ms) cubic-bezier(.4,.1,.3,1) both;
+  transform:rotate(var(--angle, 0deg));
+}
+@keyframes tilt{
+  0%   { transform:rotate(0deg) translateY(0); }
+  20%  { transform:rotate(var(--angle,0deg)) translateY(-2px); }
+  80%  { transform:rotate(var(--angle,0deg)) translateY(-1px); }
+  100% { transform:rotate(0deg) translateY(0); }
+}
+
+/* ── 2. BOUNCE-IN — input focus-gained ──────────────────────────────────────
+ * The mascot gives a tiny "I'm with you" drop when the user focuses the
+ * ask input. 280ms spring. Class removed by JS on blur. */
+.x-bounce{ animation:bounce-in 280ms cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes bounce-in{
+  0%   { transform:translateY(0) scale(1); }
+  40%  { transform:translateY(-6px) scale(1.015); }
+  70%  { transform:translateY(2px) scale(.99); }
+  100% { transform:translateY(0) scale(1); }
+}
+
+/* ── 3. GAZE — head follows the cursor (subtle, idle only) ──────────────────
+ * The mascot looks toward the cursor. CSS only — no JS loop, just a single
+ * mousemove handler that sets --mx/--my. Idle-state only, suspended while
+ * busy, and disabled under reduced-motion. */
+.stage{ --mx:.5; --my:.5; }
+.x-gaze .floaty{
+  transform:
+    translate(
+      calc((var(--mx) - .5) * 6px),
+      calc((var(--my) - .5) * -4px)
+    );
+  transition: transform 380ms cubic-bezier(.2,.7,.2,1);
+}
+/* in mini mode, the gaze target is just slightly off-centre so the little
+ * head still feels alive, but we cap movement tighter (max 3px) */
+body.mini.x-gaze .floaty{
+  transform: translate(
+    calc((var(--mx) - .5) * 3px),
+    calc((var(--my) - .5) * -2px)
+  );
+}
+
+/* ── 4. STARDUST — ambient idle particles (≠ grounded sparkle) ──────────────
+ * Five faint amber motes that orbit slowly in the lower half of the stage.
+ * Stays as long as the mascot is idle and the panel is visible. Pure CSS,
+ * no DOM (uses .stage::before's child), no JS lifecycle except a single
+ * class toggle. Distinguished from the .spark (grounded celebration) by:
+ *   - colour opacity (.35 vs 1.0)
+ *   - motion (orbit vs radial burst)
+ *   - blur (1.2px vs .3px)
+ *   - duration (8s loop vs 900ms one-shot)
+ */
+.stage .mote{
+  position:absolute; width:3px; height:3px; border-radius:50%;
+  background:var(--amber); opacity:0; filter:blur(1.2px); pointer-events:none;
+}
+.x-stardust .mote{ animation:mote-orbit 8s linear infinite; }
+.x-stardust .mote:nth-child(1){ left:18%; top:74%; animation-delay:-.5s; }
+.x-stardust .mote:nth-child(2){ left:36%; top:80%; animation-delay:-2.1s; }
+.x-stardust .mote:nth-child(3){ left:55%; top:76%; animation-delay:-3.7s; }
+.x-stardust .mote:nth-child(4){ left:72%; top:81%; animation-delay:-5.2s; }
+.x-stardust .mote:nth-child(5){ left:88%; top:75%; animation-delay:-6.6s; }
+@keyframes mote-orbit{
+  0%   { opacity:0;   transform:translate(0,0) scale(.6); }
+  15%  { opacity:.35; }
+  50%  { opacity:.35; transform:translate(calc(var(--dx,6px)), calc(var(--dy,-10px))) scale(1); }
+  85%  { opacity:.12; }
+  100% { opacity:0;   transform:translate(0,0) scale(.6); }
+}
+
+/* ── 5. BREATH-DEEP — calm-down after a nope/fallback ──────────────────────
+ * Slows the float from 5.5s to 7s for ~6s, dims the radial glow slightly.
+ * Composes with @keyframes float (longer period → same shape, slower pace).
+ * This is what Toshi does after a failed .ask — "it's ok, take a breath". */
+.x-breath .floaty{ animation:float 7s ease-in-out infinite; }
+.x-breath .stage::before{
+  background:radial-gradient(circle at 50% 44%, rgba(0,82,255,.10), transparent 62%);
+  transition: background 1.2s ease;
+}
+
+/* ── 6. SCRITCH — double-click on the mascot ────────────────────────────────
+ * Faster, snappier wiggle than .react. 300ms, 3 oscillations, slightly more
+ * amplitude (rot ±5°). Class removed by JS on animationend. */
+.x-scritch{ animation:scritch 300ms ease; }
+@keyframes scritch{
+  0%   { transform:translateY(0) rotate(0); }
+  20%  { transform:translateY(-3px) rotate(-5deg); }
+  40%  { transform:translateY(-1px) rotate(4deg); }
+  60%  { transform:translateY(-2px) rotate(-3deg); }
+  80%  { transform:translateY(0)    rotate(2deg); }
+  100% { transform:translateY(0)    rotate(0); }
+}
+
+/* ── 7. YAWN — long-idle micro-event ────────────────────────────────────────
+ * After 8 minutes of no clicks/keystrokes, Toshi closes its eyes (Rive
+ * 'closed' enum) and slowly rotates the .floaty by -1.5° (a "settling"
+ * micro-movement). Returns to NEUTRAL after 4s. JS owns the timer and the
+ * pose — CSS only shapes the visuals. */
+.x-yawn .floaty{
+  animation:yawn-settle 4s ease-in-out both;
+  transform:rotate(-1.5deg);
+}
+@keyframes yawn-settle{
+  0%   { transform:rotate(0);     filter:brightness(1);   }
+  30%  { transform:rotate(-1.5deg); filter:brightness(.95); }
+  100% { transform:rotate(0);     filter:brightness(1);   }
+}
+
+/* ── 8. HEART-BURST — gentle "like" on the footer click ─────────────────────
+ * Six small amber hearts that drift upward from the footer. Distinct from
+ * the grounded .spark burst (which is radial from 50%/42% and amber→opaque
+ * white) by:
+ *   - shape (heart SVG via clip-path, vs circle)
+ *   - origin (footer center, vs mascot center)
+ *   - direction (upward drift, vs radial)
+ *   - colour (var(--amber) only)
+ *   - trigger (footer click, NOT a grounded answer)
+ */
+.x-hearts .heart{
+  position:absolute; width:7px; height:7px; pointer-events:none; opacity:0;
+  background:var(--amber);
+  clip-path: polygon(50% 100%, 0% 38%, 22% 14%, 50% 30%, 78% 14%, 100% 38%);
+}
+.x-hearts .heart.go{ animation:heart-rise 1.4s ease-out forwards; }
+@keyframes heart-rise{
+  0%   { opacity:0; transform:translate(0,0) scale(.5); }
+  20%  { opacity:.9; }
+  100% { opacity:0; transform:translate(var(--dx,0), calc(-1 * var(--dy,32px))) scale(1); }
+}
+
+/* ── HOOK POINTS (CSS-only, no JS) ──────────────────────────────────────────
+ * Cursor hints on the new interaction surfaces. Matches the BASED palette
+ * so it doesn't look out of place. -webkit-app-region:no-drag everywhere
+ * because a drag region swallows clicks. */
+.stage[data-double="armed"]{ cursor:progress; }
+.foot{ cursor:pointer; }
+.foot:hover{ color:var(--dim); }
+
+/* ── REDUCED-MOTION GUARD ───────────────────────────────────────────────────
+ * Mirrors the @media in panel/index.html. Every transient class is killed
+ * so the panel is fully static for users who opt out. The JS layer also
+ * returns early on matchMedia. Belt + suspenders. */
+@media (prefers-reduced-motion:reduce){
+  .x-tilt,.x-bounce,.x-gaze .floaty,.x-stardust .mote,
+  .x-breath .floaty,.x-scritch,.x-yawn .floaty,.x-hearts .heart{
+    animation:none !important;
+    transform:none !important;
+  }
+  .stage .mote{ display:none; }
+}
