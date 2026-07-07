@@ -23,3 +23,8 @@ tools/mirror-probe.cjs
 tools/wsl-*.sh
 .check-*.cjs
 .ping-*.cjs
+
+# --- Zero / session scratch (never track) ---
+# .claude/ is Zero's per-session scratch dir (commit-msg drafts, smoke runners, live probes).
+# It MUST be ignored: a stray `git add .` would otherwise dump ephemeral session files.
+.claude/
