@@ -24,7 +24,8 @@ const sub = (process.argv[2] || '').toLowerCase();
   toshi show|hide    summon / hide the floating window     toshi toggle     flip it
   toshi collapse     fold into a small head                toshi expand     unfold
   toshi size <s>     resize: small | normal | large | xl | 340x520 (live if running)
-  toshi model <id>   pick Toshi's brain model, persisted to ~/.toshi.json (e.g. minimax/minimax-m3). No arg = show current · --clear = provider default
+  toshi model <id>   pick Toshi's brain model, persisted to ~/.toshi.json (e.g. minimax/minimax-m3).
+                     no arg = show current · --clear = provider default · --list = free-slug catalog · --free = live-probe & save the first free one that answers
   toshi voice <e>    spoken voice (audio TTS): off | system | kokoro | piper. No arg = show current · --list = the open-source ladder (VOICE.md)
   toshi setup        ONE-COMMAND onboarding: install the brain + index THIS repo + wire zero/openclaude/Claude Code + float the popup (--no-float to skip · --remove to undo)
                      (--mcp only · --hook only · --file <path> for Claude Desktop/Cline · --remove undoes)
@@ -64,8 +65,11 @@ docs: https://github.com/philpof102-svg/toshi`);
   if (sub === 'model') {
     // toshi model <id>  — persist the brain model to ~/.toshi.json (read by lib/llm.mjs when TOSHI_API_MODEL
     // isn't set). Works with any provider key (OPENROUTER_API_KEY, …) or a full TOSHI_API_URL+KEY config.
-    //   toshi model                 → show the current model (or that none is set)
+    //   toshi model                 → show the current model (or that none is set) + a few popular slugs
     //   toshi model minimax/minimax-m3   → use MiniMax M3 (via OpenRouter, the exact id from openrouter.ai/models)
+    //   toshi model --free          → live-probe the free-slug catalog in lib/llm.mjs and save the first one
+    //                                 that actually answers (12-step ordered probe, best→worst, 2026-07-07).
+    //   toshi model --list          → print the free-slug catalog (best→worst) without saving
     //   toshi model --clear         → back to each provider's built-in default
     const cfgPath = path.join(require('node:os').homedir(), '.toshi.json');
     let cur = {}; try { cur = JSON.parse(require('node:fs').readFileSync(cfgPath, 'utf8')) || {}; } catch {}
@@ -73,13 +77,45 @@ docs: https://github.com/philpof102-svg/toshi`);
     if (!arg) {
       console.log(cur.model
         ? `🐈  Toshi brain model: ${cur.model}  (from ~/.toshi.json)`
-        : '🐈  no model set — using the TOSHI_API_MODEL env or the provider default.\n    set one:  toshi model minimax/minimax-m3');
+        : '🐈  no model set — using the TOSHI_API_MODEL env or the provider default.\n' +
+          '    set one:  toshi model minimax/minimax-m3            (paid, capable, FR/EN)\n' +
+          '              toshi model --free                       (live-probe the free catalog, save the winner)\n' +
+          '              toshi model --list                       (free catalog, no save)\n' +
+          '              toshi model meta-llama/llama-3.3-70b-instruct:free   (the safe free default)');
       return;
     }
     if (['--clear', 'clear', 'none', 'default', 'reset'].includes(arg.toLowerCase())) {
       delete cur.model;
       require('node:fs').writeFileSync(cfgPath, JSON.stringify(cur, null, 2));
       console.log('🐈  Toshi model cleared — back to the env / provider default.');
+      return;
+    }
+    if (['--list', 'list'].includes(arg.toLowerCase())) {
+      // print the live-ordered free catalog straight from lib/llm.mjs — single source of truth
+      let free = [];
+      try { ({ FREE_FALLBACK_MODELS: free } = await import('../lib/llm.mjs')); } catch {}
+      console.log('🐈  Free-slug catalog (best→worst, 2026-07-07 — see lib/llm.mjs → FREE_FALLBACK_MODELS):');
+      if (!free.length) { console.log('    (none exported — use `toshi model <id>` with an explicit slug)'); return; }
+      free.forEach((m, i) => console.log(`    ${String(i + 1).padStart(2)}. ${m}`));
+      console.log('    pick:  toshi model <slug>            ·   auto-pick:  toshi model --free');
+      return;
+    }
+    if (['--free', 'free', 'auto'].includes(arg.toLowerCase())) {
+      // live-probe the catalog and save the first model that actually answers (uses lib/llm.mjs → pickFreeModel)
+      console.log('🐈  probing the free catalog (best→worst) — saving the first one that answers…');
+      let winner = null;
+      try {
+        const { pickFreeModel } = await import('../lib/llm.mjs');
+        const r = await pickFreeModel();
+        if (r && r.ok) winner = r.model;
+        else console.log('    (no free model answered — check your provider key, or `toshi model <paid-slug>` to bypass)');
+      } catch (e) { console.log(`    probe failed: ${e.message}`); }
+      if (winner) {
+        cur.model = winner;
+        require('node:fs').writeFileSync(cfgPath, JSON.stringify(cur, null, 2));
+        console.log(`🐈  Toshi brain model → ${winner}  (saved to ~/.toshi.json)`);
+        console.log('    (TOSHI_API_MODEL in the environment still overrides this if set.)');
+      }
       return;
     }
     cur.model = arg;

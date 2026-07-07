@@ -54,6 +54,20 @@ kokoro` upgrades to the credible voice with a one-time model fetch (consented, l
 - ⏳ Renderer wiring (`speakAloud` in the panel) + a mute button + the `toshi voice` CLI command — small,
   best done with live audio testing (a job for the local build, zero 1).
 
+## Picking the brain model
+
+Voice is only the second half — the *text* Toshi speaks comes from whichever LLM `lib/llm.mjs` resolves
+(see [docs/providers.md](docs/providers.md) for the OpenRouter / xAI / Groq / OpenAI / custom-endpoint
+matrix). The day-to-day is just:
+
+```bash
+toshi model                              # show the current brain
+toshi model minimax/minimax-m3           # paid, capable, what Phil uses
+toshi model --free                       # live-probe the free catalog, save the first one that answers
+toshi model --list                       # print the free catalog (no save)
+toshi model --clear                      # back to the provider's default
+```
+
 Sources: [hexgrad/Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) ·
 [onnx-community/Kokoro-82M-v1.0-ONNX](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX) ·
 [kokoro-js](https://www.npmjs.com/package/kokoro-js) · [OHF-Voice/piper1-gpl](https://github.com/OHF-Voice/piper1-gpl)
