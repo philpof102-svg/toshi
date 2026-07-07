@@ -80,7 +80,7 @@ have and Toshi auto-maps it:
 | Env | What it does |
 |---|---|
 | `TOSHI_API_URL` + `TOSHI_API_KEY` + `TOSHI_API_MODEL` | Explicit endpoint — any OpenAI-compatible `/chat/completions` URL. Highest priority. |
-| `OPENROUTER_API_KEY` | Auto → `https://openrouter.ai/api/v1` (default model `deepseek/deepseek-r1:free`). |
+| `OPENROUTER_API_KEY` | Auto → `https://openrouter.ai/api/v1` (default model `meta-llama/llama-3.3-70b-instruct:free`). |
 | `XAI_API_KEY` / `GROK_API_KEY` | Auto → x.ai (default `grok-2-latest`). |
 | `GROQ_API_KEY` | Auto → Groq (default `llama-3.3-70b-versatile`). |
 | `OPENAI_API_KEY` | Auto → OpenAI (default `gpt-4o-mini`). |
