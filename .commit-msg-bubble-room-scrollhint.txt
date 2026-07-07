@@ -1,0 +1,34 @@
+fix(panel): bubble now shows its full answer (50% height) + a real "more above" chevron
+
+The bubble was the main reading surface but had max-height:34% — a 5-line grounded answer
+already overflowed, and the user reported "I can't see the whole text" and "the text keeps
+scrolling down on its own". Two things to fix, both in panel/index.html, no brain changes.
+
+1. Give the bubble the room it needs (max-height 50%, was 34%):
+   - The bubble is the primary reading surface, not chrome. 34% of a 460px pod ≈ 156px
+     (≈ 4 short lines at 10.5px / 1.38 line-height). 50% ≈ 230px (≈ 6 lines), which fits
+     a typical grounded speak() reply in one go. overflow-y:auto still kicks in for the
+     longer answers, and the user can now scroll freely (no auto-reset, no forced
+     scroll-to-bottom on every render — that was the "scroll tout seul" complaint).
+   - padding-bottom:14px reserves a band for the new chevron when the body overflows.
+
+2. A real "more above" hint (the chevron was a lie before):
+   - `.bubble-more` (▾) was declared in the HTML but had no CSS — invisible in every state.
+     Now it's a sticky bottom element with a soft Base-blue gradient. It fades in ONLY when
+     the body actually overflows (.has-more, toggled by updateOverflowHint) AND only when
+     the user is NOT already at the bottom (.at-bottom). At-bottom is recomputed on every
+     scroll event (passive), so the chevron hides as soon as the user reaches the end —
+     at that point the hint would be a lie.
+   - A subtle Base-blue webkit scrollbar (6px, rgba 0,82,255,.35) makes the scroll affordance
+     discoverable. Still hidden in mini mode (cosmetic only — no chrome on the little head).
+
+3. One other small touch: scrollbar-gutter:stable reserves the scrollbar's space so the
+   text doesn't jump 6px when content crosses the overflow threshold. Tiny but it's the
+   "le texte saute quand ça déborde" micro-jank users notice without naming.
+
+Validation:
+  - node tools/check-panel-syntax.cjs → 362 lines syntax OK (+9)
+  - node test/simulate.mjs            → 46 passed · 0 failed · 0 skipped
+  (brain contract unchanged — this commit is panel-only)
+
+Files: panel/index.html (+39 / −5)

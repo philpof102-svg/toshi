@@ -77,11 +77,36 @@
   .bubble{
     position:absolute; left:10px; right:10px; bottom:8px;
     background:rgba(7,11,25,.95); border:1px solid var(--line); border-radius:11px;
-    padding:6px 9px; font-size:10.5px; line-height:1.38; color:var(--ink);
+    padding:6px 9px 14px; font-size:10.5px; line-height:1.38; color:var(--ink);
     opacity:0; transform:translateY(6px); transition:.22s; pointer-events:auto;
-    max-height:34%; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap;
+    /* max-height 50% (was 34%) — the bubble is the main surface, give it the room it needs to read
+       a full grounded answer in one go. overflow-y:auto still kicks in for long replies, and the
+       user can scroll up/down freely (no more auto-reset, no more forced scroll-to-bottom — the
+       panel only nudges down when the user was already at the bottom). The 14px bottom padding
+       reserves a band for the fading chevron (`.bubble-more`) when the body overflows. */
+    max-height:50%; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap;
     scroll-behavior:smooth; -webkit-overflow-scrolling:touch;
+    scrollbar-gutter:stable;
   }
+  /* the chevron `.bubble-more` (▾) lives at the bottom of the bubble. It fades in only when the body
+     actually overflows (.has-more is toggled by updateOverflowHint) — and only when the user is NOT
+     already at the very bottom (else the chevron would be a lie: there's nothing more "down" to read).
+     The sticky positioning + a soft gradient reinforce the "scroll up for more" hint without being loud. */
+  .bubble-more{
+    position:sticky; bottom:0; display:block; text-align:center; pointer-events:none;
+    font-size:11px; line-height:1; color:var(--base-soft);
+    margin:6px 0 -10px; padding:6px 0 0;
+    background:linear-gradient(180deg, transparent, rgba(7,11,25,.85) 40%, rgba(7,11,25,.95));
+    opacity:0; transform:translateY(2px); transition:opacity .25s ease, transform .25s ease;
+  }
+  .bubble.has-more .bubble-more{ opacity:.85; transform:none; }
+  .bubble.has-more.at-bottom .bubble-more{ opacity:0; }
+  /* webkit scrollbar: a thin Base-blue rail so the user sees there's something to scroll. Stays hidden
+     in mini mode (the .mini rule already overrides it below) — mini = purely visual, no chrome. */
+  .bubble::-webkit-scrollbar{ width:6px; height:6px; }
+  .bubble::-webkit-scrollbar-track{ background:transparent; }
+  .bubble::-webkit-scrollbar-thumb{ background:rgba(0,82,255,.35); border-radius:6px; }
+  .bubble::-webkit-scrollbar-thumb:hover{ background:rgba(0,82,255,.65); }
   .bubble.on{opacity:1; transform:none; animation:bubble-pop .34s cubic-bezier(.2,1.4,.4,1)}
   @keyframes bubble-pop{0%{opacity:0; transform:translateY(10px) scale(.92)} 100%{opacity:1; transform:none}}
   .bubble .who{color:var(--amber); font-size:8px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:2px; display:flex; align-items:center; gap:6px}
@@ -367,19 +392,28 @@ function populateProvenance({ grounded }) {
   }
 }
 
-// overflow hint: a small fading chevron at the bottom of the bubble whenever the body actually scrolls.
+// overflow hint + bottom-of-scroll state. .has-more fades the chevron in (the body actually
+// overflows the max-height:50%); .at-bottom hides it again when the user has already scrolled to
+// the very end — at that point the chevron would be a lie ("more above" but there isn't).
 // Cheap: one rAF after paint, reads scrollHeight vs clientHeight on the SCROLLING element (the
-// bubble itself — it's the one with overflow:auto, so its scroll metrics are what matter). Toggles
-// the .has-more class.
+// bubble itself — it's the one with overflow:auto, so its scroll metrics are what matter).
 function updateOverflowHint() {
   const b = $('bubble'); if (!b) return;
   const over = b.scrollHeight > b.clientHeight + 2; // +2 for sub-pixel rounding
   b.classList.toggle('has-more', over);
   // a body that fits never has more to read; leave scroll alone (the user may have scrolled within
   // a previous long answer and we want to honor that on a follow-up render)
+  const atBottom = (b.scrollTop + b.clientHeight) >= (b.scrollHeight - 4);
+  b.classList.toggle('at-bottom', atBottom);
 }
 // re-evaluate on resize (the bubble max-height is %-based, so a pod resize can change overflow)
+// AND on scroll: as the user reads older content, the chevron should hide when they reach the end.
 window.addEventListener('resize', updateOverflowHint);
+$('bubble').addEventListener('scroll', () => {
+  const b = $('bubble'); if (!b) return;
+  const atBottom = (b.scrollTop + b.clientHeight) >= (b.scrollHeight - 4);
+  b.classList.toggle('at-bottom', atBottom);
+}, { passive: true });
 function thinking() { $('grounded').hidden = true; $('bubble-body').innerHTML = '<span class="dots"><span>•</span><span>•</span><span>•</span></span>'; $('bubble').classList.add('on'); }
 
 async function submitQ(q) {
