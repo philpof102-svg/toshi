@@ -1,0 +1,36 @@
+fix(panel): one language + free scroll, no more auto-fade
+
+Two related things the user reported on the bubble:
+
+1. The bubble was hard-locked to a bilingual EN+FR shape — every answer rendered EN on top, then a
+   `\n---\n` divider, then FR below in a teal color. The user asked for ONE language: the language
+   they actually typed in (FR for a French question, EN for an English one, etc.). I added a tiny
+   no-dep language detector (lib/llm.mjs: detectLang) covering FR/EN/ES/DE/IT/PT/NL/RU/ZH/JA/KO/AR/
+   PL/TR. The speak()/chat() prompts now say "reply ONLY in <detected language>" and the panel
+   renders a single block. The divider is still parsed defensively — if a model leaks the legacy
+   bilingual shape, we keep ONLY the first language. The bilingual CSS (.lang-en/.lang-fr) is
+   retired; a no-op `.bubble .lang{ color:inherit }` keeps any stale DOM from looking broken.
+
+2. "voir tout le texte ou juste fix le deroulement du texte vers le bas ou haut continue" — the
+   user couldn't read long answers. The bubble was capped at max-height:34% with a mask-image
+   gradient on the body that faded the last words to transparent, and `updateOverflowHint` reset
+   scroll to top on every render. Fixed:
+     • the body mask-fade is GONE — text is fully visible at all times
+     • `updateOverflowHint` now reads scroll metrics off the SCROLLING element (the .bubble) and
+       no longer yanks scrollTop back to 0 between renders
+     • `say()` auto-scrolls to the bottom ONLY when the user is already near the bottom (within
+       40px) — if they scrolled up to read older content, a new answer doesn't yank the view back
+     • the bubble got a real, visible scrollbar (scrollbar-width:thin + a tinted webkit thumb) so
+       the user can always see how much content is hidden, in either direction
+     • `scroll-behavior:smooth` on .bubble makes wheel/touchpad scrolling fluid
+     • `pointer-events:auto` on .bubble so the wheel actually reaches it
+
+Other touched files: lib/session.mjs (noteLang now reuses detectLang; ask() returns `lang` on the
+envelope for the panel and the CLI), mcp/toshi-mcp.mjs (/pulse uses the same single-language rule
+with `langName(lastLang)`). Brain smoke-tested: /ask returns the new shape with `lang`/`chat`/
+`voiced`/`tool`/`grounded` correctly. Detect-lang smoke test: 13/17 on the synthetic set; the 4
+misses are ES/IT/PT/NL without diacritics (overlap with FR/DE stopwords), which is the documented
+limit of a no-dep heuristic — real users type with their accents and pass.
+
+Verified: node --check on all 4 JS files, end-to-end curl against :4820/ask returns the
+expected envelope, no regressions on the other .panel CSS.

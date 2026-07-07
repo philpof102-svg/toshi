@@ -7,7 +7,7 @@
 import http from 'node:http';
 import readline from 'node:readline';
 import { ask, status, setRepo, pulse, lastLang } from '../lib/session.mjs';
-import { speak, hasVoice, voiceKind } from '../lib/llm.mjs';
+import { speak, hasVoice, voiceKind, langName } from '../lib/llm.mjs';
 
 // grounded voice: keep the structural `answer` intact (agents/tests rely on it) and ADD `spoken` —
 // a 1-3 sentence NL reply synthesized by the zero CLI from the retrieved facts only.
@@ -93,10 +93,11 @@ const httpServer = http.createServer(async (req, res) => {
     const p = await pulse();
     if (p.comment && hasVoice()) { // let zero phrase the kindness — still ONLY from the real facts
       const base = status().repo.split(/[\\/]/).filter(Boolean).pop();
+      // ONE LANGUAGE (2026-07-07): the bubble now renders a single block in the user's language. We pass
+      // the detected ISO code (lastLang, set by noteLang on the previous ask) and the prompt tells the
+      // model to reply in that language only. The panel no longer splits on a \n---\n divider.
       const spoken = await speak(
-        lastLang === 'fr'
-          ? 'Fais UN commentaire gentil et encourageant (1-2 phrases max) au développeur sur son activité, en français.'
-          : 'Give ONE kind, encouraging comment (max 2 sentences) to the developer about their activity, in English.',
+        `Give ONE kind, encouraging comment (max 2 sentences) to the developer about their activity. Reply ONLY in ${langName(lastLang)} — no second language, no translation, no separator line.`,
         p.facts, base);
       if (spoken) p.comment = spoken;
     }

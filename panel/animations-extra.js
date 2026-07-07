@@ -223,6 +223,11 @@
   // Click the footer → 6 amber hearts drift up from the click point.
   // Distinct from the grounded .spark burst (which is radial from the
   // mascot centre). Used for a "thanks" / "I appreciate the companion" feel.
+  // Same noBurst rule as the panel's .spark: if Toshi is currently
+  // holding / using an object (hand_wave, pointing, walking, dancing),
+  // the heart-burst is suppressed — the object's own animation IS the
+  // celebration. No new global: we read the panel's poseEnum via
+  // window.__toshi.state() and consult its own OBJECT_POSES semantics.
   const HEART_QUIPS = [
     'thanks for the love 💛', 'spread the onchain love', 'one like, one commit',
     'you just made the cat happy', 'I felt that one', 'aww',
@@ -231,6 +236,17 @@
     const foot = document.querySelector('.foot'); if (!foot) return;
     foot.addEventListener('click', (e) => {
       if (reduce) return;
+      // noBurst: skip if Toshi is mid-object. We read the same source of
+      // truth the panel uses — its poseEnum — via the public state hook.
+      // If we can't read state (e.g. addon loaded before Rive), we err
+      // on the side of showing the burst (graceful degradation).
+      try {
+        const s = window.__toshi && window.__toshi.state && window.__toshi.state();
+        if (s) {
+          const NO_BURST = { hand_wave:1, pointing:1, walking:1, walking_side:1, running:1, dancing:1 };
+          if (NO_BURST[s.pose]) return;
+        }
+      } catch {}
       const stage = document.querySelector('.stage');
       if (!stage) return;
       const r = stage.getBoundingClientRect();

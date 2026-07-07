@@ -78,8 +78,9 @@
     position:absolute; left:10px; right:10px; bottom:8px;
     background:rgba(7,11,25,.95); border:1px solid var(--line); border-radius:11px;
     padding:6px 9px; font-size:10.5px; line-height:1.38; color:var(--ink);
-    opacity:0; transform:translateY(6px); transition:.22s; pointer-events:none;
-    max-height:34%; overflow:auto; white-space:pre-wrap;
+    opacity:0; transform:translateY(6px); transition:.22s; pointer-events:auto;
+    max-height:34%; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap;
+    scroll-behavior:smooth; -webkit-overflow-scrolling:touch;
   }
   .bubble.on{opacity:1; transform:none; animation:bubble-pop .34s cubic-bezier(.2,1.4,.4,1)}
   @keyframes bubble-pop{0%{opacity:0; transform:translateY(10px) scale(.92)} 100%{opacity:1; transform:none}}
@@ -276,13 +277,13 @@ window.__toshi = {
 window.addEventListener('resize', () => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} });
 
 let bubbleTimer = null;
-// `say` is the single bubble-render path. The spoken answer is BILINGUAL: EN first,
-// then a literal `\n---\n` divider, then the FR translation. We split on that divider
-// and render two <div> lines so the chat reads "EN line 1 / FR line 2" — exactly the
-// format the LLM was prompted to produce. When the reply is monolingual (a canned
-// greeting, an error, a missing LLM) we render it as a single line. No-DOM-by-default:
-// the second language is shown in a softer color via a `.fr` class so the eye knows
-// which one is the translation.
+// `say` is the single bubble-render path. The spoken answer is ONE block in the user's language
+// (EN/FR/ES/DE/IT/PT/NL/RU/ZH/JA/KO/AR/PL/TR/...) — Toshi detects the language from the question and
+// the model answers in that language. No bilingual mirror, no EN/FR split, no `\n---\n` divider. The
+// bubble auto-scrolls to the bottom on each new answer (so the latest lines are always visible), and
+// the user can scroll UP freely with the wheel, touchpad, or the scrollbar to read older content —
+// scroll position is preserved when the same answer is re-rendered, and reset when a new answer comes
+// in. A small fading chevron at the bottom hints that more content is available above.
 function say(text, grounded, holdMs) {
   $('grounded').hidden = !grounded;
   // The bubble now surfaces a little more of the answer's provenance — small, monospace pills in the
@@ -296,33 +297,31 @@ function say(text, grounded, holdMs) {
   const em = $('emote'); // gif-energy reaction: pops in with the answer
   em.hidden = false; em.textContent = grounded ? pick(['😺', '🎉', '😸', '✨']) : pick(['😺', '💤', '👀']);
   em.style.animation = 'none'; void em.offsetWidth; em.style.animation = ''; // retrigger the pop
-  // bilingual split. The divider is intentionally literal (3 dashes) so the model
-  // emits something the regex can find; we tolerate whitespace around it.
+  // ONE block in the user's language. The model is now prompted to produce a single-language reply;
+  // we still split on `\n---\n` defensively in case a model leaks the legacy bilingual shape — in
+  // that case we keep ONLY the first language (the user's one), so the bubble never reads as "EN line
+  // then FR line" again. textContent (not innerHTML) so we never render anything the model could
+  // turn into HTML.
   const body = $('bubble-body');
   const raw = String(text == null ? '' : text);
-  const parts = raw.split(/\n\s*---\s*\n/);
-  let spokenText; // the actual lines that went into the bubble (used by the copy button)
-  if (parts.length >= 2) {
-    // EN on top, FR below in a softer tone. textContent (not innerHTML) so we never
-    // render anything the model could turn into HTML — the bubble is trusted UI but
-    // textContent is the cheap, correct guard.
-    body.innerHTML = '';
-    const en = document.createElement('div'); en.className = 'lang lang-en'; en.textContent = parts[0].trim();
-    const fr = document.createElement('div'); fr.className = 'lang lang-fr'; fr.textContent = parts.slice(1).join('\n---\n').trim();
-    body.appendChild(en); body.appendChild(fr);
-    spokenText = parts[0].trim() + '\n\n' + parts.slice(1).join('\n---\n').trim();
-  } else {
-    body.textContent = raw;
-    spokenText = raw;
-  }
+  const firstLang = raw.split(/\n\s*---\s*\n/)[0].trim();
+  body.textContent = firstLang;
   // stash the plain text on the body so the copy button reads it back without re-splitting
-  body.dataset.spoken = spokenText;
+  body.dataset.spoken = firstLang;
   const b = $('bubble'); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); // retrigger pop-in
   clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => b.classList.remove('on'), holdMs || 11000);
   // after the bubble paints, check whether the content overflows the max-height: if so, add a class
   // that fades in a small chevron at the bottom of the bubble so the user knows there is more to scroll.
-  // We do this on the next frame so layout is final.
-  requestAnimationFrame(updateOverflowHint);
+  // We do this on the next frame so layout is final. We also auto-scroll to the bottom so the latest
+  // lines are visible without the user having to scroll — but only when the user is NEAR the bottom
+  // (within 40px). If they scrolled up to read older content, we respect that and keep their position
+  // (a new answer doesn't yank the view back to the bottom — that was the "le texte continue de
+  // défiler vers le bas tout seul" complaint).
+  requestAnimationFrame(() => {
+    const nearBottom = (b.scrollTop + b.clientHeight) >= (b.scrollHeight - 40);
+    if (nearBottom) b.scrollTop = b.scrollHeight; // auto-scroll: only when the user was already at the bottom
+    updateOverflowHint();
+  });
 }
 
 // Last ask response (kept on a closure for the .who row). Updated every time submitQ resolves.
@@ -369,13 +368,15 @@ function populateProvenance({ grounded }) {
 }
 
 // overflow hint: a small fading chevron at the bottom of the bubble whenever the body actually scrolls.
-// Cheap: one rAF after paint, reads scrollHeight vs clientHeight, toggles a class.
+// Cheap: one rAF after paint, reads scrollHeight vs clientHeight on the SCROLLING element (the
+// bubble itself — it's the one with overflow:auto, so its scroll metrics are what matter). Toggles
+// the .has-more class.
 function updateOverflowHint() {
-  const body = $('bubble-body'); const b = $('bubble'); if (!body || !b) return;
-  const over = body.scrollHeight > body.clientHeight + 2; // +2 for sub-pixel rounding
+  const b = $('bubble'); if (!b) return;
+  const over = b.scrollHeight > b.clientHeight + 2; // +2 for sub-pixel rounding
   b.classList.toggle('has-more', over);
-  // a body that fits never has more to read; reset scroll so the next overflowed answer starts at top
-  if (!over) body.scrollTop = 0;
+  // a body that fits never has more to read; leave scroll alone (the user may have scrolled within
+  // a previous long answer and we want to honor that on a follow-up render)
 }
 // re-evaluate on resize (the bubble max-height is %-based, so a pod resize can change overflow)
 window.addEventListener('resize', updateOverflowHint);
