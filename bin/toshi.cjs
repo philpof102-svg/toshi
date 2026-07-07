@@ -25,6 +25,7 @@ const sub = (process.argv[2] || '').toLowerCase();
   toshi collapse     fold into a small head                toshi expand     unfold
   toshi size <s>     resize: small | normal | large | xl | 340x520 (live if running)
   toshi model <id>   pick Toshi's brain model, persisted to ~/.toshi.json (e.g. minimax/minimax-m3). No arg = show current · --clear = provider default
+  toshi voice <e>    spoken voice (audio TTS): off | system | kokoro | piper. No arg = show current · --list = the open-source ladder (VOICE.md)
   toshi setup        ONE-COMMAND onboarding: install the brain + index THIS repo + wire zero/openclaude/Claude Code + float the popup (--no-float to skip · --remove to undo)
                      (--mcp only · --hook only · --file <path> for Claude Desktop/Cline · --remove undoes)
   toshi version      print version
@@ -86,6 +87,49 @@ docs: https://github.com/philpof102-svg/toshi`);
     console.log(`🐈  Toshi brain model → ${arg}  (saved to ~/.toshi.json)`);
     console.log('    make sure a provider key is set — e.g. OPENROUTER_API_KEY, or TOSHI_API_URL + TOSHI_API_KEY.');
     console.log('    (TOSHI_API_MODEL in the environment still overrides this if set.)');
+    return;
+  }
+  if (sub === 'voice') {
+    // toshi voice <off|system|kokoro|piper>  — persist the SPOKEN (audio TTS) voice to ~/.toshi.json {voice},
+    // read by lib/tts.mjs. Open-source + local, graceful fallback (kokoro→piper→system→off). See VOICE.md.
+    //   toshi voice                → show current + the default
+    //   toshi voice --list         → the engine ladder (license + size + install)
+    //   toshi voice kokoro         → the credible local voice (Kokoro-82M, Apache-2.0, one-time download)
+    //   toshi voice off | --clear  → mute / back to the default (system = Web Speech, 0 download)
+    const { TTS_ENGINES, PERSONA } = await import('../lib/tts.mjs');
+    const cfgPath = path.join(require('node:os').homedir(), '.toshi.json');
+    let cur = {}; try { cur = JSON.parse(require('node:fs').readFileSync(cfgPath, 'utf8')) || {}; } catch {}
+    const arg = (process.argv[3] || '').trim().toLowerCase();
+    const ids = TTS_ENGINES.map((e) => e.id); // system | kokoro | piper
+    if (['--list', 'list'].includes(arg)) {
+      console.log('🐈  Toshi voices — open-source, local, no cloud (see VOICE.md):');
+      for (const e of TTS_ENGINES) console.log(`    ${e.id.padEnd(7)} ${e.label}  ·  ${e.license}  ·  ${e.size}  ·  ${e.install}`);
+      console.log(`    off     mute (text bubbles still work)`);
+      console.log(`    persona: rate ${PERSONA.rate} · pitch ${PERSONA.pitch} · FR voice ${PERSONA.kokoro.fr} · EN voice ${PERSONA.kokoro.en}`);
+      return;
+    }
+    if (!arg) {
+      console.log(cur.voice
+        ? `🐈  Toshi voice: ${cur.voice}  (from ~/.toshi.json)`
+        : '🐈  no voice set — default is "system" (Web Speech, 0 download).\n    upgrade:  toshi voice kokoro   ·   see all:  toshi voice --list');
+      return;
+    }
+    if (['--clear', 'clear', 'default', 'reset'].includes(arg)) {
+      delete cur.voice;
+      require('node:fs').writeFileSync(cfgPath, JSON.stringify(cur, null, 2));
+      console.log('🐈  Toshi voice cleared — back to the default (system = Web Speech).');
+      return;
+    }
+    if (arg !== 'off' && !ids.includes(arg)) {
+      console.log(`🙀  unknown voice "${arg}". Choose: off | ${ids.join(' | ')}   (toshi voice --list for details)`);
+      return;
+    }
+    cur.voice = arg;
+    require('node:fs').writeFileSync(cfgPath, JSON.stringify(cur, null, 2));
+    console.log(`🐈  Toshi voice → ${arg}  (saved to ~/.toshi.json)`);
+    if (arg === 'kokoro') console.log('    first use downloads the Kokoro-82M ONNX model once (~80–330MB), then 100% local.');
+    if (arg === 'piper') console.log('    needs the piper binary + a .onnx voice on PATH (see VOICE.md).');
+    if (arg === 'off') console.log('    Toshi is muted — text bubbles still work.');
     return;
   }
   if (sub === 'ask') {
