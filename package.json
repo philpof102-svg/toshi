@@ -10,9 +10,20 @@
     "toshi-mcp": "mcp/toshi-mcp.mjs"
   },
   "files": [
-    "bin/", "lib/", "mcp/", "panel/", "tools/", "desktop/",
-    "plugin.json", "serve.js", "toshi.bat", "server.json", "smithery.yaml",
-    "README.md", "LICENSE", "ATTRIBUTION.md"
+    "bin/",
+    "lib/",
+    "mcp/",
+    "panel/",
+    "tools/",
+    "desktop/",
+    "plugin.json",
+    "serve.js",
+    "toshi.bat",
+    "server.json",
+    "smithery.yaml",
+    "README.md",
+    "LICENSE",
+    "ATTRIBUTION.md"
   ],
   "scripts": {
     "toshi": "electron .",
@@ -20,7 +31,7 @@
     "brain": "node mcp/toshi-mcp.mjs",
     "ask": "node tools/toshi.mjs ask",
     "zero-hook": "node tools/install-zero-hook.mjs",
-    "test": "node test/simulate.mjs"
+    "test": "node test/simulate.mjs && node test/animations-smoke.cjs"
   },
   "repository": {
     "type": "git",
