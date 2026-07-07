@@ -148,7 +148,7 @@
     <div class="stage">
       <div class="floaty" id="floaty"><canvas id="toshi" width="620" height="820"></canvas></div>
       <div class="loading" id="loading">waking Toshi…</div>
-      <div class="bubble" id="bubble"><div class="who">toshi <span class="grounded" id="grounded" hidden>from your repo</span><span class="emote" id="emote" hidden></span></div><div id="bubble-body"></div></div>
+      <div class="bubble" id="bubble"><div class="who">toshi <span class="grounded" id="grounded" hidden>from your repo</span><span class="emote" id="emote" hidden></span><button class="bubble-copy" id="bubble-copy" type="button" title="copy this reply" aria-label="copy Toshi's reply" hidden>⧉</button></div><div id="bubble-body"></div><span class="bubble-more" id="bubble-more" aria-hidden="true">▾</span></div>
     </div>
 
     <!-- ONE quick chip for the common grounded ask; the input below is the primary path and takes BOTH
@@ -183,14 +183,33 @@ const EYE_CYCLE = ['look_up','look_down','look_left','look_right','blink','squin
 const FLOURISH = ['look_around','pointing','hand_wave','dancing','celebration']; // ambient poses (openhuman-style)
 const VISEMES = ['aa','E','ih','oh','ou','PP','DD'];
 
+// Poses that imply Toshi is HOLDING / USING an object. Behind those poses we
+// suppress the radial .spark confetti burst (and the heart-burst from the
+// footer) — the object's own animation IS the celebration. The rule is
+// intentional, not a bug: a burst behind a held prop reads as visual noise.
+const OBJECT_POSES = new Set([
+  'hand_wave',  // waving a paw
+  'pointing',   // pointing at something
+  'walking', 'walking_side', 'running', // moving with a prop / in motion
+  'dancing',    // often paired with a prop
+]);
+
 let rive = null, poseEnum = null, eyesEnum = null, mouthEnum = null, poseTimer = null;
 const tag = (t) => { if ($('pose-tag')) $('pose-tag').textContent = t; };
 const setEnum = (p, v) => { try { if (p) p.value = v; } catch {} };
+// single source of truth for "is Toshi currently holding an object?"
+// consulted by sparkle() and by the footer heart-burst. Pure function of
+// the current pose enum — no other state to keep in sync.
+function poseUsesObject() { return OBJECT_POSES.has(poseEnum && poseEnum.value); }
 
-function setPose(name, label, holdMs) {
+function setPose(name, label, holdMs, opts) {
   setEnum(poseEnum, name); tag((label || name).replace(/_/g, ' '));
   clearTimeout(poseTimer);
   if (name !== 'idle') poseTimer = setTimeout(() => { setEnum(poseEnum, 'idle'); tag('idle'); }, holdMs || 2600);
+  // surface the object-in-hand hint on the stage so the CSS layer can
+  // also dim ambient particles (motes) if it ever wants to. No visual
+  // effect today — wiring only — but it's the right hook point.
+  try { document.querySelector('.stage').dataset.usesObject = OBJECT_POSES.has(name) ? '1' : '0'; } catch {}
 }
 function celebrate() { setPose('celebration', '🎉 got it', 2800); }
 function talk(ms) { // lip-flap via viseme codes; 'sil' closes the mouth at rest
@@ -199,8 +218,16 @@ function talk(ms) { // lip-flap via viseme codes; 'sil' closes the mouth at rest
     if ((t += 150) > (ms || 1200)) { clearInterval(iv); setEnum(mouthEnum, 'sil'); } }, 150);
 }
 function reactWiggle(cls) { const f = $('floaty'); if (reduce || !f) return; f.classList.remove('react','nope'); void f.offsetWidth; f.classList.add(cls); setTimeout(() => f.classList.remove(cls), 480); }
-function sparkle() {
+// `sparkle` (the radial .spark confetti burst) is gated on `poseUsesObject()`:
+// if Toshi is currently waving / pointing / holding a prop, the burst is
+// suppressed — the object's own animation IS the celebration. Callers can
+// also pass { force: true } to override the gate (rare; reserved for
+// truly event-driven bursts like a successful repo commit pulse).
+function sparkle(opts) {
   if (reduce) return; const st = document.querySelector('.stage');
+  if (!st) return;
+  const force = !!(opts && opts.force);
+  if (!force && poseUsesObject()) return; // rule: no confetti behind an in-hand object
   for (let i=0;i<10;i++){ const s=document.createElement('div'); s.className='spark'; const a=Math.random()*6.28, r=40+Math.random()*60;
     s.style.left='50%'; s.style.top='42%'; s.style.setProperty('--dx',Math.cos(a)*r+'px'); s.style.setProperty('--dy',Math.sin(a)*r+'px');
     st.appendChild(s); requestAnimationFrame(()=>s.classList.add('go')); setTimeout(()=>s.remove(),950); }
@@ -249,26 +276,125 @@ window.__toshi = {
 window.addEventListener('resize', () => { try { rive && rive.resizeDrawingSurfaceToCanvas(); } catch {} });
 
 let bubbleTimer = null;
+// `say` is the single bubble-render path. The spoken answer is BILINGUAL: EN first,
+// then a literal `\n---\n` divider, then the FR translation. We split on that divider
+// and render two <div> lines so the chat reads "EN line 1 / FR line 2" — exactly the
+// format the LLM was prompted to produce. When the reply is monolingual (a canned
+// greeting, an error, a missing LLM) we render it as a single line. No-DOM-by-default:
+// the second language is shown in a softer color via a `.fr` class so the eye knows
+// which one is the translation.
 function say(text, grounded, holdMs) {
   $('grounded').hidden = !grounded;
+  // The bubble now surfaces a little more of the answer's provenance — small, monospace pills in the
+  // .who row, same palette. They answer the three things a developer actually wonders after a reply:
+  //   • WHICH tool ran (search_graph, trace_call_path, detect_changes, get_architecture, chat, ...)
+  //   • WAS the LLM voicing on (✦ rephrased into NL · ≡ raw structural summary, the no-voice path)
+  //   • IS this grounded or small talk (the existing 'from your repo' badge stays — we just keep it
+  //     for grounded and use 'chat' for free conversation so the two never look the same)
+  // The pills are tiny, dim by default, and the .who row still reads as one line in mini mode.
+  populateProvenance({ grounded: !!grounded });
   const em = $('emote'); // gif-energy reaction: pops in with the answer
   em.hidden = false; em.textContent = grounded ? pick(['😺', '🎉', '😸', '✨']) : pick(['😺', '💤', '👀']);
   em.style.animation = 'none'; void em.offsetWidth; em.style.animation = ''; // retrigger the pop
-  $('bubble-body').textContent = text;
+  // bilingual split. The divider is intentionally literal (3 dashes) so the model
+  // emits something the regex can find; we tolerate whitespace around it.
+  const body = $('bubble-body');
+  const raw = String(text == null ? '' : text);
+  const parts = raw.split(/\n\s*---\s*\n/);
+  let spokenText; // the actual lines that went into the bubble (used by the copy button)
+  if (parts.length >= 2) {
+    // EN on top, FR below in a softer tone. textContent (not innerHTML) so we never
+    // render anything the model could turn into HTML — the bubble is trusted UI but
+    // textContent is the cheap, correct guard.
+    body.innerHTML = '';
+    const en = document.createElement('div'); en.className = 'lang lang-en'; en.textContent = parts[0].trim();
+    const fr = document.createElement('div'); fr.className = 'lang lang-fr'; fr.textContent = parts.slice(1).join('\n---\n').trim();
+    body.appendChild(en); body.appendChild(fr);
+    spokenText = parts[0].trim() + '\n\n' + parts.slice(1).join('\n---\n').trim();
+  } else {
+    body.textContent = raw;
+    spokenText = raw;
+  }
+  // stash the plain text on the body so the copy button reads it back without re-splitting
+  body.dataset.spoken = spokenText;
   const b = $('bubble'); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); // retrigger pop-in
   clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => b.classList.remove('on'), holdMs || 11000);
+  // after the bubble paints, check whether the content overflows the max-height: if so, add a class
+  // that fades in a small chevron at the bottom of the bubble so the user knows there is more to scroll.
+  // We do this on the next frame so layout is final.
+  requestAnimationFrame(updateOverflowHint);
 }
+
+// Last ask response (kept on a closure for the .who row). Updated every time submitQ resolves.
+// We surface `tool` (the graph tool that ran) and `voiced` (whether the LLM rephrased the answer).
+let lastTool = '';
+let lastVoiced = false;
+let lastChat = false;
+function populateProvenance({ grounded }) {
+  const row = document.querySelector('.bubble .who'); if (!row) return;
+  // rebuild the small meta pills on every say(): cheap, single-digit children, and it keeps the
+  // .who row honest about the *current* answer even if state changed between turns.
+  row.querySelectorAll('.meta').forEach((n) => n.remove());
+  // tool pill (only when we actually ran a tool — chat fallback has no graph lookup to brag about)
+  if (lastTool && lastTool !== 'help') {
+    const t = document.createElement('span');
+    t.className = 'meta pill pill-tool';
+    t.textContent = lastTool; // monospace, dim — names the graph tool that produced the answer
+    t.title = `retrieved via ${lastTool}`; // hover: the full name
+    row.appendChild(t);
+  }
+  // voice pill: ✦ (NL rephrased by the LLM) or ≡ (raw structural summary, the no-voice path)
+  const v = document.createElement('span');
+  v.className = 'meta pill pill-voice' + (lastVoiced ? ' pill-voice-on' : ' pill-voice-off');
+  v.textContent = lastVoiced ? '✦ voiced' : '≡ raw';
+  v.title = lastVoiced
+    ? 'rephrased into natural language by the brain model'
+    : 'raw structural summary (no LLM rephrasing — set a model with `toshi model <id>`)';
+  row.appendChild(v);
+  // grounded vs chat pill (independent of the existing 'from your repo' badge — this one is
+  // explicit and stays even when the badge hides for a free-conversation turn)
+  if (lastChat) {
+    const c = document.createElement('span');
+    c.className = 'meta pill pill-chat';
+    c.textContent = 'chat';
+    c.title = 'small talk — not a repo lookup. Ask "what changed" / "où est X" to ground it.';
+    row.appendChild(c);
+  } else if (grounded) {
+    const g = document.createElement('span');
+    g.className = 'meta pill pill-grounded';
+    g.textContent = 'from repo';
+    g.title = 'answered from your codebase graph';
+    row.appendChild(g);
+  }
+}
+
+// overflow hint: a small fading chevron at the bottom of the bubble whenever the body actually scrolls.
+// Cheap: one rAF after paint, reads scrollHeight vs clientHeight, toggles a class.
+function updateOverflowHint() {
+  const body = $('bubble-body'); const b = $('bubble'); if (!body || !b) return;
+  const over = body.scrollHeight > body.clientHeight + 2; // +2 for sub-pixel rounding
+  b.classList.toggle('has-more', over);
+  // a body that fits never has more to read; reset scroll so the next overflowed answer starts at top
+  if (!over) body.scrollTop = 0;
+}
+// re-evaluate on resize (the bubble max-height is %-based, so a pod resize can change overflow)
+window.addEventListener('resize', updateOverflowHint);
 function thinking() { $('grounded').hidden = true; $('bubble-body').innerHTML = '<span class="dots"><span>•</span><span>•</span><span>•</span></span>'; $('bubble').classList.add('on'); }
 
 async function submitQ(q) {
   if (!q || busy) return;
   $('q').value=''; $('send').disabled=true; busy = true;
   setPose('look_around', 'thinking', 15000); setEnum(eyesEnum, 'thinking'); reactWiggle('react'); thinking();
+  // clear provenance + copy state for the new turn (a new answer deserves a clean header)
+  lastTool = ''; lastVoiced = false; lastChat = false;
+  const cp = $('bubble-copy'); if (cp) { cp.hidden = true; cp.classList.remove('copied'); }
   try {
     const r = await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q }) });
     if (!r.ok) throw new Error('mcp '+r.status);
     const j = await r.json();
     setEnum(eyesEnum, 'NEUTRAL');
+    // capture provenance BEFORE say() — populateProvenance() reads from these closures
+    lastTool = j.tool || ''; lastVoiced = !!j.voiced; lastChat = !!j.chat;
     // grounded → celebrate; free chat → a warm wave (it's a normal conversation, not a repo fact); the
     // bare abilities greeting → a gentle "heads-up" point.
     if (j.grounded) { celebrate(); sparkle(); }
@@ -276,13 +402,36 @@ async function submitQ(q) {
     else { setPose('pointing', 'heads-up', 2200); }
     const text = j.spoken || j.answer || '(no answer)'; // voiced when available, structural/chat otherwise
     talk(Math.min(2600, text.length*22)); say(text, !!j.grounded, Math.max(9000, Math.min(20000, text.length*90)));
+    // reveal the copy button once we have something to copy (the body is the source of truth, and
+    // it is stashed on body.dataset.spoken by say())
+    if (cp) cp.hidden = false;
   } catch {
     setEnum(eyesEnum, 'confused'); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 1200);
     setPose('idle'); reactWiggle('nope');
     say("start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I read your real session (via codebase-memory-mcp).", false);
+    if (cp) cp.hidden = true; // nothing to copy from a brain-down banner
   }
   busy = false; $('send').disabled=false; $('q').focus();
 }
+// copy button — pulls the stashed plain text (EN\n\nFR — the same thing the user sees) into the clipboard.
+// Uses the modern Clipboard API when available (Electron + secure contexts); falls back to execCommand on
+// plain http://127.0.0.1 which is treated as an insecure context by some browsers.
+$('bubble-copy').addEventListener('click', async (e) => {
+  e.stopPropagation();
+  const body = $('bubble-body'); if (!body) return;
+  const txt = body.dataset.spoken || body.textContent || '';
+  if (!txt) return;
+  let ok = false;
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(txt); ok = true; } } catch {}
+  if (!ok) { // insecure-context fallback (file:// or http on some browsers) — the classic exec path
+    try { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); document.body.removeChild(ta); } catch {}
+  }
+  const btn = $('bubble-copy'); if (!btn) return;
+  btn.classList.toggle('copied', ok); // flips the icon to ✓ for ~1.2s, then reverts
+  btn.title = ok ? 'copied!' : 'copy failed — select the bubble text';
+  setTimeout(() => { btn.classList.remove('copied'); btn.title = 'copy this reply'; }, 1200);
+});
 $('ask').addEventListener('submit', (e) => { e.preventDefault(); submitQ($('q').value.trim()); });
 // quick chips: one tap = a real ask; "trouve…" pre-fills so you type just the symbol
 document.querySelectorAll('.chips button').forEach((b) => b.addEventListener('click', () => {
@@ -342,7 +491,7 @@ setInterval(async () => {
     if (p.comment && p.comment !== lastPulse) {
       lastPulse = p.comment;
       setPose(p.event === 'commit' ? 'celebration' : 'hand_wave', p.event === 'commit' ? '🎉' : '😺', 2600);
-      reactWiggle('react'); if (p.event === 'commit') sparkle();
+      reactWiggle('react'); if (p.event === 'commit') sparkle({ force: true }); // commit = real event, burst regardless of pose
       say(p.comment, true, 9500);
     }
   } catch {}
