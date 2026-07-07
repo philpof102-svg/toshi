@@ -28,6 +28,15 @@ The rest of the page is the *why* and the *what if it didn't work*.
 2. Click **"Create Key"**, name it `toshi` (or whatever), copy the
    `sk-or-v1-…` string. **You only see it once** — paste it somewhere safe
    (a password manager) before closing the modal.
+
+   > **⚠️ Use a normal API key — NOT a *Provisioning* / management key.** OpenRouter's
+   > keys page has a separate **Provisioning** section for keys that *manage your account*
+   > (create/delete other keys). Those keys have the **same `sk-or-v1-…` format** but
+   > **cannot make chat calls** — every request returns `401 "User not found"`. A real
+   > new user lost ~20 min here: the format looked right, so re-copying it (twice) never
+   > helped. If you get `401 User not found` with a key you're sure you copied whole, you
+   > grabbed a provisioning key — go back and make a **standard** key with the normal
+   > **"Create Key"** button (not the Provisioning/management area).
 3. Optional: top up a few dollars of credits. OpenRouter has many free
    models — `toshi` works on a $0 balance against `:free` slugs, but paid
    slugs (e.g. `minimax/minimax-m3`) need a positive balance. The default
@@ -169,6 +178,7 @@ TOSHI_DEBUG=1 toshi ask "dis ok"
 |---|---|---|
 | `toshi ask` returns the *watching* greeting every time | `OPENROUTER_API_KEY` not in Toshi's env | re-check the path: `node -e "console.log(process.env.OPENROUTER_API_KEY)"` from the same shell you launched Toshi in. On Windows headless, prefer `~/.toshi/.env` — see §2. |
 | *"hmm, mon modèle n'a rien renvoyé"* with `TOSHI_DEBUG=1` showing 401 | bad / truncated key | re-copy from <https://openrouter.ai/keys> (the full string is ~50 chars starting with `sk-or-v1-`) |
+| `401 "User not found"` with a key you're **sure** is copied whole, and re-copying doesn't help | you made a **Provisioning / management key**, not an inference key — same `sk-or-v1-…` format, but it can only manage the account, not chat | at <https://openrouter.ai/keys> make a **standard** key (the normal **Create Key** button), NOT one from the Provisioning/management section. *(A real new user lost ~20 min on exactly this.)* |
 | 402 from OpenRouter | no credits on the account | OpenRouter has many `:free` slugs that don't need credits — `toshi model --free` switches to one automatically. For paid models, top up at <https://openrouter.ai/credits>. |
 | 404 from OpenRouter | the model id was retired or mistyped | `toshi model --free` to auto-pick a live one, or browse <https://openrouter.ai/models> for current slugs |
 | 429 from OpenRouter | free-tier rate limit hit | `toshi model --free` (different free model) or wait a few minutes |
