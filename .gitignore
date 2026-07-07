@@ -7,3 +7,8 @@ node_modules/
 .run-*.cmd
 .smoke-*.cjs
 .spawn-*.cjs
+
+# secrets — never track a provider key (.env was a real hole; a fresh clone must not risk committing it)
+.env
+.env.*
+!.env.example
