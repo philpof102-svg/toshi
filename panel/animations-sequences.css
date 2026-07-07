@@ -1,0 +1,95 @@
+/* ───────────────────────────────────────────────────────────────────────────
+ * toshi — SEQUENCES stylesheet (panel/animations-sequences.css)
+ * Companion to panel/animations-sequences.js. Same Fable-5 rules as
+ * animations-extra.css: only ADD classes (.x- prefix), only ADD keyframes,
+ * only compose on top of the base .floaty animation. No overwrite, no
+ * border, no new color — just the BASED palette already on :root.
+ *
+ * What lives here:
+ *   - 4 transient keyframes (yawn-settle, focus-tilt, confused-shake,
+ *     patrol-tilt) each ≈ 0.5-2.2s, removed by JS on animationend.
+ *   - 5 body.x-eyes-* classes that signal an "eye intent" to the eye
+ *     channel (subtle cosmetic layer over the canvas, never touches the
+ *     Rive enum). The panel's own 2600ms glance cycle keeps running.
+ *   - 1 @media (prefers-reduced-motion:reduce) guard that kills every
+ *     transient class — matches the original CSS, belt + suspenders.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. YAWN-SETTLE (morningStretch) ──────────────────────────────────────
+ * A slightly livelier cousin of the extra pack's .x-yawn (which is -1.5°
+ * settle). Here we go bigger (±2°) and faster, to feel like an actual
+ * morning stretch, not a sleepy drift. Held for ~1.6s. */
+.x-yawn-settle{ animation:yawn-stretch 1.6s ease-in-out both; }
+@keyframes yawn-stretch{
+  0%   { transform:rotate(0); }
+  35%  { transform:rotate(2deg)   translateY(-1px); }
+  65%  { transform:rotate(-1.5deg) translateY(0); }
+  100% { transform:rotate(0); }
+}
+
+/* ── 2. FOCUS-TILT (focusMode) ────────────────────────────────────────────
+ * A very gentle micro-sway while the brain is thinking. ±1° peak, 1.6s
+ * ease-in-out. Lower amplitude than the extras' tilt (which is ±2° on eye
+ * glances) because focusMode is a long-held state, not a quick beat. */
+.x-focus-tilt{ animation:focus-tilt 1.6s ease-in-out both; }
+@keyframes focus-tilt{
+  0%, 100% { transform:rotate(0); }
+  50%      { transform:rotate(1deg); }
+}
+
+/* ── 3. CONFUSED-SHAKE (confusedRecovery) ────────────────────────────────
+ * The "pointing hésitant" beat — a fast micro-shake ±2°, 3 oscillations,
+ * 700ms. Subtle, not the full .nope horizontal shake. Removed by JS. */
+.x-confused-shake{ animation:confused-shake 700ms ease; }
+@keyframes confused-shake{
+  0%   { transform:translateX(0)   rotate(0); }
+  20%  { transform:translateX(-2px) rotate(-2deg); }
+  40%  { transform:translateX(2px)  rotate(2deg); }
+  60%  { transform:translateX(-1px) rotate(-1deg); }
+  80%  { transform:translateX(1px)  rotate(1deg); }
+  100% { transform:translateX(0)   rotate(0); }
+}
+
+/* ── 4. PATROL-TILT (patrol) ──────────────────────────────────────────────
+ * Walking_side L→R with a side-to-side sway. ±1.5° peak, 2.2s, ease-in-out
+ * — the body sways like a cat mid-stride. The pose itself is walking_side
+ * (Rive), the tilt is purely cosmetic. */
+.x-patrol-tilt{ animation:patrol-tilt 2.2s ease-in-out both; }
+@keyframes patrol-tilt{
+  0%   { transform:rotate(0); }
+  25%  { transform:rotate(-1.5deg); }
+  50%  { transform:rotate(0); }
+  75%  { transform:rotate(1.5deg); }
+  100% { transform:rotate(0); }
+}
+
+/* ── 5. EYE-INTENT OVERLAYS (cosmetic, NEVER touches the Rive enum) ──────
+ * The panel's eye channel (2600ms) still drives the actual Rive eye state.
+ * These classes apply a VERY subtle CSS filter / overlay to the canvas so
+ * the user can read the intent ("thinking brow", "confused squint", "eyes
+ * closed during yawn") without us writing to the eyeEnum the panel owns.
+ * The filter is light (0.04-0.10) so it never washes out the mascot. */
+body.x-eyes-thinking  #toshi{ filter:brightness(0.98); }
+body.x-eyes-confused  #toshi{ filter:brightness(0.96) contrast(1.04); }
+body.x-eyes-closed    #toshi{ filter:brightness(0.94); }
+body.x-eyes-look-left  #toshi{ filter:brightness(0.99); }
+body.x-eyes-look-right #toshi{ filter:brightness(0.99); }
+/* the transitions make the overlay feel like a soft blink in/out (matches
+   the 650ms glance window the panel uses for the eye channel) */
+#toshi{ transition:filter 320ms ease; }
+
+/* ── REDUCED-MOTION GUARD ────────────────────────────────────────────────
+ * Same belt + suspenders as animations-extra.css: every transient class
+ * killed, the filter transitions disabled, the eye-intent overlays
+ * stripped. Static panel under reduced-motion — no compromise. */
+@media (prefers-reduced-motion:reduce){
+  .x-yawn-settle, .x-focus-tilt, .x-confused-shake, .x-patrol-tilt{
+    animation:none !important; transform:none !important;
+  }
+  body.x-eyes-thinking  #toshi,
+  body.x-eyes-confused  #toshi,
+  body.x-eyes-closed    #toshi,
+  body.x-eyes-look-left  #toshi,
+  body.x-eyes-look-right #toshi{ filter:none !important; }
+  #toshi{ transition:none !important; }
+}
