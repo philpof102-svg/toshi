@@ -208,6 +208,10 @@
 <script defer src="animations-extra.js"></script>
 <link rel="stylesheet" href="animations-sequences.css" />
 <script defer src="animations-sequences.js"></script>
+<link rel="stylesheet" href="wardrobe.css" />
+<script defer src="wardrobe.js"></script>
+<link rel="stylesheet" href="mascots.css" />
+<script defer src="mascots.js"></script>
 </head>
 <body>
   <div class="pod" role="application" aria-label="Toshi companion">
@@ -231,6 +235,13 @@
     <div class="chips" aria-label="quick asks">
       <button type="button" data-q="what changed?">what's new</button>
     </div>
+    <!-- Mascot picker — picks which .riv drives the panel. The 3 mascots ship in panel/mascots/
+         (jarvis, tiny-mascot, toshi — all from the tinyhumansai/mascots archive, all GPL-3.0, all
+         share the openhuman driving contract). Filled in at runtime by panel/mascots.js. -->
+    <div class="mascot-picker-row" id="mascot-picker" role="group" aria-label="mascot"></div>
+    <!-- Wardrobe picker — toggles original SVG wearables (crown, beret, glasses, scarf, hoodie, cape, …).
+         Filled in at runtime by panel/wardrobe.js (one pill per catalog item + a ∅ clear pill). -->
+    <div class="wardrobe-picker-row" id="wardrobe-picker" role="group" aria-label="wardrobe"></div>
     <form class="ask" id="ask">
       <input id="q" autocomplete="off" placeholder="talk to Toshi — ask the code, or just chat…" aria-label="talk to Toshi" />
       <button type="submit" id="send">›</button>
@@ -239,7 +250,10 @@
   </div>
 
 <script>
-const RIV_URL = 'https://raw.githubusercontent.com/tinyhumansai/mascots/main/mascots/toshi/toshi.riv';
+// RIV_URL is now resolved at boot from the mascot catalog (panel/mascots.js → panel/mascots/...).
+// The default mascot on first load is the same 'toshi' cat as before, served from the local
+// panel/mascots/ folder — no archive fetch at runtime. The catalog's _registerSwapFn() callback
+// (registered by bootRive) handles live swaps (mascot picker).
 const MCP_ASK = 'http://127.0.0.1:4820/ask'; // the brain (CORS open) — same target from file:// (Electron) or http (dev)
 const $ = (id) => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -253,31 +267,58 @@ const pick = (xs) => xs[Math.floor(Math.random() * xs.length)];
  *   pose:  idle · look_around · pointing · hand_wave · dancing · celebration · jumping · walking(_side) · running
  *   eyes:  NEUTRAL · blink · look_up/down/left/right · squinting · confused · thinking · closed
  *   mouth: the 15 Oculus viseme codes (sil = resting/closed)
- * Requires @rive-app/canvas ≥ 2.3x (autoBind + viewModelInstance). */
+ * Requires @rive-app/canvas ≥ 2.3x (autoBind + viewModelInstance).
+ *
+ * MULTI-MASCOT NOTE: each mascot in the catalog has its own MASCOT_PROFILES entry (in
+ * panel/mascots.js) that maps the canonical enums/values to the per-mascot vocabulary. The
+ * EYE_CYCLE / FLOURISH / VISEMES / OBJECT_POSES below are RE-INITIALIZED on every swap from the
+ * new profile, so the life-loop code below (setPose / talk / sparkle / lifeLoop) keeps using
+ * the same names — only the values change. The CATALOG-AGNOSTIC shape is:
+ *   - kind: 'enum-trio' (Toshi, Tiny Mascot) → use pose/eyes/mouthViewModel
+ *   - kind: 'anim-state' (Jarvis) → use a single numeric animState enum
+ * The drive code below tolerates both: setEnum() guards on null, and talk()/celebrate() no-op
+ * on a profile that doesn't expose a given enum.
+ */
 const EYE_CYCLE = ['look_up','look_down','look_left','look_right','blink','squinting','confused','thinking']; // manifest channel
-const FLOURISH = ['look_around','pointing','hand_wave','dancing','celebration']; // ambient poses (openhuman-style)
+const FLOURISH = ['look_around','pointing','hand_wave','dancing','celebration']; // ambient poses (openhuman-style, re-bound on swap)
 const VISEMES = ['aa','E','ih','oh','ou','PP','DD'];
 
 // Poses that imply Toshi is HOLDING / USING an object. Behind those poses we
 // suppress the radial .spark confetti burst (and the heart-burst from the
 // footer) — the object's own animation IS the celebration. The rule is
 // intentional, not a bug: a burst behind a held prop reads as visual noise.
-const OBJECT_POSES = new Set([
-  'hand_wave',  // waving a paw
-  'pointing',   // pointing at something
-  'walking', 'walking_side', 'running', // moving with a prop / in motion
-  'dancing',    // often paired with a prop
-]);
+// Re-initialized on every mascot swap from the profile (different mascots have different
+// "in-hand" poses).
+let OBJECT_POSES = new Set(['hand_wave','pointing','walking','walking_side','running','dancing']);
 
-let rive = null, poseEnum = null, eyesEnum = null, mouthEnum = null, poseTimer = null;
+let rive = null, poseEnum = null, eyesEnum = null, mouthEnum = null, animStateEnum = null, poseTimer = null;
+let _profile = null; // current MASCOT_PROFILES entry (null until boot)
 const tag = (t) => { if ($('pose-tag')) $('pose-tag').textContent = t; };
 const setEnum = (p, v) => { try { if (p) p.value = v; } catch {} };
-// single source of truth for "is Toshi currently holding an object?"
+// single source of truth for "is the mascot currently holding an object?"
 // consulted by sparkle() and by the footer heart-burst. Pure function of
 // the current pose enum — no other state to keep in sync.
-function poseUsesObject() { return OBJECT_POSES.has(poseEnum && poseEnum.value); }
+// On anim-state mascots (Jarvis), there's no pose enum — the mascot either
+// rotates (0), listens (1), or talks (2). We use the animState to gate
+// sparkle(): only suppress when the mascot is mid-talk (2) — the ring's
+// own pulse IS the celebration when rotating (0) or listening (1).
+function poseUsesObject() {
+  if (_profile && _profile.kind === 'anim-state') {
+    try { return Number(animStateEnum && animStateEnum.value) === 2; } catch { return false; }
+  }
+  return OBJECT_POSES.has(poseEnum && poseEnum.value);
+}
 
 function setPose(name, label, holdMs, opts) {
+  // anim-state mascots (Jarvis): the only "pose" is the animState number
+  // — there's no body pose. The life-loop's flourish calls become
+  // no-ops for the visible state (the ring is always rotating), and
+  // talk() drives animState to 2 (talking) then back to 0.
+  if (_profile && _profile.kind === 'anim-state') {
+    // For Jarvis, the only useful pose transition is "talking" while
+    // talk() is active. We don't trigger that here — talk() owns it.
+    return;
+  }
   setEnum(poseEnum, name); tag((label || name).replace(/_/g, ' '));
   clearTimeout(poseTimer);
   if (name !== 'idle') {
@@ -298,6 +339,17 @@ function setPose(name, label, holdMs, opts) {
 function celebrate() { setPose('celebration', '🎉 got it', 2800); }
 function talk(ms) { // lip-flap via viseme codes; 'sil' closes the mouth at rest
   if (reduce) return;
+  // anim-state mascots (Jarvis) have no mouth enum — they have a single
+  // numeric animState. While talking, we hold animState = talkingAnim
+  // (2) and revert to restingAnim (0) when done. The viseme tick is
+  // a no-op on those mascots.
+  if (_profile && _profile.kind === 'anim-state') {
+    const ta = (_profile.talkingAnim != null) ? _profile.talkingAnim : 2;
+    const ra = (_profile.restingAnim != null) ? _profile.restingAnim : 0;
+    setEnum(animStateEnum, ta);
+    setTimeout(() => setEnum(animStateEnum, ra), ms || 1200);
+    return;
+  }
   let t = 0; const iv = setInterval(() => { setEnum(mouthEnum, pick(VISEMES));
     if ((t += 150) > (ms || 1200)) { clearInterval(iv); setEnum(mouthEnum, 'sil'); } }, 150);
 }
@@ -354,10 +406,36 @@ async function _lifeLoop() {
   while (!reduce) {
     // ── REST phase — guaranteed minimum 3s, then 0–5s more (so it never feels periodic)
     await _sleep(rand(3000, 8000));
-    if (busy || !poseEnum) continue;
+    if (busy) continue;
+    // skip the whole flourish/eye life on anim-state mascots (Jarvis):
+    // they have no pose enum and only one eyes-equivalent (the ring is always
+    // rotating). The loop just becomes a long REST for those mascots.
+    if (!_profile) continue;
+    if (_profile.kind === 'anim-state') {
+      // a tiny rare pulse on the ring so it doesn't feel frozen. We re-use
+      // the listening state (1) for ~600ms every 12-22s. The user reads it
+      // as "the AI is alive" without a visible body change.
+      if (animStateEnum && !busy) {
+        const ta = (_profile.listeningAnim != null) ? _profile.listeningAnim : 1;
+        const ra = (_profile.restingAnim != null) ? _profile.restingAnim : 0;
+        setEnum(animStateEnum, ta);
+        await _sleep(rand(500, 900));
+        if (!busy) setEnum(animStateEnum, ra);
+      }
+      continue;
+    }
+    if (!poseEnum || !eyesEnum) continue;
 
     // ── pick the next beat — 30% GLANCE, 70% FLOURISH, but every 3rd flourish is special
     const wantFlourish = (Math.random() < 0.7) && (Date.now() - _lastFlourishAt > 4000);
+    // Use the active profile's flourish set when present, else fall back to the
+    // global FLOURISH list. Tiny Mascot has its own set (bookreading, coffeedrink,
+    // writing, …); Toshi uses the openhuman-style set.
+    const flourishes = (_profile.flourishes && _profile.flourishes.length) ? _profile.flourishes : FLOURISH;
+    // eyes resting value differs per mascot: Toshi='NEUTRAL', Tiny Mascot='idle'.
+    // We pick the right one from the active profile so the blink/glance timer
+    // below resets to a value the artboard actually has.
+    const restingEyes = _profile.restingEyes || 'NEUTRAL';
     if (wantFlourish) {
       _lifeState = 'FLOURISH';
       _lastFlourishAt = Date.now();
@@ -365,11 +443,11 @@ async function _lifeLoop() {
       // every 3rd flourish: longer hold + a small paired eye glance in the middle (cat looking around)
       const long = (_flourishCount % 3 === 0);
       const hold = long ? rand(3800, 5200) : rand(2400, 3400);
-      const pose = pick(FLOURISH);
+      const pose = pick(flourishes);
       setPose(pose, null, hold); // schedules its own idle-revert via setPose's internal timer (+200ms blend)
       if (long) {
         setTimeout(() => {
-          if (!busy && eyesEnum) { setEnum(eyesEnum, pick(GLANCE_VALUES)); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 800); }
+          if (!busy && eyesEnum) { setEnum(eyesEnum, pick(GLANCE_VALUES)); setTimeout(() => setEnum(eyesEnum, restingEyes), 800); }
         }, Math.floor(hold * 0.45));
       }
       // wait hold + 200ms blend buffer before considering the lifecycle "back to REST".
@@ -379,7 +457,7 @@ async function _lifeLoop() {
     } else {
       // ── GLANCE phase — short, sweet, never collides with a flourish
       _lifeState = 'GLANCE';
-      if (eyesEnum) { setEnum(eyesEnum, pick(GLANCE_VALUES)); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), rand(700, 1100)); }
+      if (eyesEnum) { setEnum(eyesEnum, pick(GLANCE_VALUES)); setTimeout(() => setEnum(eyesEnum, restingEyes), rand(700, 1100)); }
       await _sleep(rand(1100, 1500));
       _lifeState = 'REST';
     }
@@ -393,8 +471,9 @@ function startLife() {
   // with the main life loop. We use the 'blink' enum (not random — eyes only blink closed).
   setInterval(() => {
     if (busy || !eyesEnum || _lifeState !== 'REST') return; // never blink during a flourish
+    const restingEyes = (_profile && _profile.restingEyes) || 'NEUTRAL';
     setEnum(eyesEnum, 'blink');
-    setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 180);
+    setTimeout(() => setEnum(eyesEnum, restingEyes), 180);
   }, rand(4000, 7000));
 
   // ── NATURAL EMOTES (2026-07-07) ──────────────────────────────────────
@@ -407,6 +486,12 @@ function startLife() {
   // This is what makes a Toshi session feel like a living cat instead of a clockwork doll:
   // these micro-emotes are the small, unmotivated gestures that real animals do between
   // purposeful actions.
+  // restEyes() — single source of truth for "the eye value that means
+  // 'eyes back to neutral'". Per-mascot: Toshi='NEUTRAL', Tiny Mascot='idle'.
+  // The NATURAL emotes below (sigh, double-blink, thinking drift, slow glance)
+  // all end on this value; on anim-state mascots (Jarvis) the helper returns
+  // null and the calls become no-ops (setEnum guards on null).
+  const restEyes = () => (_profile && _profile.restingEyes) || 'NEUTRAL';
   const NATURAL = [
     // 1. SIGH — eyes close, head dips slightly, returns. The "I just exhaled" beat.
     async () => {
@@ -414,22 +499,22 @@ function startLife() {
       setEnum(eyesEnum, 'closed');
       const f = $('floaty'); if (f) { f.classList.remove('x-sigh'); void f.offsetWidth; f.classList.add('x-sigh'); }
       await _sleep(1200);
-      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL');
+      if (!busy && eyesEnum) setEnum(eyesEnum, restEyes());
       if (f) setTimeout(() => f.classList.remove('x-sigh'), 1500);
     },
     // 2. DOUBLE-BLINK — two quick blinks, ~120ms apart. The "yes I see you" beat.
     async () => {
       if (busy || _lifeState !== 'REST' || !eyesEnum) return;
       setEnum(eyesEnum, 'blink'); await _sleep(160);
-      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL'); await _sleep(120);
-      if (!busy && eyesEnum) { setEnum(eyesEnum, 'blink'); await _sleep(160); setEnum(eyesEnum, 'NEUTRAL'); }
+      if (!busy && eyesEnum) setEnum(eyesEnum, restEyes()); await _sleep(120);
+      if (!busy && eyesEnum) { setEnum(eyesEnum, 'blink'); await _sleep(160); setEnum(eyesEnum, restEyes()); }
     },
     // 3. THINKING DRIFT — slow squint that lingers. Toshi is "considering" something.
     async () => {
       if (busy || _lifeState !== 'REST' || !eyesEnum) return;
       setEnum(eyesEnum, 'thinking');
       await _sleep(1800);
-      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL');
+      if (!busy && eyesEnum) setEnum(eyesEnum, restEyes());
     },
     // 4. SLOW GLANCE — one eye direction held longer than a normal glance (1.6s vs 700ms).
     //    The "huh, what's that over there" beat.
@@ -437,7 +522,7 @@ function startLife() {
       if (busy || _lifeState !== 'REST' || !eyesEnum) return;
       setEnum(eyesEnum, pick(['look_up', 'look_left', 'look_right']));
       await _sleep(1600);
-      if (!busy && eyesEnum) setEnum(eyesEnum, 'NEUTRAL');
+      if (!busy && eyesEnum) setEnum(eyesEnum, restEyes());
     },
   ];
   // pick a random natural emote, wait 12–22s, repeat. We DON'T use setInterval — we await between
@@ -453,23 +538,98 @@ function startLife() {
 }
 
 function bootRive() {
+  // Resolve the initial mascot from the catalog. The catalog (panel/mascots.js) is loaded
+  // with `defer` so by the time we run, window.__toshiMascots is always defined. If it
+  // isn't (e.g. someone loaded index.html directly without mascots.js), we fall back to
+  // a hard-coded local toshi.riv — same bytes as the manifest, never the archive.
+  const cat = window.__toshiMascots;
+  const id = (cat && cat.current) ? cat.current : 'toshi';
+  const catalog = cat && cat.list ? cat.list() : [{ id: 'toshi', name: 'Toshi' }];
+  const entry = (cat && cat.catalog) ? cat.catalog.find((m) => m.id === id) : null;
+  const url = entry ? entry.file : 'mascots/toshi.riv';
+  const profile = cat ? cat.profile(id) : null;
+  _loadMascot(url, profile, { isFirstBoot: true, name: (entry && entry.name) || 'Toshi' });
+}
+
+// _loadMascot — the actual Rive boot. Called once at startup AND on every mascot swap
+// (the catalog calls it through _registerSwapFn). Tears down any previous Rive instance
+// cleanly (cleanup() releases the WASM heap; without it, repeated swaps leak memory
+// and eventually the panel crashes).
+let _riveLoaded = false;
+function _loadMascot(url, profile, ctx) {
   if (!window.rive) { $('loading').textContent = 'rive runtime blocked — needs network'; return; }
+  // bind the active profile FIRST — even before the onLoad fires — so setPose() /
+  // poseUsesObject() / talk() see the right shape during the (brief) loading state.
+  _profile = profile || null;
+  // refresh the local OBJECT_POSES / flourishes from the new profile so the existing
+  // life-loop code (which is closed over the OLD `let OBJECT_POSES`) immediately
+  // reflects the new mascot. We mutate the existing Set in place (it was declared
+  // with `let`) rather than re-binding — re-binding would orphan the closure ref.
+  if (profile && profile.objectPoses) {
+    OBJECT_POSES.clear();
+    for (const p of profile.objectPoses) OBJECT_POSES.add(p);
+  } else {
+    OBJECT_POSES.clear();
+  }
+  // re-bind the constant-ish globals the rest of the code reads. EYE_CYCLE / VISEMES
+  // are catalog-agnostic (the same Oculus set is shared), so we leave them; FLOURISH
+  // varies per mascot and is already consulted from `FLOURISH` directly — for the
+  // life-loop, we'll fix the read site to consult _profile.flourishes when present.
+  poseEnum = null; eyesEnum = null; mouthEnum = null; animStateEnum = null; poseTimer = null;
+  // tear down any previous Rive instance (hot-swap path)
+  if (rive) {
+    try { rive.cleanup && rive.cleanup(); } catch {}
+    try { rive.stop && rive.stop(); } catch {}
+    rive = null;
+  }
+  $('loading').classList.remove('gone');
+  $('loading').textContent = 'waking ' + (ctx.name || 'Toshi') + '…';
   try {
     rive = new window.rive.Rive({
-      src: RIV_URL, canvas: $('toshi'), stateMachines: 'MascotSM', autoplay: true, autoBind: true,
+      src: url, canvas: $('toshi'), stateMachines: 'MascotSM', autoplay: true, autoBind: true,
       fit: 'contain', alignment: 'center',
       onLoad() {
         $('loading').classList.add('gone');
         try { rive.resizeDrawingSurfaceToCanvas(); } catch {}
         try {
           const vmi = rive.viewModelInstance;
-          poseEnum = vmi.enum('pose'); eyesEnum = vmi.enum('eyes'); mouthEnum = vmi.enum('mouthVisemeCode');
-          setEnum(eyesEnum, 'NEUTRAL'); setEnum(mouthEnum, 'sil'); // a driven face — no more weird resting expression
+          if (_profile && _profile.kind === 'anim-state') {
+            // Jarvis: single numeric animState. There is no pose/eyes/mouth.
+            animStateEnum = vmi.enum(_profile.enums.anim);
+            const ra = (_profile.restingAnim != null) ? _profile.restingAnim : 0;
+            setEnum(animStateEnum, ra);
+          } else {
+            // Toshi / Tiny Mascot: pose / eyes / mouthVisemeCode. The enum
+            // NAMES are per-profile (Tiny Mascot uses 'idle' for eyes, not
+            // 'NEUTRAL'); the values are looked up via _profile.enums.
+            poseEnum = vmi.enum(_profile.enums.pose);
+            eyesEnum = vmi.enum(_profile.enums.eyes);
+            mouthEnum = vmi.enum(_profile.enums.mouth);
+            setEnum(eyesEnum, _profile.restingEyes);
+            setEnum(mouthEnum, _profile.restingMouth);
+          }
         } catch (e) { /* older runtime: mascot still renders on the SM defaults */ }
-        setPose('hand_wave', 'hi 👋', 1900); reactWiggle('react'); // greet — the SM blends it cleanly
-        startLife();
+        // Greet — but only on first boot or when the catalog asked for a non-silent
+        // swap. Silent swaps (catalog's own pre-select during boot) skip the
+        // flourish so the user doesn't see two waves in a row.
+        const isFirstBoot = !!(ctx && ctx.isFirstBoot);
+        const silent = !!(ctx && ctx.silent);
+        if (!silent && _profile && _profile.kind !== 'anim-state' && _profile.greetingPose) {
+          setPose(_profile.greetingPose.name, _profile.greetingPose.label, _profile.greetingPose.holdMs);
+          reactWiggle('react');
+        }
+        // (re)start the life loop. startLife() is idempotent on the global timers:
+        // the first call kicks off _lifeLoop, the natural emote loop, and the blink
+        // interval. Subsequent calls would create duplicate intervals, so we gate
+        // by _riveLoaded — only the very first boot starts the life.
+        if (!_riveLoaded) { startLife(); _riveLoaded = true; }
+        // after a swap, the pose enum is null on the anim-state profile. Re-apply
+        // the resting pose so the new mascot doesn't show a partial frame.
+        if (!isFirstBoot && _profile && _profile.kind !== 'anim-state') {
+          try { setEnum(poseEnum, 'idle'); tag('idle'); } catch {}
+        }
       },
-      onLoadError() { $('loading').textContent = 'could not load Toshi (network)'; },
+      onLoadError() { $('loading').textContent = 'could not load ' + (ctx.name || 'Toshi') + ' (network)'; },
     });
   } catch { $('loading').textContent = 'rive init failed'; }
 }
@@ -477,7 +637,14 @@ function bootRive() {
 window.__toshi = {
   pause: () => { try { rive.pause(); } catch {} },
   resume: () => { try { rive.play('MascotSM'); } catch {} },
-  state: () => { try { return { pose: poseEnum && poseEnum.value, eyes: eyesEnum && eyesEnum.value, mouth: mouthEnum && mouthEnum.value }; } catch { return null; } },
+  state: () => {
+    try {
+      if (_profile && _profile.kind === 'anim-state') {
+        return { animState: animStateEnum && animStateEnum.value, profile: _profile.kind, mascot: (window.__toshiMascots && window.__toshiMascots.current) || null };
+      }
+      return { pose: poseEnum && poseEnum.value, eyes: eyesEnum && eyesEnum.value, mouth: mouthEnum && mouthEnum.value, profile: _profile && _profile.kind, mascot: (window.__toshiMascots && window.__toshiMascots.current) || null };
+    } catch { return null; }
+  },
   setPose: (p, ms) => setPose(p, null, ms),
   say: (t, g, ms) => say(t, g, ms), // debug/self-portrait hook (say is hoisted)
 };
@@ -601,7 +768,16 @@ function thinking() { $('grounded').hidden = true; $('bubble-body').innerHTML = 
 async function submitQ(q) {
   if (!q || busy) return;
   $('q').value=''; $('send').disabled=true; busy = true;
-  setPose('look_around', 'thinking', 15000); setEnum(eyesEnum, 'thinking'); reactWiggle('react'); thinking();
+  // anim-state mascots (Jarvis): no pose enum, but they DO have a listening
+  // state on their animState. Drive it for the duration of the fetch so
+  // the ring visually "listens" while the brain thinks.
+  if (_profile && _profile.kind === 'anim-state' && animStateEnum) {
+    const la = (_profile.listeningAnim != null) ? _profile.listeningAnim : 1;
+    setEnum(animStateEnum, la);
+  } else {
+    setPose('look_around', 'thinking', 15000); setEnum(eyesEnum, 'thinking'); reactWiggle('react');
+  }
+  thinking();
   // clear provenance + copy state for the new turn (a new answer deserves a clean header)
   lastTool = ''; lastVoiced = false; lastChat = false;
   const cp = $('bubble-copy'); if (cp) { cp.hidden = true; cp.classList.remove('copied'); }
@@ -609,11 +785,14 @@ async function submitQ(q) {
     const r = await fetch(MCP_ASK, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q }) });
     if (!r.ok) throw new Error('mcp '+r.status);
     const j = await r.json();
-    setEnum(eyesEnum, 'NEUTRAL');
+    setEnum(eyesEnum, (_profile && _profile.restingEyes) || 'NEUTRAL');
     // capture provenance BEFORE say() — populateProvenance() reads from these closures
     lastTool = j.tool || ''; lastVoiced = !!j.voiced; lastChat = !!j.chat;
     // grounded → celebrate; free chat → a warm wave (it's a normal conversation, not a repo fact); the
-    // bare abilities greeting → a gentle "heads-up" point.
+    // bare abilities greeting → a gentle "heads-up" point. On anim-state mascots
+    // (Jarvis) the pose calls are no-ops (setPose guards on kind) and the
+    // listening state has already been re-set to resting by talk() — so the
+    // ring simply rotates while the answer speaks.
     if (j.grounded) { celebrate(); sparkle(); }
     else if (j.chat) { setPose('hand_wave', '😺', 2200); reactWiggle('react'); }
     else { setPose('pointing', 'heads-up', 2200); }
@@ -623,8 +802,14 @@ async function submitQ(q) {
     // it is stashed on body.dataset.spoken by say())
     if (cp) cp.hidden = false;
   } catch {
-    setEnum(eyesEnum, 'confused'); setTimeout(() => setEnum(eyesEnum, 'NEUTRAL'), 1200);
-    setPose('idle'); reactWiggle('nope');
+    setEnum(eyesEnum, 'confused'); setTimeout(() => setEnum(eyesEnum, (_profile && _profile.restingEyes) || 'NEUTRAL'), 1200);
+    // anim-state fallback: just put the ring back on the resting state
+    if (_profile && _profile.kind === 'anim-state' && animStateEnum) {
+      const ra = (_profile.restingAnim != null) ? _profile.restingAnim : 0;
+      setEnum(animStateEnum, ra);
+    } else {
+      setPose('idle'); reactWiggle('nope');
+    }
     say("start my brain first:\n  node mcp/toshi-mcp.mjs\nthen I read your real session (via codebase-memory-mcp).", false);
     if (cp) cp.hidden = true; // nothing to copy from a brain-down banner
   }
@@ -731,6 +916,18 @@ async function pollWatching() {
   } catch { const el = $('watching'); if (el) el.textContent = ''; watching = ''; }
 }
 setInterval(pollWatching, 4000); pollWatching();
+
+// Wire the mascot catalog's swap callback to _loadMascot so the picker
+// (panel/mascots.js) can hot-swap the running Rive source. The catalog
+// calls this with (entry, profile, opts); we tear down the previous Rive
+// instance, bind the new profile, and greet on the new artboard.
+try {
+  if (window.__toshiMascots && window.__toshiMascots._registerSwapFn) {
+    window.__toshiMascots._registerSwapFn((entry, profile, opts) => {
+      _loadMascot(entry.file, profile, { isFirstBoot: false, name: entry.name, silent: !!(opts && opts.silent) });
+    });
+  }
+} catch {}
 
 bootRive();
 </script>

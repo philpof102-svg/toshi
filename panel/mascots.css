@@ -1,0 +1,91 @@
+/* ───────────────────────────────────────────────────────────────────────────
+ * toshi — MASCOTS stylesheet (panel/mascots.css)
+ * Companion to panel/mascots.js. Same Fable-5 rules as wardrobe.css:
+ *   - only ADD classes (.mascot- prefix)
+ *   - reuse the BASED palette declared on :root in panel/index.html
+ *   - respect prefers-reduced-motion
+ *   - never override wardrobe / chips / .stage styles
+ *
+ * What lives here:
+ *   - the .mascot-picker-row (a single horizontal row of pills, sits
+ *     just above the wardrobe-picker-row)
+ *   - the .mascot-pill button (mirrors .wardrobe-pill but slightly
+ *     larger; this is a primary control, not a slot toggle)
+ *   - the .mascot-pill-dot (a tiny 8×8 swatch in the mascot's accent)
+ *   - the small "mascot" label on the left of the row
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. PICKER ROW ────────────────────────────────────────────────────────
+ * Same horizontal flex layout as .wardrobe-picker-row, but a touch
+ * taller (the dots are 8px instead of thumbnails). */
+.mascot-picker-row{
+  display:flex; align-items:center; gap:6px; padding:0 11px 6px;
+  -webkit-app-region:no-drag;
+  overflow-x:auto; overflow-y:hidden;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.mascot-picker-row::-webkit-scrollbar{ display:none; }
+
+/* the small "mascot" label on the left — small caps, monospace, dim.
+ * Mirrors the "to your repo · " footer style. */
+.mascot-picker-label{
+  font:inherit; font-size:8.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--faint); padding:0 4px 0 0; flex-shrink:0;
+}
+
+/* ── 2. THE PILL BUTTON ──────────────────────────────────────────────────
+ * Slightly bigger than a wardrobe pill (this is a primary control).
+ * Resting state: dim border in the BASED palette. Hover: lift + glow. */
+.mascot-pill{
+  font:inherit; font-size:10.5px; letter-spacing:.04em; color:var(--dim);
+  background:rgba(0,82,255,.08);
+  border:1px solid rgba(0,82,255,.22); border-radius:999px;
+  padding:4px 11px 4px 8px; cursor:pointer; white-space:nowrap;
+  display:inline-flex; align-items:center; gap:6px;
+  transition:transform .12s ease, background .15s, color .15s, box-shadow .15s, border-color .15s;
+}
+.mascot-pill:hover{
+  color:#fff; background:rgba(0,82,255,.28); transform:translateY(-1.2px);
+  box-shadow:0 3px 10px -5px rgba(0,82,255,.85), 0 0 0 1px rgba(0,82,255,.3);
+}
+.mascot-pill:active{ transform:translateY(0) scale(.95); }
+
+/* active state — the mascot accent color wins the border + glow.
+ * The dot pulses once on switch (a tiny "I am the one" beat). */
+.mascot-pill.is-on{
+  color:#fff; background:rgba(0,82,255,.32);
+  border-color:var(--accent, var(--base));
+  box-shadow:0 0 0 1px var(--accent, var(--base)) inset, 0 0 10px -4px var(--accent, var(--base));
+}
+.mascot-pill.is-on .mascot-pill-name{ color:#fff; }
+.mascot-pill.is-on .mascot-pill-dot{
+  background:var(--accent, var(--base));
+  box-shadow:0 0 8px var(--accent, var(--base));
+  animation:mascot-dot-pulse 600ms cubic-bezier(.2,1.4,.4,1) both;
+}
+@keyframes mascot-dot-pulse{
+  0%   { transform:scale(.4); }
+  60%  { transform:scale(1.4); }
+  100% { transform:scale(1); }
+}
+
+/* ── 3. THE DOT (8×8 swatch) ──────────────────────────────────────────────
+ * A tiny circle filled with the mascot's accent color (set as --accent
+ * inline by mascots.js). Off-state: hollow, dim border. On-state: solid
+ * + glow. */
+.mascot-pill-dot{
+  display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:transparent;
+  border:1px solid var(--accent, rgba(0,82,255,.5));
+  flex-shrink:0;
+  transition:background .2s ease, box-shadow .2s ease;
+}
+
+/* ── 4. REDUCED-MOTION GUARD ─────────────────────────────────────────────
+ * Match the rest of the panel: every transient is killed under reduce. */
+@media (prefers-reduced-motion:reduce){
+  .mascot-pill{ transition:none !important; }
+  .mascot-pill:hover{ transform:none !important; }
+  .mascot-pill.is-on .mascot-pill-dot{ animation:none !important; }
+}
