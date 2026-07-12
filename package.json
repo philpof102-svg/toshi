@@ -31,7 +31,7 @@
     "brain": "node mcp/toshi-mcp.mjs",
     "ask": "node tools/toshi.mjs ask",
     "zero-hook": "node tools/install-zero-hook.mjs",
-    "test": "node test/simulate.mjs && node test/animations-smoke.cjs && node test/chat-smoke.mjs && node test/tts-smoke.mjs"
+    "test": "node test/simulate.mjs && node test/animations-smoke.cjs && node test/chat-smoke.mjs && node test/tts-smoke.mjs && node scripts/check-inline.cjs"
   },
   "repository": {
     "type": "git",

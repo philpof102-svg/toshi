@@ -28,3 +28,6 @@ tools/wsl-*.sh
 # .claude/ is Zero's per-session scratch dir (commit-msg drafts, smoke runners, live probes).
 # It MUST be ignored: a stray `git add .` would otherwise dump ephemeral session files.
 .claude/
+.toshi.pid
+.toshi-launch.log
+.test-out.txt
