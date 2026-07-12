@@ -1,0 +1,51 @@
+/* ───────────────────────────────────────────────────────────────────────────
+ * toshi — MOTION EXTEND stylesheet (panel/animations-extend.css)
+ * Companion to panel/animations-extend.js. Same Fable-5 rules as
+ * animations-sequences.css: only ADD classes (.x- prefix), only ADD
+ * keyframes, only compose on top of the base .floaty animation. No
+ * overwrite, no border, no new color — just the BASED palette already
+ * on :root.
+ *
+ * What lives here:
+ *   - 1 new eye-intent overlay (x-eyes-look-around) — matches the 5
+ *     already styled in animations-sequences.css.
+ *   - 1 transient keyframe (x-extend-soften) that briefly softens the
+ *     transition between two consecutive poses (the Markov chain can
+ *     produce a jump-cut if the Rive enum snaps from one pose to the
+ *     next; the soften layer adds a 240ms scale-in over the first beat
+ *     so the eye reads it as one motion).
+ *   - 1 @media (prefers-reduced-motion:reduce) guard that kills every
+ *     transient class — matches the original CSS, belt + suspenders.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. EYE-INTENT OVERLAY: look-around ──────────────────────────────────
+ * Mirrors the 5 overlays in animations-sequences.css. The look-around
+ * pose is the "where am I?" beat, so the overlay is a very subtle
+ * brightness lift on the canvas (suggests "scanning" without changing
+ * the actual Rive eye state — the panel's own eye channel still drives
+ * the look_left/look_right/look_up/look_down cycle). The filter is
+ * light (0.02) so it never washes out the mascot. */
+body.x-eyes-look-around #toshi{ filter:brightness(1.02); }
+
+/* ── 2. EXTEND-SOFTEN (transient) ────────────────────────────────────────
+ * A 240ms scale-in (1.0 → 1.015 → 1.0) applied to the floaty during
+ * the first beat of a Markov-chained pose. The chain can switch from
+ * idle to pointing to celebration in <100ms (the Rive enum snaps); the
+ * soften layer makes the switch read as a single, slightly bouncy
+ * motion instead of a cut. Held for 240ms, removed by JS via the
+ * animationend helper in animations-extend.js. */
+.x-extend-soften{ animation:extend-soften 240ms ease-out both; }
+@keyframes extend-soften{
+  0%   { transform:scale(1.0); }
+  50%  { transform:scale(1.015); }
+  100% { transform:scale(1.0); }
+}
+
+/* ── REDUCED-MOTION GUARD ────────────────────────────────────────────────
+ * Same belt + suspenders as animations-sequences.css: every transient
+ * class killed, the filter transition disabled, the eye-intent overlay
+ * stripped. Static panel under reduced-motion — no compromise. */
+@media (prefers-reduced-motion:reduce){
+  .x-extend-soften{ animation:none !important; transform:none !important; }
+  body.x-eyes-look-around #toshi{ filter:none !important; }
+}
