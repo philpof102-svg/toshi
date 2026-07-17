@@ -1,0 +1,4417 @@
+[
+  {
+    "kind": "file",
+    "id": "bin/toshi.cjs",
+    "loc": 311
+  },
+  {
+    "kind": "symbol",
+    "id": "path",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ROOT",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "repo",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "PORT",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "sub",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "PRESETS",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "arg",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "w",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfgPath",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cur",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctl",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfgPath",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cur",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "arg",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "free",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "winner",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfgPath",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cur",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "arg",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ids",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "e",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "q",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctl",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r0",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "w",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cp",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "extra",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "onlyMcp",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "removing",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "noFloat",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "run",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "code",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "have",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "isWin",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "exeName",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "roots",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "bin",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "rel",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctl",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctl",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "env",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "electron",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "child",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "os",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fsx",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "logPath",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "errFd",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "failed",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "script",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "c",
+    "file": "bin/toshi.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "desktop/eyes-nudge.cjs",
+    "loc": 89
+  },
+  {
+    "kind": "symbol",
+    "id": "DEFAULTS",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "no",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "meaningfulEvent",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "body",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "snippet",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "createTact",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfg",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "decide",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "event",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "sinceLast",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cooldown",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "windowOpen",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "applied",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "windowOpen",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "dismissed",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "engaged",
+    "file": "desktop/eyes-nudge.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "desktop/eyes-read.cjs",
+    "loc": 90
+  },
+  {
+    "kind": "symbol",
+    "id": "is",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "classifyKind",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "looksLikeError",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "createReader",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "has",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tryTier",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "read",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "app",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "title",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "meta",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctx",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "text",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "sum",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "csum",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "body",
+    "file": "desktop/eyes-read.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "desktop/eyes.cjs",
+    "loc": 92
+  },
+  {
+    "kind": "symbol",
+    "id": "TIERS",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "memoryStore",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "grants",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "createEyes",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "enumerate",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "sources",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "grant",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "revoke",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "revokeAll",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "grants",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "isGranted",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "capture",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "g",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "sources",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "src",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "png",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "screenTextProvenance",
+    "file": "desktop/eyes.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "desktop/main.cjs",
+    "loc": 151
+  },
+  {
+    "kind": "symbol",
+    "id": "path",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "os",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fs",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ROOT",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "brain",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "CFG_PATH",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "PRESETS",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "clamp",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "readCfg",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "resolveSize",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "c",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "w",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "startBrain",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "createWindow",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "GAP",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "wa",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "win",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fitOnScreen",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "wa",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "MINI",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "q",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "deadline",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "snap",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "img",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "the",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "img2",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tick",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "on",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "the",
+    "file": "desktop/main.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "desktop/preload.cjs",
+    "loc": 12
+  },
+  {
+    "kind": "file",
+    "id": "donate/index.html",
+    "loc": 171
+  },
+  {
+    "kind": "symbol",
+    "id": "CONFIG",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "if",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "$",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "amount",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "v",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "flash",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "encodeTransfer",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "units",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "addr",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "amt",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "ensureBase",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "cur",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "connect",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "accts",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "eth",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "found",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "data",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "tx",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "txt",
+    "file": "donate/index.html"
+  },
+  {
+    "kind": "file",
+    "id": "lib/llm.mjs",
+    "loc": 383
+  },
+  {
+    "kind": "symbol",
+    "id": "pexec",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "loadEnv",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "paths",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "userEnv",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "line",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "zeroEntry",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "isWin",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "roots",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "add",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "rel",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "exe",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "js",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "persistedModel",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfg",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "API",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "E",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "model",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "FREE_FALLBACK_MODELS",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pickFreeModel",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "api",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tried",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctl",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t0",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ms",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "content",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "entry",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "hasVoice",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "voiceKind",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "apiCallOnce",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "useOpenRouter",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "reasoning",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "body",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "errBody",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "msg",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "content",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "session",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "isFreeSlug",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "apiComplete",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "api",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "list",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "sequence",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastErr",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "model",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctl",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "raw",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "speakViaApi",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tidy",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cut",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "end",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "singleLang",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "LANG_HINTS",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "detectLang",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "best",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "LANG_NAME",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "langName",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "the",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "speak",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "lang",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "target",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "prompt",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "list",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "raw",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "chat",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "q",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "lang",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "target",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "system",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "hist",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "raw",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "hx",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "prompt",
+    "file": "lib/llm.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "lib/session.mjs",
+    "loc": 237
+  },
+  {
+    "kind": "symbol",
+    "id": "pexec",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "resolveBin",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "isWin",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "exe",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "roots",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "add",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "rel",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "BIN",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "REPO",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "projectName",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "norm",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "resolveProject",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "hit",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "e",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "setRepo",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "STOP",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "extractTerm",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tick",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tokens",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "idLike",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "literally",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "route",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "term",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "esc",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "summarize",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "data",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "syms",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fmt",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "labels",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ask",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "lang",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "base",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "spoken",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "project",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "run",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "speak",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "base",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "facts",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "spoken",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "msg",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "status",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastLang",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "noteLang",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "c",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "seenCommit",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pulse",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "facts",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "event",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "project",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "n",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "base",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "CANNED",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "comment",
+    "file": "lib/session.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "lib/tts.mjs",
+    "loc": 103
+  },
+  {
+    "kind": "symbol",
+    "id": "TTS_ENGINES",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "PERSONA",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "resolveTts",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "want",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "can",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "e",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "planUtterance",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "l",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "persistedVoice",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfg",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "v",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "kokoroAvailable",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "synthKokoroNode",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "mod",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "KokoroTTS",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tts",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "voice",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "audio",
+    "file": "lib/tts.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "mcp/toshi-mcp.mjs",
+    "loc": 132
+  },
+  {
+    "kind": "symbol",
+    "id": "askSpoken",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "base",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "spoken",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "PORT",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "TOOLS",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "mood",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "panelCmd",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "panelSize",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastWindowPing",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "send",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "handle",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "n",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "a",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "httpServer",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "windowAlive",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "a",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ok",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "zero",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "base",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "spoken",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "q",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "mcp/toshi-mcp.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "panel/animations-extra.css",
+    "loc": 244
+  },
+  {
+    "kind": "symbol",
+    "id": "is",
+    "file": "panel/animations-extra.css"
+  },
+  {
+    "kind": "symbol",
+    "id": "when",
+    "file": "panel/animations-extra.css"
+  },
+  {
+    "kind": "symbol",
+    "id": "toggle",
+    "file": "panel/animations-extra.css"
+  },
+  {
+    "kind": "symbol",
+    "id": "is",
+    "file": "panel/animations-extra.css"
+  },
+  {
+    "kind": "file",
+    "id": "panel/animations-extra.js",
+    "loc": 296
+  },
+  {
+    "kind": "symbol",
+    "id": "is",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "$",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "reduce",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "rand",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "pick",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "whenReady",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "w",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "runner",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "transient",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "once",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "TILT_BY_EYE",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "tilt",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "self",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindBounceIn",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindGaze",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "raf",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "mx",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "my",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "toggle",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "ensureMotes",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stardust",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "idle",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "ok",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "breathDeep",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "on",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindBreathDeep",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "obs",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindScritch",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastClick",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "now",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "SCRITCH_QUIPS",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindYawn",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastActivity",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bump",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "e",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "which",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "HEART_QUIPS",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindHearts",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "foot",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "NO_BURST",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "cx",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "cy",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "h",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "init",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastEye",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "e",
+    "file": "panel/animations-extra.js"
+  },
+  {
+    "kind": "file",
+    "id": "panel/animations-sequences.css",
+    "loc": 96
+  },
+  {
+    "kind": "file",
+    "id": "panel/animations-sequences.js",
+    "loc": 437
+  },
+  {
+    "kind": "symbol",
+    "id": "$",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "reduce",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "rand",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "pick",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "transient",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "once",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "safeSetPose",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "whenReady",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "w",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "on",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "is",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "signalEyes",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "clearEyes",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "SEQ",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "clearAllTimers",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "tSet",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "id",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "tInterval",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "id",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "cancelSeq",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "cancelSeq",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "startSeq",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctx",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "morningStretchRunner",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "directly",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "victoryLapRunner",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "spawnSparkBurst",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "st",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "count",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "a",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "focusRunner",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stage",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "tick",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "scheduleNextTilt",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "startFocus",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "stopFocus",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "confusedRunner",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "patrolRunner",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "maybePatrol",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastVictoryAt",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindSubmitQHooks",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "body",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "obs",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "html",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "em",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "txt",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "tSetSafe",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "to",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindNopeHook",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "obs",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "once",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "bindMorningHook",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "l",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "obs",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "init",
+    "file": "panel/animations-sequences.js"
+  },
+  {
+    "kind": "file",
+    "id": "panel/index.html",
+    "loc": 739
+  },
+  {
+    "kind": "symbol",
+    "id": "so",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "RIV_URL",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "MCP_ASK",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "$",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "reduce",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "rand",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "pick",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "EYE_CYCLE",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "FLOURISH",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "VISEMES",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "OBJECT_POSES",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "rive",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "tag",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "setEnum",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "of",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "poseUsesObject",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "setPose",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "total",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "celebrate",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "talk",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "iv",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "reactWiggle",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "dur",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "sparkle",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "st",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "force",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "a",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "busy",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "GLANCE_VALUES",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "block",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "_lifeState",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "_lastFlourishAt",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "_flourishCount",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "_sleep",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "_lifeLoop",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "wantFlourish",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "long",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "hold",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "pose",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "startLife",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "NATURAL",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "naturalLoop",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "bootRive",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "vmi",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "bubbleTimer",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "say",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "em",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "body",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "raw",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "firstLang",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "nearBottom",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastTool",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastVoiced",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastChat",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "populateProvenance",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "row",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "v",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "c",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "g",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "updateOverflowHint",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "over",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "atBottom",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "atBottom",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "thinking",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "submitQ",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "cp",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "text",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "body",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "txt",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "ok",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "ta",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "btn",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "QUIPS",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "collapsed",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "desk",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "setCollapsed",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "MINI_HELLOS",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "runPanelCmd",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "lastPulse",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "watching",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "pollWatching",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "base",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "first",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "el",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "symbol",
+    "id": "el",
+    "file": "panel/index.html"
+  },
+  {
+    "kind": "file",
+    "id": "scripts/check-inline.cjs",
+    "loc": 38
+  },
+  {
+    "kind": "symbol",
+    "id": "fs",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "path",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "file",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "html",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "blocks",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "re",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "tag",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "body",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "isSrc",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "bad",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "label",
+    "file": "scripts/check-inline.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "serve.js",
+    "loc": 21
+  },
+  {
+    "kind": "symbol",
+    "id": "root",
+    "file": "serve.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "types",
+    "file": "serve.js"
+  },
+  {
+    "kind": "symbol",
+    "id": "p",
+    "file": "serve.js"
+  },
+  {
+    "kind": "file",
+    "id": "test/animations-smoke.cjs",
+    "loc": 73
+  },
+  {
+    "kind": "symbol",
+    "id": "fs",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "path",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "vm",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "noop",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "makeEl",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "harness",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "src",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "doc",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "win",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ctx",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "seqWin",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fn",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "the",
+    "file": "test/animations-smoke.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "test/chat-smoke.mjs",
+    "loc": 69
+  },
+  {
+    "kind": "symbol",
+    "id": "BIN",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "eq",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "has",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/chat-smoke.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "test/eyes-nudge-smoke.cjs",
+    "loc": 90
+  },
+  {
+    "kind": "symbol",
+    "id": "assert",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ERR",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "CALM",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "READY",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "T",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "now",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "first",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "st",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "soon",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "st",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "base",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "gap",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "now",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "first",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "st",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "again",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "now",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "s1",
+    "file": "test/eyes-nudge-smoke.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "test/eyes-read-smoke.cjs",
+    "loc": 92
+  },
+  {
+    "kind": "symbol",
+    "id": "assert",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "PNG",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ta",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ocr",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ocr",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "vlm",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cloud",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "off",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "on",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ocr",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ocrCalls",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ocr",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/eyes-read-smoke.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "test/eyes-smoke.cjs",
+    "loc": 102
+  },
+  {
+    "kind": "symbol",
+    "id": "assert",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "stubCapturer",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "calls",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pixels",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ta",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cap",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "eyes",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "list",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "eyes",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "eyes",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "frame",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "eyes",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "eyes",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "eyes",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cloud",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "local",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "none",
+    "file": "test/eyes-smoke.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "test/simulate.mjs",
+    "loc": 299
+  },
+  {
+    "kind": "symbol",
+    "id": "pexec",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "REPO",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "norm",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "C",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "check",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "skipped",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "backendIndexed",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "reindex",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "CORE",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runCore",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "wantGrounded",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ok",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "isolatedAsk",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "code",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "child",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runDegrade",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "noBin",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "unindexed",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "okUnindexed",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runPortability",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "f",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "bin",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "prev",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pj",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pluginCall",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "child",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runPlugin",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "asked",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "st",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "mood",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "unknown",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runHttp",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "TP",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "brain",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "res",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "h1",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "other",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "sw",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "back",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pu",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pc",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d1",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "d2",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "bad",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runMcp",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "net",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "P",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "blocker",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "srv",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "send",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "result",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "buf",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "seen",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "to",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "i",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "line",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runVoice",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "savedLLM",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "runChat",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "off",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "code",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "child",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "empty",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ready",
+    "file": "test/simulate.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "test/tts-smoke.mjs",
+    "loc": 37
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "test/tts-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "t",
+    "file": "test/tts-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ok",
+    "file": "test/tts-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fr",
+    "file": "test/tts-smoke.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "en",
+    "file": "test/tts-smoke.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "tools/check-detect-lang.mjs",
+    "loc": 32
+  },
+  {
+    "kind": "symbol",
+    "id": "cases",
+    "file": "tools/check-detect-lang.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pass",
+    "file": "tools/check-detect-lang.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "got",
+    "file": "tools/check-detect-lang.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ok",
+    "file": "tools/check-detect-lang.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "tools/check-panel-syntax.cjs",
+    "loc": 14
+  },
+  {
+    "kind": "symbol",
+    "id": "fs",
+    "file": "tools/check-panel-syntax.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "path",
+    "file": "tools/check-panel-syntax.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "html",
+    "file": "tools/check-panel-syntax.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "tools/check-panel-syntax.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "code",
+    "file": "tools/check-panel-syntax.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "tools/install-mcp.mjs",
+    "loc": 53
+  },
+  {
+    "kind": "symbol",
+    "id": "here",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "mcpEntry",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "args",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fileArg",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "targets",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "removing",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "entry",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "file",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfg",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "zeroExe",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "zargs",
+    "file": "tools/install-mcp.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "tools/install-zero-hook.mjs",
+    "loc": 50
+  },
+  {
+    "kind": "symbol",
+    "id": "here",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "toshiCli",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "args",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "targets",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "scopeDir",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "file",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cfg",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "parsed",
+    "file": "tools/install-zero-hook.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "tools/launch-toshi.cjs",
+    "loc": 78
+  },
+  {
+    "kind": "symbol",
+    "id": "http",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "path",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fs",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ROOT",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "LOG",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "log",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "spawnN",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "child",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "ping",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "req",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "tools/launch-toshi.cjs"
+  },
+  {
+    "kind": "file",
+    "id": "tools/toshi.mjs",
+    "loc": 24
+  },
+  {
+    "kind": "symbol",
+    "id": "readStdin",
+    "file": "tools/toshi.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "tools/toshi.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "cmd",
+    "file": "tools/toshi.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "a",
+    "file": "tools/toshi.mjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "out",
+    "file": "tools/toshi.mjs"
+  },
+  {
+    "kind": "file",
+    "id": "tools/verify-toshi.cjs",
+    "loc": 55
+  },
+  {
+    "kind": "symbol",
+    "id": "http",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "https",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "fs",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "pingHttp",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "lib",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "req",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "b",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r1",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "j",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r2",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "mirrors",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "m",
+    "file": "tools/verify-toshi.cjs"
+  },
+  {
+    "kind": "symbol",
+    "id": "r",
+    "file": "tools/verify-toshi.cjs"
+  }
+]

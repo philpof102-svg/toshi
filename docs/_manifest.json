@@ -1,0 +1,199 @@
+{
+  "generated_at": "2026-07-17T18:11:59.210Z",
+  "target": "D:\\Users\\VolKov\\veilleIA\\toshi",
+  "files": [
+    {
+      "path": "bin/toshi.cjs",
+      "loc": 311,
+      "doc": "docs/files/bin__toshi.cjs.md",
+      "sha256": "b3c0240d085fe592f046b916001f9415617b3cdd0111695e7301e861f2210f57"
+    },
+    {
+      "path": "desktop/eyes-nudge.cjs",
+      "loc": 89,
+      "doc": "docs/files/desktop__eyes-nudge.cjs.md",
+      "sha256": "7d794be94fc4f14a2d43813f80b9b535cd97992de87d85a07e42ea54edf7da8a"
+    },
+    {
+      "path": "desktop/eyes-read.cjs",
+      "loc": 90,
+      "doc": "docs/files/desktop__eyes-read.cjs.md",
+      "sha256": "ff188b4e3c9b672abf822780f406605d7db33cfb7a728be4a011236de76f055a"
+    },
+    {
+      "path": "desktop/eyes.cjs",
+      "loc": 92,
+      "doc": "docs/files/desktop__eyes.cjs.md",
+      "sha256": "910a1edb3dad307d72f395914262836e0cfa2bf763b2bfa160f67cd1ab334030"
+    },
+    {
+      "path": "desktop/main.cjs",
+      "loc": 151,
+      "doc": "docs/files/desktop__main.cjs.md",
+      "sha256": "7854534fd44e7ac2e7018d17c9fdb657d2b52dfaa09b0007e643f7892a56be07"
+    },
+    {
+      "path": "desktop/preload.cjs",
+      "loc": 12,
+      "doc": "docs/files/desktop__preload.cjs.md",
+      "sha256": "4e93a16fa485362ef8e1fc60044a49a476148e904c549169faea8e6827438e42"
+    },
+    {
+      "path": "donate/index.html",
+      "loc": 171,
+      "doc": "docs/files/donate__index.html.md",
+      "sha256": "639cd27698c95afe946fe61daa70f5559f2e1be425217cc65f5f6522dae38595"
+    },
+    {
+      "path": "lib/llm.mjs",
+      "loc": 383,
+      "doc": "docs/files/lib__llm.mjs.md",
+      "sha256": "e8705ea8801c63bfbfd21b6fc4d00b0f02207f1c2e4fd34b41eb17bf998da866"
+    },
+    {
+      "path": "lib/session.mjs",
+      "loc": 237,
+      "doc": "docs/files/lib__session.mjs.md",
+      "sha256": "9c9ea9562564dc731ebd130ac6ee197cc9ead9db2a45d1edf6a22594ad38106b"
+    },
+    {
+      "path": "lib/tts.mjs",
+      "loc": 103,
+      "doc": "docs/files/lib__tts.mjs.md",
+      "sha256": "347ae512b596e3ebef45de8b344a0ac592b9098a46fd2ae265b4d7197cd685e1"
+    },
+    {
+      "path": "mcp/toshi-mcp.mjs",
+      "loc": 132,
+      "doc": "docs/files/mcp__toshi-mcp.mjs.md",
+      "sha256": "4342a0ce0b7ea40fcfa6800cb6daa546886c8d38fcca9315b596ff3138f8a9dc"
+    },
+    {
+      "path": "panel/animations-extra.css",
+      "loc": 244,
+      "doc": "docs/files/panel__animations-extra.css.md",
+      "sha256": "3a465528467d22a884fa8fc4806c80a242fe55ae5917b7e63721de26109f0ea9"
+    },
+    {
+      "path": "panel/animations-extra.js",
+      "loc": 296,
+      "doc": "docs/files/panel__animations-extra.js.md",
+      "sha256": "cd0b3aebbf799dd38d2563332d8079f2067a11fe6749f1adbd0386e53f4d59ef"
+    },
+    {
+      "path": "panel/animations-sequences.css",
+      "loc": 96,
+      "doc": "docs/files/panel__animations-sequences.css.md",
+      "sha256": "1852852777baf95e55bbb043b0f0827e35e3f95dff4420fc0bb16963cc088585"
+    },
+    {
+      "path": "panel/animations-sequences.js",
+      "loc": 437,
+      "doc": "docs/files/panel__animations-sequences.js.md",
+      "sha256": "2ef02baef5b10f9966d454d429a89c0846260590b41d41beda460861bf4f673c"
+    },
+    {
+      "path": "panel/index.html",
+      "loc": 739,
+      "doc": "docs/files/panel__index.html.md",
+      "sha256": "8884710b1fec333c8fad92e0c13dcc688f63f4bd38fe8abec255db905fbf89a1"
+    },
+    {
+      "path": "scripts/check-inline.cjs",
+      "loc": 38,
+      "doc": "docs/files/scripts__check-inline.cjs.md",
+      "sha256": "e44997c0d3eaebd50bf523062ad4c6e87fca14694ec46705175fed26031df361"
+    },
+    {
+      "path": "serve.js",
+      "loc": 21,
+      "doc": "docs/files/serve.js.md",
+      "sha256": "7541b2a41360f8faa6ef113add6e79828cac11e8ab317f46caca24b7c55fc854"
+    },
+    {
+      "path": "test/animations-smoke.cjs",
+      "loc": 73,
+      "doc": "docs/files/test__animations-smoke.cjs.md",
+      "sha256": "72d2d29b1ee8cef1b596e402b4e0d99bc3b09ebb359f318b08f4621da85f566b"
+    },
+    {
+      "path": "test/chat-smoke.mjs",
+      "loc": 69,
+      "doc": "docs/files/test__chat-smoke.mjs.md",
+      "sha256": "a8799723635c259548256c4a0b7fcef68d9150a23e4a2bb84846ab568269be61"
+    },
+    {
+      "path": "test/eyes-nudge-smoke.cjs",
+      "loc": 90,
+      "doc": "docs/files/test__eyes-nudge-smoke.cjs.md",
+      "sha256": "5c84be9df05e1222762378f8af9f394d221ebb3040064cd17033653440f689b7"
+    },
+    {
+      "path": "test/eyes-read-smoke.cjs",
+      "loc": 92,
+      "doc": "docs/files/test__eyes-read-smoke.cjs.md",
+      "sha256": "e063f2037405a91fb27a584c5055f6bcc22a0c6ce7c1899a8ba7c2acc9aa9064"
+    },
+    {
+      "path": "test/eyes-smoke.cjs",
+      "loc": 102,
+      "doc": "docs/files/test__eyes-smoke.cjs.md",
+      "sha256": "8bc6e3ae2b1c382965c27ab5c5b79502905d0163bbfa89365161bd48a93bdf8a"
+    },
+    {
+      "path": "test/simulate.mjs",
+      "loc": 299,
+      "doc": "docs/files/test__simulate.mjs.md",
+      "sha256": "5731ebee4ce7bea784991d6654b2c30586d4ba6072c9fde193edc08548ba5786"
+    },
+    {
+      "path": "test/tts-smoke.mjs",
+      "loc": 37,
+      "doc": "docs/files/test__tts-smoke.mjs.md",
+      "sha256": "3603bf24ea0bd42844fe023158a72c0700d58526d8969e7a848e58c709994db0"
+    },
+    {
+      "path": "tools/check-detect-lang.mjs",
+      "loc": 32,
+      "doc": "docs/files/tools__check-detect-lang.mjs.md",
+      "sha256": "183dd91391e4a4eee07b7d56e89a29c2ec0369b3565294c097a87f74615ce582"
+    },
+    {
+      "path": "tools/check-panel-syntax.cjs",
+      "loc": 14,
+      "doc": "docs/files/tools__check-panel-syntax.cjs.md",
+      "sha256": "b6e4a52230c017a6d53fe0aaf2b4baec7abcda7fe7c9a0b905aa0d0a634de17d"
+    },
+    {
+      "path": "tools/install-mcp.mjs",
+      "loc": 53,
+      "doc": "docs/files/tools__install-mcp.mjs.md",
+      "sha256": "ce313d8bac74e188cb31ceddfb45acb02bcfcc5a0639cdfd8f6e9afc7bbe5625"
+    },
+    {
+      "path": "tools/install-zero-hook.mjs",
+      "loc": 50,
+      "doc": "docs/files/tools__install-zero-hook.mjs.md",
+      "sha256": "77eb4f1180f6327f59af336afe36e45f587c6042530fa292c01a39c3cfe3ba8d"
+    },
+    {
+      "path": "tools/launch-toshi.cjs",
+      "loc": 78,
+      "doc": "docs/files/tools__launch-toshi.cjs.md",
+      "sha256": "e2f3cc6e4587da3fc05e83a62f690f3839eb1df2b82ed2da0078015cff13540f"
+    },
+    {
+      "path": "tools/toshi.mjs",
+      "loc": 24,
+      "doc": "docs/files/tools__toshi.mjs.md",
+      "sha256": "0d5149abd59c08ff10b0d04e9fb84421f52b60d2d9c8533a01ecce1c637c0f11"
+    },
+    {
+      "path": "tools/verify-toshi.cjs",
+      "loc": 55,
+      "doc": "docs/files/tools__verify-toshi.cjs.md",
+      "sha256": "6c052ec7080a38f4f07810cda82c9d5a3db2eda018436e67b66f3d932f5ba54a"
+    }
+  ],
+  "index": "docs/INDEX.md"
+}
