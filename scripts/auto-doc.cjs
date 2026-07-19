@@ -17,9 +17,22 @@ try {
     .filter(f => EXT_RE.test(f) && !EXCLUDE.test(f));
 } catch { process.exit(1); }
 
-// ensure dirs
-fs.rmSync(DOCS, { recursive: true, force: true });
+/* NEVER wipe docs/ wholesale.
+ * This used to be `fs.rmSync(DOCS, {recursive:true, force:true})`, which deleted EVERYTHING in docs/ —
+ * including work this generator did not write and cannot rewrite: the hand-authored openrouter-key.md
+ * and providers.md guides, and the three real product screenshots (toshi-answer/mini/panel.png) that
+ * the README and the site link to. One run destroyed 429 lines and 3 images, and all six doc invariants
+ * still passed afterwards, because they only check the shape of what IS there.
+ * A generator may only remove what it previously generated. The old manifest is that record; anything
+ * not in it is somebody's work and is left alone. */
 fs.mkdirSync(path.join(DOCS, "files"), { recursive: true });
+try {
+  const prev = JSON.parse(fs.readFileSync(path.join(DOCS, "_manifest.json"), "utf8"));
+  for (const rel of (prev.files || [])) {
+    const p = path.join(DOCS, "files", String(rel).replace(/[\\\/]/g, "__") + ".md");
+    if (fs.existsSync(p)) fs.rmSync(p, { force: true });
+  }
+} catch { /* no previous manifest: first run, nothing of ours to clean */ }
 
 // helpers
 const read = (rel) => { try { return fs.readFileSync(path.join(ROOT, rel), "utf8"); } catch { return ""; } };

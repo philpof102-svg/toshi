@@ -1,7 +1,7 @@
 # `lib/tts.mjs`
 
 **Role**: Toshi TTS — an OPEN-SOURCE, LOCAL voice for the mascot. GPL-3.0. ===============================================================================================
-**LOC**: 103
+**LOC**: 104
 **Imports**: node:fs, node:os, node:path
 
 **Exports**:

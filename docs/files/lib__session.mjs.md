@@ -1,7 +1,7 @@
 # `lib/session.mjs`
 
 **Role**: Toshi session awareness — the token-cheap brain. GPL-3.0. Delegates to codebase-memory-mcp (MIT, DeusData) via its one-shot CLI: `codebase-memory-mcp cli <tool>
-**LOC**: 237
+**LOC**: 265
 **Imports**: node:child_process, node:util, node:fs, node:path, ./llm.mjs
 
 **Exports**:
