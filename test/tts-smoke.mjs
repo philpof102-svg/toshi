@@ -21,10 +21,18 @@ t('env TOSHI_TTS=off overrides a configured engine', resolveTts({ configured: 'k
 t('system explicitly unavailable + nothing else → off', resolveTts({ configured: 'system', avail: { system: false } }).engine, 'off');
 t('default (unconfigured) → system', resolveTts({}).engine, 'system');
 
-// persona: a bright cat companion + a NATIVE French voice so "quoi de neuf" isn't said with an EN accent
+/* VOICE IDS MUST EXIST IN THE PACK.
+ * This used to assert a NATIVE French voice, `ff_siwis` — which kokoro-js does not ship and never did.
+ * The installed package exposes only af_/am_ (US) and bf_/bm_ (UK) ids, so the "French" voice failed at
+ * synthesis time while the test stayed green: it was pinning a wish, not the product.
+ * So the assertion is now the property that would have CAUGHT it — every configured voice must be a
+ * real id from a family kokoro actually ships — plus the honest consequence: FR has no native voice, so
+ * it deliberately falls back to the EN one. The day kokoro adds French, `fr` changes and this still passes. */
+const KOKORO_FAMILIES = /^(af|am|bf|bm)_[a-z]+$/;   // American/British, female/male — the whole pack
 const fr = planUtterance('quoi de neuf', { lang: 'fr', configured: 'kokoro', avail: { kokoro: true } });
 const en = planUtterance('hey there', { lang: 'en', configured: 'kokoro', avail: { kokoro: true } });
-t('FR utterance → native FR Kokoro voice', fr.kokoroVoice, 'ff_siwis');
+t('FR voice is a REAL kokoro id (no invented ff_/fm_ voice)', KOKORO_FAMILIES.test(fr.kokoroVoice), true);
+t('EN voice is a REAL kokoro id', KOKORO_FAMILIES.test(en.kokoroVoice), true);
 t('EN utterance → warm EN Kokoro voice', en.kokoroVoice, 'af_heart');
 t('persona lifts pitch (cute, not corporate)', PERSONA.pitch > 1, true);
 t('persona lifts rate (perky)', PERSONA.rate > 1, true);

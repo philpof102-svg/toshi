@@ -98,8 +98,19 @@ function isolatedAsk(env, q = 'what changed?') {
 async function runDegrade() {
   console.log(`\n${C.d}DEGRADE — missing backend / unindexed repo (must be honest, never crash)${C.x}`);
   const noBin = await isolatedAsk({ CODEBASE_MEMORY_BIN: 'toshi-no-such-binary-xyz' });
-  check('binary absent → grounded:false + "demo mode"',
-    noBin.grounded === false && /demo mode/i.test(noBin.answer || ''), JSON.stringify(noBin).slice(0, 120));
+  /* The wording legitimately changed when free-chat-without-a-repo landed, so this asserts the PROPERTY
+   * instead of the old magic string: with no backend Toshi must (a) report grounded:false and (b) never
+   * OFFER a capability it does not have. (b) is the one that regressed — the chat fallback replied "I can
+   * look through your git history, recent commits, or code modifications" while the binary was absent.
+   * grounded:false was still correct machine-side, but a human reads the answer, not the flag.
+   *
+   * Asserted as PRESENCE of an explicit inability, not absence of a phrase: an LLM reply is not
+   * deterministic, and an honest conditional ("if you index it I could check your commits") would fail
+   * an absence-regex. A flaky test is worse than no test — so we require the answer to SAY it cannot
+   * see the code, which is the thing we actually care about and which honest replies always contain. */
+  const admitsBlind = /(don'?t|do not|cannot|can'?t|no)\s+(have\s+)?(access|repo|repository|code|view)|pas de repo|aucun repo|je ne (vois|peux) pas/i;
+  check('binary absent → grounded:false AND the answer admits it cannot see the code',
+    noBin.grounded === false && admitsBlind.test(noBin.answer || ''), JSON.stringify(noBin).slice(0, 200));
   const unindexed = await isolatedAsk({ TOSHI_REPO: join(tmpdir(), 'toshi-unindexed-' + process.pid) });
   const okUnindexed = unindexed.grounded === false && /index/i.test(unindexed.answer || '');
   // if the real binary is missing this collapses to the demo-mode branch — still honest, so accept either
