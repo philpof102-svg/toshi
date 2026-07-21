@@ -274,6 +274,29 @@ docs: https://github.com/philpof102-svg/toshi`);
     }
   } catch { /* no companion running — launch one */ }
 
+  // Keep the Toshi install fresh: fast-forward from GitHub before floating a new window, so each
+  // launch runs the latest code. Best-effort and safe by construction — only when ROOT is a git
+  // checkout with a reachable 'origin'. --ff-only NEVER merges, rebases, or clobbers local work;
+  // on anything unexpected (offline, diverged, dirty tree) we note it once and launch anyway.
+  // A normal `npm i -g` install has no .git, so this is a silent no-op there. Opt out: TOSHI_NO_PULL=1.
+  if (!process.env.TOSHI_NO_PULL) {
+    try {
+      const cp = require('node:child_process');
+      if (require('node:fs').existsSync(path.join(ROOT, '.git'))) {
+        const git = (args) => cp.spawnSync('git', ['-C', ROOT, ...args], { encoding: 'utf8', timeout: 8000 });
+        const before = (git(['rev-parse', 'HEAD']).stdout || '').trim();
+        const pull = git(['pull', '--ff-only']);
+        if (pull.status === 0) {
+          const after = (git(['rev-parse', 'HEAD']).stdout || '').trim();
+          if (before && after && before !== after) console.log('🐈  Toshi fast-forwarded to the latest from GitHub.');
+        } else {
+          const why = (pull.stderr || pull.stdout || 'unreachable').trim().split('\n')[0];
+          if (!/Already up to date/i.test(why)) console.log(`🐈  (self-update skipped — ${why})`);
+        }
+      }
+    } catch { /* git missing or offline — launch with what we have */ }
+  }
+
   const env = { ...process.env, TOSHI_REPO: repo };
   let electron = null;
   try {
