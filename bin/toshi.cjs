@@ -224,7 +224,7 @@ docs: https://github.com/philpof102-svg/toshi`);
       // pass the JSON as ONE arg with a forward-slash path — no shell, or Windows cmd mangles the quotes.
       const isWin = process.platform === 'win32';
       const exeName = isWin ? 'codebase-memory-mcp.exe' : 'codebase-memory-mcp';
-      const roots = [process.env.npm_config_prefix, isWin && process.env.APPDATA && path.join(process.env.APPDATA, 'npm'), '/usr/local', '/opt/homebrew', process.env.HOME && path.join(process.env.HOME, '.npm-global')].filter(Boolean);
+      const roots = [process.env.npm_config_prefix, isWin && process.env.APPDATA && path.join(process.env.APPDATA, 'npm'), '/usr/local', '/opt/homebrew', require('node:os').homedir() && path.join(require('node:os').homedir(), '.npm-global')].filter(Boolean);
       let bin = 'codebase-memory-mcp';
       for (const r of roots) for (const rel of [['node_modules'], ['lib', 'node_modules']]) { const p = path.join(r, ...rel, 'codebase-memory-mcp', 'bin', exeName); if (require('node:fs').existsSync(p)) { bin = p; break; } }
       console.log(`🐈  indexing ${repo} for grounded answers…`);

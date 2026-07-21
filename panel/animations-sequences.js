@@ -88,6 +88,7 @@
   const SEQ = {
     name: null,        // 'morningStretch' | 'victoryLap' | ...
     timers: [],        // {id, kind:'timeout'|'interval'} we own
+    unsafeTimers: [],  // raw setTimeout ids from tSetSafe() — also cleared on cancel
     cancel: null,      // fn returned by the sequence
     heldBusy: false,   // did WE set window.busy=true at start?
     startedAt: 0,
@@ -95,6 +96,8 @@
   function clearAllTimers() {
     SEQ.timers.forEach((t) => { try { t.kind === 'interval' ? clearInterval(t.id) : clearTimeout(t.id); } catch {} });
     SEQ.timers = [];
+    SEQ.unsafeTimers.forEach((id) => { try { clearTimeout(id); } catch {} });
+    SEQ.unsafeTimers = [];
   }
   // Schedule a timer that we OWN (auto-cleaned on cancel). Returns the id.
   function tSet(fn, ms) {
@@ -372,11 +375,13 @@
     obs.observe(b,   { attributes: true, attributeFilter: ['class'] });
     return obs;
   }
-  // helper that registers a tSet outside a sequence (e.g. for the small
+  // helper that registers a setTimeout outside a sequence (e.g. for the small
   // post-answer delay that runs BEFORE the new sequence starts; we need
-  // it cleared too if the user closes the panel)
+  // it cleared too if the user closes the panel or a new sequence cancels)
   function tSetSafe(fn, ms) {
-    return setTimeout(() => { try { fn(); } catch {} }, ms);
+    const id = setTimeout(() => { try { fn(); } catch {} }, ms);
+    SEQ.unsafeTimers.push(id);
+    return id;
   }
 
   // Heuristic 2: when the brain is DOWN (the .nope path fires), the panel
