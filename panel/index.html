@@ -767,9 +767,21 @@ async function pollWatching() {
     }
   } catch { const el = $('watching'); if (el) el.textContent = ''; watching = ''; }
 }
-setInterval(pollWatching, 4000); pollWatching();
+  setInterval(pollWatching, 4000); pollWatching();
 
-bootRive();
+  // ── VISIBILITY CHANGE HANDLER (2026-07-23) ──────────────────────────────
+  // Fix bug "1 tic par 3.5s" : quand l'onglet passe en arrière-plan, le navigateur
+  // throttle requestAnimationFrame drastiquement. On pause/reprend Rive proprement.
+  document.addEventListener('visibilitychange', () => {
+    if (!rive) return;
+    if (document.hidden) {
+      try { rive.pause(); } catch {}
+    } else {
+      try { rive.play('MascotSM'); } catch {}
+    }
+  });
+
+  bootRive();
 </script>
 </body>
 </html>
