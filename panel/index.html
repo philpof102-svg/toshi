@@ -214,17 +214,19 @@
   body.mini[data-sb$="r"] .pod{right:0} body.mini[data-sb$="l"] .pod{left:0}
   body.mini[data-sb^="b"] .pod{bottom:0} body.mini[data-sb^="t"] .pod{top:0}
   body.mini[data-sb] .mexp{display:none}
-  body.mini[data-sb] .bubble{position:absolute; left:auto; right:auto; top:auto; bottom:auto;
-    width:184px; max-width:184px; max-height:none; overflow:visible; font-size:10.5px; line-height:1.4;
-    padding:9px 11px; border:1px solid var(--line); border-radius:13px; background:rgba(7,11,25,.96)}
-  body.mini[data-sb="br"] .bubble{left:8px; top:8px}  body.mini[data-sb="bl"] .bubble{right:8px; top:8px}
-  body.mini[data-sb="tr"] .bubble{left:8px; bottom:8px} body.mini[data-sb="tl"] .bubble{right:8px; bottom:8px}
-  body.mini[data-sb] .bubble::after{content:""; position:absolute; width:15px; height:15px;
-    background:rgba(7,11,25,.96); transform:rotate(45deg); z-index:-1}
-  body.mini[data-sb="br"] .bubble::after{right:16px; bottom:-7px; border-right:1px solid var(--line); border-bottom:1px solid var(--line)}
-  body.mini[data-sb="bl"] .bubble::after{left:16px; bottom:-7px; border-left:1px solid var(--line); border-bottom:1px solid var(--line)}
-  body.mini[data-sb="tr"] .bubble::after{right:16px; top:-7px; border-right:1px solid var(--line); border-top:1px solid var(--line)}
-  body.mini[data-sb="tl"] .bubble::after{left:16px; top:-7px; border-left:1px solid var(--line); border-top:1px solid var(--line)}
+  body.mini[data-sb] .bubble{display:none}   /* the in-pod bubble is trapped in .stage — the body-level .sb shows instead */
+  /* the external speech bubble — body-level, so it can sit anywhere in the grown window */
+  .sb{display:none; position:absolute; box-sizing:border-box; width:184px; max-width:184px;
+    background:rgba(7,11,25,.96); border:1px solid var(--line); border-radius:13px; padding:9px 11px;
+    font-size:10.5px; line-height:1.4; color:var(--ink); white-space:pre-wrap; word-break:break-word; z-index:6; -webkit-app-region:no-drag}
+  body.mini[data-sb] .sb{display:block}
+  body.mini[data-sb="br"] .sb{left:8px; top:8px}   body.mini[data-sb="bl"] .sb{right:8px; top:8px}
+  body.mini[data-sb="tr"] .sb{left:8px; bottom:8px} body.mini[data-sb="tl"] .sb{right:8px; bottom:8px}
+  .sb::after{content:""; position:absolute; width:15px; height:15px; background:rgba(7,11,25,.96); transform:rotate(45deg); z-index:-1}
+  body.mini[data-sb="br"] .sb::after{right:16px; bottom:-7px; border-right:1px solid var(--line); border-bottom:1px solid var(--line)}
+  body.mini[data-sb="bl"] .sb::after{left:16px; bottom:-7px; border-left:1px solid var(--line); border-bottom:1px solid var(--line)}
+  body.mini[data-sb="tr"] .sb::after{right:16px; top:-7px; border-right:1px solid var(--line); border-top:1px solid var(--line)}
+  body.mini[data-sb="tl"] .sb::after{left:16px; top:-7px; border-left:1px solid var(--line); border-top:1px solid var(--line)}
   @media (prefers-reduced-motion:reduce){ .pod,.dot,.floaty,.spark{animation:none !important} }
 </style>
 <link rel="stylesheet" href="animations-extra.css" />
@@ -260,6 +262,9 @@
     </form>
     <div class="foot"><span id="watching"></span>Toshi · mascot by <a href="https://github.com/tinyhumansai/mascots" target="_blank" rel="noopener">tinyhumans</a> · open source · on zero via MCP</div>
   </div>
+  <!-- mini SPEECH bubble — a body-level SIBLING of .pod (the in-.pod #bubble is trapped inside .stage and
+       can't leave the 116 pod). Shown only when body[data-sb] is set (window grown, mini speaking). -->
+  <div class="sb" id="sb" aria-hidden="true"><div class="sb-body" id="sb-body"></div></div>
 
 <script>
 const RIV_URL = 'https://raw.githubusercontent.com/tinyhumansai/mascots/main/mascots/toshi/toshi.riv';
@@ -542,6 +547,7 @@ function say(text, grounded, holdMs) {
   body.textContent = firstLang;
   // stash the plain text on the body so the copy button reads it back without re-splitting
   body.dataset.spoken = firstLang;
+  try { const sbb = $('sb-body'); if (sbb) sbb.textContent = firstLang; } catch {}   // mirror into the body-level speech bubble (mini)
   const b = $('bubble'); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); // retrigger pop-in
   if (document.body.classList.contains('mini')) { try { window.toshiDesktop?.miniSpeak?.(); } catch {} } // grow the window → bubble beside the pod
   clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => {
