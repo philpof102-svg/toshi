@@ -138,7 +138,64 @@ function createWindow() {
       setTimeout(tick, 1500);
     }, 7000);
   }
+  // ── THE WATCHER (opt-in): TOSHI_WATCH=1 → Toshi glances near the cursor and comments. Pure addon —
+  // its only output is window.__toshi.say(), so it never touches the animation. Privacy tiers below.
+  if (process.env.TOSHI_WATCH === '1') startWatcher(win);
   return win;
+}
+
+// Glance near the cursor → an in-character line. Reuses the dormant EYES (eyes.cjs/eyes-read.cjs).
+// Privacy is layered + opt-in:
+//   default            → TITLE-ONLY (no pixels): Toshi reacts to WHICH app/kind you're in. Local template lines.
+//   TOSHI_WATCH_GRANT=1 + TOSHI_OCR/TOSHI_VLM (module → async(png)=>text) → reads on-screen contents.
+//   TOSHI_WATCH_CLOUD=1 → agent-written lines via Toshi's own free LLM; if screen CONTENTS are sent, the
+//                         line carries a provenance label ("screen read → …") — never hidden.
+function startWatcher(win) {
+  try {
+    const { desktopCapturer } = require('electron');
+    const { createEyes } = require('./eyes.cjs');
+    const { createReader } = require('./eyes-read.cjs');
+    const { makeWatcher } = require('./watch.cjs');
+    const load = (p) => { try { return p ? require(p) : null; } catch { return null; } };
+
+    const eyes = createEyes({ capturer: desktopCapturer, now: () => Date.now() });
+    const reader = createReader({ ocr: load(process.env.TOSHI_OCR), vlm: load(process.env.TOSHI_VLM) });
+    if (process.env.TOSHI_WATCH_GRANT === '1') {
+      eyes.enumerate().then((list) => { const s = list.find((x) => /screen/i.test(x.id)); if (s) eyes.grant(s.id, 'read'); }).catch(() => {});
+    }
+
+    const say = (text, ms) => {
+      console.log('[toshi] 💬', text); // echo the quip to the console (a light verbose trail)
+      try { win.webContents.executeJavaScript(`window.__toshi && window.__toshi.say ? window.__toshi.say(${JSON.stringify(text)}, false, ${Number(ms) || 4500}) : 0`); } catch {}
+    };
+
+    const MODEL = process.env.TOSHI_WATCH_MODEL || "Toshi's cloud model";
+    const allowCloud = process.env.TOSHI_WATCH_CLOUD === '1';
+    // Toshi speaks the USER's language: the OS locale first (e.g. fr-FR → 'fr'), English as the default
+    // fallback. Override with TOSHI_LANG. EN-first = 'en' is what we land on when the locale is unknown.
+    const LANG = String(process.env.TOSHI_LANG || (app.getLocale() || 'en').split('-')[0] || 'en').toLowerCase();
+    const llm = allowCloud ? async ({ ctx }) => {
+      const { chat, detectLang, langName } = await import('../lib/llm.mjs');
+      const body = (ctx.text || ctx.summary || '').trim();
+      const what = body
+        ? `On screen: ${body.slice(0, 500)}`
+        : `The user is in a ${ctx.kind} (${ctx.app || 'an app'})${ctx.hasError ? ', an error is showing' : ''}.`;
+      const line = String(await chat(`You are Toshi, a playful cat desktop companion. Reply in ${langName(LANG)} only — no other language. React to what the user is doing with ONE punchy line of 8 words or fewer, in character, a single emoji, no preamble, no quotes. ${what}`) || '').trim();
+      // language consistency: a free model sometimes drifts to another language — drop it (the instant
+      // template already covered the moment). detectLang is Toshi's own detector.
+      if (line && detectLang(line) !== LANG) return '';
+      if (body) { ctx.mustLabel = true; ctx.label = `screen read → ${MODEL}`; } // contents left the device — never hidden
+      return line;
+    } : null;
+
+    const watcher = makeWatcher(
+      { eyes, reader, say, llm, cursor: () => screen.getCursorScreenPoint(), now: () => Date.now() },
+      { allowCloud, modelName: MODEL, minGapMs: Number(process.env.TOSHI_WATCH_GAP_MS) || 45000 },
+    );
+    win.webContents.once('did-finish-load', () => watcher.start(Number(process.env.TOSHI_WATCH_POLL_MS) || 6000));
+    win.on('closed', () => watcher.stop());
+    console.log(`[toshi] 👀 watcher ON — ${process.env.TOSHI_WATCH_GRANT === '1' ? 'contents' : 'title-only'} tier, ${allowCloud ? `agent lines (${LANG}, cloud, labeled)` : 'local template lines'}`);
+  } catch (e) { console.error('[toshi] watcher failed:', e.message); }
 }
 
 app.whenReady().then(() => {

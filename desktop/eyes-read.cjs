@@ -18,10 +18,10 @@
 // Cheap window-kind heuristic (title first, then any text we read). Never throws.
 function classifyKind(title = '', text = '') {
   const s = (String(title) + ' \n ' + String(text)).toLowerCase();
-  if (/\bvs ?code\b|\bvim\b|\bnvim\b|\bsublime\b|\bintellij\b|\bpycharm\b|\.(js|ts|tsx|py|rs|go|java|rb|c|cpp|cs|sol)\b/.test(s)) return 'editor';
-  if (/\bterminal\b|\bbash\b|\bzsh\b|\bpowershell\b|\bcmd\.exe\b|\biterm\b|\bconsole\b|\$\s|\bnpm (run|test|install)\b/.test(s)) return 'terminal';
-  if (/\bchrome\b|\bfirefox\b|\bsafari\b|\bedge\b|\barc\b|https?:\/\//.test(s)) return 'browser';
-  if (/\bslack\b|\bdiscord\b|\bwhatsapp\b|\btelegram\b|\bmessages\b/.test(s)) return 'chat';
+  if (/\bvs ?code\b|\bvscodium?\b|\bvisual studio\b|\bcursor\b|\bwebstorm\b|\brider\b|\bnotepad\+\+\b|\bvim\b|\bnvim\b|\bsublime\b|\bintellij\b|\bpycharm\b|\.(js|ts|tsx|py|rs|go|java|rb|c|cpp|cs|sol)\b/.test(s)) return 'editor';
+  if (/\bwindows terminal\b|\bterminal\b|\bgit bash\b|\bbash\b|\bzsh\b|\bpwsh\b|\bpowershell\b|\bwsl\b|\bubuntu\b|\bcmd\.exe\b|\biterm\b|\bconsole\b|\$\s|\bnpm (run|test|install)\b/.test(s)) return 'terminal';
+  if (/\bchrome\b|\bchromium\b|\bfirefox\b|\bsafari\b|\bedge\b|\bbrave\b|\bopera\b|\bvivaldi\b|\barc\b|https?:\/\//.test(s)) return 'browser';
+  if (/\bslack\b|\bdiscord\b|\bwhatsapp\b|\btelegram\b|\bteams\b|\bsignal\b|\bmessages\b/.test(s)) return 'chat';
   return 'other';
 }
 
