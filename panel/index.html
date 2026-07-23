@@ -216,17 +216,17 @@
   body.mini[data-sb] .mexp{display:none}
   body.mini[data-sb] .bubble{display:none}   /* the in-pod bubble is trapped in .stage — the body-level .sb shows instead */
   /* the external speech bubble — body-level, so it can sit anywhere in the grown window */
-  .sb{display:none; position:absolute; box-sizing:border-box; width:184px; max-width:184px;
-    background:rgba(7,11,25,.96); border:1px solid var(--line); border-radius:13px; padding:9px 11px;
-    font-size:10.5px; line-height:1.4; color:var(--ink); white-space:pre-wrap; word-break:break-word; z-index:6; -webkit-app-region:no-drag}
+  .sb{display:none; position:absolute; box-sizing:border-box; width:max-content; max-width:150px; min-width:44px;
+    background:rgba(7,11,25,.96); border:1px solid var(--line); border-radius:12px; padding:7px 10px;
+    font-size:10px; line-height:1.35; color:var(--ink); white-space:pre-wrap; word-break:break-word; z-index:6; -webkit-app-region:no-drag}
   body.mini[data-sb] .sb{display:block}
-  body.mini[data-sb="br"] .sb{left:8px; top:8px}   body.mini[data-sb="bl"] .sb{right:8px; top:8px}
-  body.mini[data-sb="tr"] .sb{left:8px; bottom:8px} body.mini[data-sb="tl"] .sb{right:8px; bottom:8px}
-  .sb::after{content:""; position:absolute; width:15px; height:15px; background:rgba(7,11,25,.96); transform:rotate(45deg); z-index:-1}
-  body.mini[data-sb="br"] .sb::after{right:16px; bottom:-7px; border-right:1px solid var(--line); border-bottom:1px solid var(--line)}
-  body.mini[data-sb="bl"] .sb::after{left:16px; bottom:-7px; border-left:1px solid var(--line); border-bottom:1px solid var(--line)}
-  body.mini[data-sb="tr"] .sb::after{right:16px; top:-7px; border-right:1px solid var(--line); border-top:1px solid var(--line)}
-  body.mini[data-sb="tl"] .sb::after{left:16px; top:-7px; border-left:1px solid var(--line); border-top:1px solid var(--line)}
+  /* hug the pod: bubble sits just OUTSIDE the 116 pod on its horizontal side, aimed at the head */
+  body.mini[data-sb$="r"] .sb{right:122px}  body.mini[data-sb$="l"] .sb{left:122px}
+  body.mini[data-sb^="b"] .sb{bottom:30px}  body.mini[data-sb^="t"] .sb{top:30px}
+  .sb::after{content:""; position:absolute; width:0; height:0; border-style:solid}
+  body.mini[data-sb$="r"] .sb::after{right:-8px; border-width:7px 0 7px 8px; border-color:transparent transparent transparent rgba(7,11,25,.96)}
+  body.mini[data-sb$="l"] .sb::after{left:-8px; border-width:7px 8px 7px 0; border-color:transparent rgba(7,11,25,.96) transparent transparent}
+  body.mini[data-sb^="b"] .sb::after{bottom:13px}  body.mini[data-sb^="t"] .sb::after{top:13px}
   @media (prefers-reduced-motion:reduce){ .pod,.dot,.floaty,.spark{animation:none !important} }
 </style>
 <link rel="stylesheet" href="animations-extra.css" />
