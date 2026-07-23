@@ -8,4 +8,8 @@ contextBridge.exposeInMainWorld('toshiDesktop', {
   hide: () => ipcRenderer.send('toshi:win', 'hide'),
   show: () => ipcRenderer.send('toshi:win', 'show'),
   resize: (w, h) => ipcRenderer.send('toshi:resize', w, h),
+  // mini speech-bubble: grow the window so the bubble sits BESIDE the pod, then shrink back.
+  miniSpeak: () => ipcRenderer.send('toshi:mini-speak'),
+  miniQuiet: () => ipcRenderer.send('toshi:mini-quiet'),
+  onMiniLayout: (cb) => ipcRenderer.on('toshi:mini-layout', (_e, data) => cb(data)),
 });

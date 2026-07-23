@@ -86,6 +86,36 @@ function createWindow() {
     try { [W, H] = clamp(w, h); const b = win.getBounds();
       win.setBounds(fitOnScreen({ x: b.x + b.width - W, y: b.y + b.height - H, width: W, height: H })); } catch {}
   });
+  // Mini SPEECH BUBBLE. When Toshi speaks while folded, grow the window so a real bubble can sit BESIDE the
+  // pod (not over it), with the side chosen by WHERE the pod is on screen: the pod stays at its edge and the
+  // bubble+tail grow toward the screen centre (so the bubble never runs off the edge). Shrinks back to the
+  // 116 pod when the quip ends. main owns the geometry; the renderer just paints for the `corner` it's told.
+  const SPEAK_W = 300, SPEAK_H = 196;
+  let miniCorner = null;
+  const cornerOf = (r) => { const a = screen.getDisplayMatching(r).workArea;
+    return (r.y + r.height / 2 > a.y + a.height / 2 ? 'b' : 't') + (r.x + r.width / 2 > a.x + a.width / 2 ? 'r' : 'l'); };
+  ipcMain.on('toshi:mini-speak', () => {
+    try {
+      const b = win.getBounds();
+      if (b.width > MINI || b.height > MINI) return;                 // only from the folded 116 pod
+      miniCorner = cornerOf({ x: b.x, y: b.y, width: MINI, height: MINI });
+      const nx = miniCorner.includes('r') ? b.x + MINI - SPEAK_W : b.x;   // grow toward screen centre, pod stays put
+      const ny = miniCorner.includes('b') ? b.y + MINI - SPEAK_H : b.y;
+      win.setBounds(fitOnScreen({ x: nx, y: ny, width: SPEAK_W, height: SPEAK_H }));
+      win.webContents.send('toshi:mini-layout', { corner: miniCorner });
+    } catch {}
+  });
+  ipcMain.on('toshi:mini-quiet', () => {
+    try {
+      if (!miniCorner) return;
+      const b = win.getBounds();
+      const px = miniCorner.includes('r') ? b.x + b.width - MINI : b.x; // put the pod back in its corner
+      const py = miniCorner.includes('b') ? b.y + b.height - MINI : b.y;
+      win.setBounds(fitOnScreen({ x: px, y: py, width: MINI, height: MINI }));
+      win.webContents.send('toshi:mini-layout', { corner: null });
+      miniCorner = null;
+    } catch {}
+  });
   // Do NOT use the 'screen-saver' always-on-top level — on Windows it makes the window refuse keyboard
   // focus (you couldn't type). Plain alwaysOnTop keeps it above normal windows AND typable.
   win.loadFile(path.join(ROOT, 'panel', 'index.html'));

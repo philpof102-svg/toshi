@@ -205,6 +205,26 @@
     width:22px; height:22px; border-radius:7px; border:1px solid rgba(0,82,255,.4); background:rgba(7,11,25,.75);
     color:#cbd5e1; font-size:12px; line-height:1; cursor:pointer; -webkit-app-region:no-drag; padding:0}
   body.mini .mexp:hover{color:#fff; background:var(--base)}
+  /* ── mini SPEECH bubble beside the pod ──────────────────────────────────────────────────────────────
+     When Toshi speaks while folded, main grows the window to 300×196 and sets body[data-sb] to the pod's
+     screen corner (br/bl/tr/tl). The pod pins to that corner; the bubble + tail sit on the DIAGONAL toward
+     the screen centre (so the bubble never runs off the edge), with a tail pointing back at the pod.
+     No data-sb (folded 116 pod) → the in-pod bubble rules above apply, so this is purely additive. */
+  body.mini[data-sb] .pod{position:absolute; width:116px; height:116px}
+  body.mini[data-sb$="r"] .pod{right:0} body.mini[data-sb$="l"] .pod{left:0}
+  body.mini[data-sb^="b"] .pod{bottom:0} body.mini[data-sb^="t"] .pod{top:0}
+  body.mini[data-sb] .mexp{display:none}
+  body.mini[data-sb] .bubble{position:absolute; left:auto; right:auto; top:auto; bottom:auto;
+    width:184px; max-width:184px; max-height:none; overflow:visible; font-size:10.5px; line-height:1.4;
+    padding:9px 11px; border:1px solid var(--line); border-radius:13px; background:rgba(7,11,25,.96)}
+  body.mini[data-sb="br"] .bubble{left:8px; top:8px}  body.mini[data-sb="bl"] .bubble{right:8px; top:8px}
+  body.mini[data-sb="tr"] .bubble{left:8px; bottom:8px} body.mini[data-sb="tl"] .bubble{right:8px; bottom:8px}
+  body.mini[data-sb] .bubble::after{content:""; position:absolute; width:15px; height:15px;
+    background:rgba(7,11,25,.96); transform:rotate(45deg); z-index:-1}
+  body.mini[data-sb="br"] .bubble::after{right:16px; bottom:-7px; border-right:1px solid var(--line); border-bottom:1px solid var(--line)}
+  body.mini[data-sb="bl"] .bubble::after{left:16px; bottom:-7px; border-left:1px solid var(--line); border-bottom:1px solid var(--line)}
+  body.mini[data-sb="tr"] .bubble::after{right:16px; top:-7px; border-right:1px solid var(--line); border-top:1px solid var(--line)}
+  body.mini[data-sb="tl"] .bubble::after{left:16px; top:-7px; border-left:1px solid var(--line); border-top:1px solid var(--line)}
   @media (prefers-reduced-motion:reduce){ .pod,.dot,.floaty,.spark{animation:none !important} }
 </style>
 <link rel="stylesheet" href="animations-extra.css" />
@@ -494,6 +514,10 @@ let bubbleTimer = null;
 // the user can scroll UP freely with the wheel, touchpad, or the scrollbar to read older content —
 // scroll position is preserved when the same answer is re-rendered, and reset when a new answer comes
 // in. A small fading chevron at the bottom hints that more content is available above.
+// mini speech-bubble: main tells us which screen corner the pod is in (or null when folding back) so the
+// pod + bubble + tail lay out beside each other. Fail-safe: if the bridge is absent, the in-pod bubble stays.
+try { window.toshiDesktop?.onMiniLayout?.((d) => { if (d && d.corner) document.body.dataset.sb = d.corner; else delete document.body.dataset.sb; }); } catch {}
+
 function say(text, grounded, holdMs) {
   $('grounded').hidden = !grounded;
   // The bubble now surfaces a little more of the answer's provenance — small, monospace pills in the
@@ -519,7 +543,11 @@ function say(text, grounded, holdMs) {
   // stash the plain text on the body so the copy button reads it back without re-splitting
   body.dataset.spoken = firstLang;
   const b = $('bubble'); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); // retrigger pop-in
-  clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => b.classList.remove('on'), holdMs || 11000);
+  if (document.body.classList.contains('mini')) { try { window.toshiDesktop?.miniSpeak?.(); } catch {} } // grow the window → bubble beside the pod
+  clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => {
+    b.classList.remove('on');
+    if (document.body.dataset.sb) { try { window.toshiDesktop?.miniQuiet?.(); } catch {} }               // fold back to the 116 pod
+  }, holdMs || 11000);
   // after the bubble paints, check whether the content overflows the max-height: if so, add a class
   // that fades in a small chevron at the bottom of the bubble so the user knows there is more to scroll.
   // We do this on the next frame so layout is final. We also auto-scroll to the bottom so the latest
