@@ -192,9 +192,12 @@
   body.mini .stage::after{display:none}
   /* mini can still SPEAK — a compact bubble overlays the top of the little head (fits inside 116×116).
      Hidden until say() adds .on, so it only appears when Toshi actually has something to say. */
-  body.mini .bubble{left:5px; right:33px; top:5px; bottom:auto; max-height:86%; font-size:8.5px; line-height:1.32;
+  /* mini bubble GROWS to fit the whole quip (no max-height clip) — the message is never cut; a long line
+     just makes the bubble taller (it may extend past the little head, which is fine). Padding clears the
+     rounded corner so the first line isn't clipped; right:33px leaves room for the ⤢ expand button. */
+  body.mini .bubble{left:5px; right:33px; top:5px; bottom:auto; max-height:none; font-size:8.5px; line-height:1.32;
     padding:8px 9px 7px; border-radius:10px; background:rgba(7,11,25,.94); -webkit-app-region:no-drag; z-index:4;
-    scrollbar-width:none}
+    overflow:visible; scrollbar-width:none}
   body.mini .bubble::-webkit-scrollbar{display:none}
   body.mini .bubble .who{display:none}
   .mexp{display:none}
