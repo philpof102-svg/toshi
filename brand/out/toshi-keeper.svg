@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
+<defs>
+    <linearGradient id="furGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4C93FF"/><stop offset=".42" stop-color="#1667FF"/><stop offset="1" stop-color="#0F53E0"/>
+    </linearGradient>
+    <linearGradient id="furGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0F53E0"/><stop offset="1" stop-color="#0A3AAE"/>
+    </linearGradient>
+    <linearGradient id="bibGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F2F6FC"/><stop offset="1" stop-color="#CFDCEF"/>
+    </linearGradient>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+    <filter id="bigGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="48"/>
+    </filter>
+    <radialGradient id="vignette" cx=".5" cy=".46" r=".78">
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/>
+    </radialGradient>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B1436"/><stop offset=".55" stop-color="#0A1B4E"/><stop offset="1" stop-color="#050A20"/>
+    </linearGradient>
+  </defs>
+
+    <rect width="1000" height="1000" fill="url(#night)"/>
+    <circle cx="243" cy="1" r="2.6" fill="#E8F0FF" opacity="0.51"/><circle cx="47" cy="580" r="2.0" fill="#E8F0FF" opacity="0.28"/><circle cx="173" cy="471" r="1.7" fill="#E8F0FF" opacity="0.77"/><circle cx="174" cy="679" r="1.6" fill="#E8F0FF" opacity="0.51"/><circle cx="618" cy="420" r="0.9" fill="#E8F0FF" opacity="0.60"/><circle cx="656" cy="165" r="1.1" fill="#E8F0FF" opacity="0.68"/><circle cx="243" cy="462" r="1.6" fill="#E8F0FF" opacity="0.38"/><circle cx="840" cy="604" r="1.9" fill="#E8F0FF" opacity="0.93"/><circle cx="674" cy="629" r="2.0" fill="#E8F0FF" opacity="0.36"/><circle cx="884" cy="553" r="0.9" fill="#E8F0FF" opacity="0.49"/><circle cx="143" cy="692" r="1.3" fill="#E8F0FF" opacity="0.52"/><circle cx="557" cy="103" r="2.2" fill="#E8F0FF" opacity="0.62"/><circle cx="954" cy="172" r="2.5" fill="#E8F0FF" opacity="0.60"/><circle cx="859" cy="210" r="1.0" fill="#E8F0FF" opacity="0.55"/><circle cx="757" cy="146" r="2.7" fill="#E8F0FF" opacity="0.77"/><circle cx="456" cy="325" r="1.1" fill="#E8F0FF" opacity="0.53"/><circle cx="637" cy="547" r="1.0" fill="#E8F0FF" opacity="0.36"/><circle cx="920" cy="615" r="2.1" fill="#E8F0FF" opacity="0.71"/><circle cx="14" cy="659" r="1.9" fill="#E8F0FF" opacity="0.72"/><circle cx="790" cy="378" r="0.9" fill="#E8F0FF" opacity="0.71"/><circle cx="354" cy="0" r="2.6" fill="#E8F0FF" opacity="0.51"/><circle cx="437" cy="354" r="2.2" fill="#E8F0FF" opacity="0.67"/><circle cx="698" cy="309" r="1.3" fill="#E8F0FF" opacity="0.76"/><circle cx="748" cy="525" r="1.5" fill="#E8F0FF" opacity="0.29"/><circle cx="996" cy="215" r="2.3" fill="#E8F0FF" opacity="0.26"/><circle cx="620" cy="415" r="1.7" fill="#E8F0FF" opacity="0.63"/><circle cx="262" cy="112" r="1.0" fill="#E8F0FF" opacity="0.69"/><circle cx="266" cy="478" r="1.3" fill="#E8F0FF" opacity="0.42"/><circle cx="532" cy="413" r="1.3" fill="#E8F0FF" opacity="0.70"/><circle cx="333" cy="383" r="1.9" fill="#E8F0FF" opacity="0.73"/><circle cx="643" cy="215" r="2.0" fill="#E8F0FF" opacity="0.46"/><circle cx="837" cy="491" r="2.0" fill="#E8F0FF" opacity="0.73"/><circle cx="818" cy="541" r="2.7" fill="#E8F0FF" opacity="0.68"/><circle cx="905" cy="229" r="1.3" fill="#E8F0FF" opacity="0.31"/><circle cx="68" cy="289" r="2.4" fill="#E8F0FF" opacity="0.26"/><circle cx="329" cy="352" r="2.8" fill="#E8F0FF" opacity="0.82"/><circle cx="407" cy="267" r="1.8" fill="#E8F0FF" opacity="0.32"/><circle cx="943" cy="8" r="2.9" fill="#E8F0FF" opacity="0.80"/><circle cx="874" cy="625" r="2.2" fill="#E8F0FF" opacity="0.51"/><circle cx="794" cy="483" r="1.4" fill="#E8F0FF" opacity="0.28"/><circle cx="370" cy="79" r="1.9" fill="#E8F0FF" opacity="0.35"/><circle cx="146" cy="253" r="1.7" fill="#E8F0FF" opacity="0.85"/><circle cx="314" cy="427" r="2.6" fill="#E8F0FF" opacity="0.53"/><circle cx="279" cy="223" r="2.8" fill="#E8F0FF" opacity="0.88"/><circle cx="99" cy="268" r="1.6" fill="#E8F0FF" opacity="0.80"/><circle cx="115" cy="264" r="2.9" fill="#E8F0FF" opacity="0.59"/><circle cx="374" cy="302" r="1.3" fill="#E8F0FF" opacity="0.68"/><circle cx="644" cy="335" r="1.1" fill="#E8F0FF" opacity="0.92"/><circle cx="126" cy="633" r="2.4" fill="#E8F0FF" opacity="0.27"/><circle cx="169" cy="608" r="2.8" fill="#E8F0FF" opacity="0.94"/><circle cx="584" cy="560" r="2.5" fill="#E8F0FF" opacity="0.31"/><circle cx="367" cy="587" r="1.1" fill="#E8F0FF" opacity="0.28"/><circle cx="931" cy="168" r="2.9" fill="#E8F0FF" opacity="0.26"/><circle cx="153" cy="9" r="2.9" fill="#E8F0FF" opacity="0.89"/><circle cx="830" cy="204" r="2.3" fill="#E8F0FF" opacity="0.59"/><circle cx="365" cy="155" r="2.6" fill="#E8F0FF" opacity="0.40"/><circle cx="760" cy="257" r="1.2" fill="#E8F0FF" opacity="0.93"/><circle cx="254" cy="641" r="1.4" fill="#E8F0FF" opacity="0.31"/><circle cx="168" cy="123" r="2.4" fill="#E8F0FF" opacity="0.36"/><circle cx="798" cy="112" r="2.1" fill="#E8F0FF" opacity="0.83"/><circle cx="432" cy="169" r="2.4" fill="#E8F0FF" opacity="0.51"/><circle cx="812" cy="124" r="3.0" fill="#E8F0FF" opacity="0.73"/><circle cx="634" cy="688" r="1.9" fill="#E8F0FF" opacity="0.37"/><circle cx="888" cy="323" r="0.9" fill="#E8F0FF" opacity="0.70"/><circle cx="152" cy="251" r="2.1" fill="#E8F0FF" opacity="0.90"/><circle cx="133" cy="317" r="1.9" fill="#E8F0FF" opacity="0.45"/><circle cx="58" cy="46" r="2.4" fill="#E8F0FF" opacity="0.56"/><circle cx="729" cy="540" r="1.3" fill="#E8F0FF" opacity="0.82"/><circle cx="329" cy="221" r="1.8" fill="#E8F0FF" opacity="0.74"/><circle cx="301" cy="13" r="2.4" fill="#E8F0FF" opacity="0.92"/><circle cx="878" cy="111" r="2.3" fill="#E8F0FF" opacity="0.73"/><circle cx="99" cy="94" r="2.4" fill="#E8F0FF" opacity="0.30"/><circle cx="383" cy="265" r="1.2" fill="#E8F0FF" opacity="0.35"/><circle cx="991" cy="229" r="1.6" fill="#E8F0FF" opacity="0.44"/><circle cx="948" cy="661" r="1.9" fill="#E8F0FF" opacity="0.64"/><circle cx="272" cy="389" r="1.4" fill="#E8F0FF" opacity="0.68"/><circle cx="558" cy="24" r="1.2" fill="#E8F0FF" opacity="0.34"/><circle cx="281" cy="405" r="1.6" fill="#E8F0FF" opacity="0.52"/><circle cx="358" cy="428" r="1.5" fill="#E8F0FF" opacity="0.77"/><circle cx="833" cy="396" r="2.5" fill="#E8F0FF" opacity="0.50"/><circle cx="738" cy="396" r="1.9" fill="#E8F0FF" opacity="0.32"/><circle cx="465" cy="192" r="0.9" fill="#E8F0FF" opacity="0.37"/><circle cx="237" cy="295" r="2.5" fill="#E8F0FF" opacity="0.88"/><circle cx="490" cy="547" r="2.7" fill="#E8F0FF" opacity="0.83"/><circle cx="255" cy="423" r="1.5" fill="#E8F0FF" opacity="0.27"/><circle cx="867" cy="550" r="2.3" fill="#E8F0FF" opacity="0.36"/><circle cx="575" cy="190" r="1.2" fill="#E8F0FF" opacity="0.85"/><circle cx="883" cy="329" r="1.0" fill="#E8F0FF" opacity="0.51"/><circle cx="705" cy="490" r="1.5" fill="#E8F0FF" opacity="0.64"/><circle cx="648" cy="643" r="1.7" fill="#E8F0FF" opacity="0.74"/>
+    <circle cx="768" cy="200" r="104" fill="#F3F7DF" opacity=".92"/>
+    <circle cx="726" cy="170" r="104" fill="#0A1B4E"/>
+    <!-- heartbeat BEHIND the cat and below the chin line — the first draft ran it across the muzzle -->
+    <path d="M 60 830 L 200 830 L 232 764 L 268 900 L 300 830 L 700 830 L 732 764 L 768 900 L 800 830 L 940 830"
+          fill="none" stroke="#39FF9E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+    
+  <g>
+    
+    
+  <g stroke="#0A1230" stroke-width="15" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M 296 356 C 258 272 224 178 220 128 C 218 102 246 96 274 120 C 338 172 414 226 476 266 Z" fill="#1667FF"/>
+    <path d="M 296 356 C 258 272 224 178 220 128 C 218 102 246 96 274 120 C 338 172 414 226 476 266 Z" fill="#1667FF" transform="translate(1000,0) scale(-1,1)"/>
+  </g>
+  <g stroke="none">
+    <path d="M 322 330 C 300 272 282 212 281 178 C 280 162 294 160 310 174 C 350 208 398 242 438 270 Z" fill="#0C2E7A" opacity=".9"/>
+    <path d="M 322 330 C 300 272 282 212 281 178 C 280 162 294 160 310 174 C 350 208 398 242 438 270 Z" fill="#0C2E7A" opacity=".9" transform="translate(1000,0) scale(-1,1)"/>
+  </g>
+    
+  <path d="M 500 742 C 462 742 434 768 428 806 C 330 838 240 916 202 1012 L 798 1012 C 760 916 670 838 572 806 C 566 768 538 742 500 742 Z"
+        fill="url(#furGrad2)" stroke="#0A1230" stroke-width="16" stroke-linejoin="round"/>
+  <!-- shadow the fur just under the jaw, or the head looks pasted onto the body -->
+  <path d="M 428 806 C 470 830 530 830 572 806 C 560 852 440 852 428 806 Z" fill="#0A3AAE" opacity=".55"/>
+    
+  <path d="M 500 262 C 656 262 790 352 790 508 C 790 608 734 700 638 748 C 596 770 550 780 500 780 C 450 780 404 770 362 748 C 266 700 210 608 210 508 C 210 352 344 262 500 262 Z" fill="url(#furGrad)" stroke="#0A1230" stroke-width="16" stroke-linejoin="round"/>
+  <!-- cheek shading, kept inside the silhouette so no halo appears on dark backgrounds -->
+  <path d="M 214 476 C 228 620 326 726 450 758 C 320 772 216 664 210 540 Z" fill="#0A3AAE" opacity=".5"/>
+  <path d="M 786 476 C 772 620 674 726 550 758 C 680 772 784 664 790 540 Z" fill="#0A3AAE" opacity=".28"/>
+    
+  <g fill="#4C93FF" opacity=".92">
+    <path d="M 470 300 C 486 320 492 352 488 384 C 474 366 462 332 470 300 Z"/>
+    <path d="M 524 296 C 544 318 552 352 548 388 C 530 368 516 330 524 296 Z"/>
+    <path d="M 578 312 C 600 334 610 364 608 396 C 588 378 572 346 578 312 Z"/>
+    <path d="M 416 318 C 432 340 438 370 434 400 C 418 382 408 350 416 318 Z" opacity=".7"/>
+  </g>
+    
+    
+  <path d="M 500 434 C 552 496 604 522 660 540 C 716 558 744 606 732 658 C 714 728 620 784 500 784 C 380 784 286 728 268 658 C 256 606 284 558 340 540 C 396 522 448 496 500 434 Z" fill="url(#bibGrad)" stroke="#0A1230" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M 500 446 C 546 498 588 520 636 537 C 660 545 676 560 686 578 C 640 556 566 536 500 470 Z" fill="#CFDCEF" opacity=".55"/>
+    <defs><clipPath id="clipL"><ellipse cx="396" cy="470" rx="70" ry="76"/></clipPath>
+                 <clipPath id="clipR"><ellipse cx="604" cy="470" rx="70" ry="76"/></clipPath></defs>
+    <g>
+      <ellipse cx="396" cy="470" rx="70" ry="76" fill="#FFFFFF"/>
+      <ellipse cx="396" cy="474" rx="58" ry="64" fill="#7FD4FF"/>
+      <ellipse cx="396" cy="476" rx="32" ry="42" fill="#08122B"/>
+      <ellipse cx="378" cy="446" rx="16" ry="19" fill="#fff" opacity=".96"/>
+      <circle cx="412" cy="504" r="8" fill="#fff" opacity=".5"/>
+      
+      <ellipse cx="396" cy="470" rx="70" ry="76" fill="none" stroke="#0A1230" stroke-width="14"/>
+      
+    </g>
+    <g>
+      <ellipse cx="604" cy="470" rx="70" ry="76" fill="#FFFFFF"/>
+      <ellipse cx="604" cy="474" rx="58" ry="64" fill="#7FD4FF"/>
+      <ellipse cx="604" cy="476" rx="32" ry="42" fill="#08122B"/>
+      <ellipse cx="622" cy="446" rx="16" ry="19" fill="#fff" opacity=".96"/>
+      <circle cx="588" cy="504" r="8" fill="#fff" opacity=".5"/>
+      
+      <ellipse cx="604" cy="470" rx="70" ry="76" fill="none" stroke="#0A1230" stroke-width="14"/>
+      
+    </g>
+    
+  <path d="M 466 596 C 466 580 481 571 500 571 C 519 571 534 580 534 596 C 534 617 517 630 500 630 C 483 630 466 617 466 596 Z" fill="#0A1230"/>
+  <path d="M 500 630 L 500 654" stroke="#0A1230" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 500 652 C 500 682 468 696 448 676 M 500 652 C 500 682 532 696 552 676" fill="none" stroke="#0A1230" stroke-width="12" stroke-linecap="round"/>
+    
+  <g fill="#0A1230" opacity="0.45">
+    <circle cx="372" cy="606" r="7"/><circle cx="330" cy="636" r="7"/><circle cx="380" cy="656" r="7"/>
+    <circle cx="628" cy="606" r="7"/><circle cx="670" cy="636" r="7"/><circle cx="620" cy="656" r="7"/>
+  </g>
+  </g>
+    <!-- scarf instead of a hood: it can sit UNDER the chin without hiding the ears (the whole point) -->
+    <g stroke="#0A1230" stroke-width="14" stroke-linejoin="round">
+      <path d="M 404 788 C 440 828 560 828 596 788 C 640 810 664 850 660 892 C 600 862 400 862 340 892 C 336 850 360 810 404 788 Z" fill="#16307C"/>
+      <path d="M 560 866 L 596 1004 L 508 1004 L 520 872 Z" fill="#16307C"/>
+      <path d="M 356 872 C 420 852 580 852 644 872" fill="none" stroke="#3B5CC4" stroke-width="9" opacity=".9"/>
+    </g>
+    <rect width="1000" height="1000" fill="url(#vignette)"/>
+</svg>
