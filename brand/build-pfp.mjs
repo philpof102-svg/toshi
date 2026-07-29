@@ -242,6 +242,41 @@ function rng(seed) {
 // ── themes ─────────────────────────────────────────────────────────────────────────────────────
 const THEMES = {};
 
+/* 0 ─ THE AGENT. The core ask ("image toshi agent"): spy-poster Toshi, straight from the 007-style
+ *     reference — gun-barrel spiral behind, black suit, tie, earpiece, unimpressed stare. No weapon:
+ *     the barrel rifling and the suit carry the trope on their own. */
+THEMES.agent = () => {
+  const rings = [470, 400, 332, 268, 210, 158, 112].map((rr, i) =>
+    `<circle cx="500" cy="470" r="${rr}" fill="${i % 2 ? '#E9ECF2' : '#CBD2DE'}"/>`).join('');
+  const rifling = Array.from({ length: 10 }, (_, i) => {
+    const a = (i / 10) * Math.PI * 2;
+    const x1 = 500 + Math.cos(a) * 118, y1 = 470 + Math.sin(a) * 118;
+    const x2 = 500 + Math.cos(a + 0.5) * 476, y2 = 470 + Math.sin(a + 0.5) * 476;
+    return `<path d="M ${x1.toFixed(0)} ${y1.toFixed(0)} L ${x2.toFixed(0)} ${y2.toFixed(0)}" stroke="#9AA3B4" stroke-width="7" opacity=".5"/>`;
+  }).join('');
+  return {
+    title: 'L’Agent — la quête de base',
+    inner: `
+    <rect width="1000" height="1000" fill="#14161C"/>
+    <g>${rings}${rifling}</g>
+    <circle cx="500" cy="470" r="476" fill="none" stroke="#0B0D12" stroke-width="52"/>
+    <g fill="#C22B2B" opacity=".85"><circle cx="122" cy="188" r="9"/><circle cx="874" cy="238" r="7"/><circle cx="146" cy="742" r="7"/></g>
+    ${character({ mood: 'annoyed', mouth: 'flat', iris: '#7FA6C8',
+      // suit drawn OVER the shoulder wedge: two lapels, a shirt V and the tie — worn, not floating
+      preBib: '' })}
+    <g stroke="${P.ink}" stroke-width="14" stroke-linejoin="round">
+      <path d="M 500 806 L 396 1010 L 188 1010 C 216 892 320 800 436 780 Z" fill="#171B26"/>
+      <path d="M 500 806 L 604 1010 L 812 1010 C 784 892 680 800 564 780 Z" fill="#11141D"/>
+      <path d="M 452 788 L 500 846 L 548 788 L 548 1010 L 452 1010 Z" fill="#F2F5FA"/>
+      <path d="M 500 846 L 466 900 L 500 1010 L 534 900 Z" fill="#1D2C55"/>
+    </g>
+    <!-- earpiece: the one prop that says agent without saying weapon -->
+    <path d="M 786 552 C 826 570 838 620 812 660 C 800 700 786 738 776 766" fill="none" stroke="#0B0D12" stroke-width="10" stroke-linecap="round" opacity=".9"/>
+    <circle cx="784" cy="548" r="17" fill="#0B0D12"/>
+    <rect width="1000" height="1000" fill="url(#vignette)" opacity=".8"/>`,
+  };
+};
+
 /* 1 ─ TERMINAL WATCHER. The "the eyes are me" portrait: everything else is dimmed to near-monochrome
  *     so the only living colour in the frame is the eyes, with a cursor block sitting in each pupil.
  *     Toshi's actual job in this repo is watching a terminal, so the theme is literal, not decorative. */

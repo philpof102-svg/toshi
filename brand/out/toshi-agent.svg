@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
+<defs>
+    <linearGradient id="furGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4C93FF"/><stop offset=".42" stop-color="#1667FF"/><stop offset="1" stop-color="#0F53E0"/>
+    </linearGradient>
+    <linearGradient id="furGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0F53E0"/><stop offset="1" stop-color="#0A3AAE"/>
+    </linearGradient>
+    <linearGradient id="bibGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F2F6FC"/><stop offset="1" stop-color="#CFDCEF"/>
+    </linearGradient>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+    <filter id="bigGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="48"/>
+    </filter>
+    <radialGradient id="vignette" cx=".5" cy=".46" r=".78">
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/>
+    </radialGradient>
+    
+  </defs>
+
+    <rect width="1000" height="1000" fill="#14161C"/>
+    <g><circle cx="500" cy="470" r="470" fill="#CBD2DE"/><circle cx="500" cy="470" r="400" fill="#E9ECF2"/><circle cx="500" cy="470" r="332" fill="#CBD2DE"/><circle cx="500" cy="470" r="268" fill="#E9ECF2"/><circle cx="500" cy="470" r="210" fill="#CBD2DE"/><circle cx="500" cy="470" r="158" fill="#E9ECF2"/><circle cx="500" cy="470" r="112" fill="#CBD2DE"/><path d="M 618 470 L 918 698" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 595 539 L 704 900" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 536 582 L 412 938" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 464 582 L 154 797" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 405 539 L 28 531" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 382 470 L 82 242" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 405 401 L 296 40" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 464 358 L 588 2" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 536 358 L 846 143" stroke="#9AA3B4" stroke-width="7" opacity=".5"/><path d="M 595 401 L 972 409" stroke="#9AA3B4" stroke-width="7" opacity=".5"/></g>
+    <circle cx="500" cy="470" r="476" fill="none" stroke="#0B0D12" stroke-width="52"/>
+    <g fill="#C22B2B" opacity=".85"><circle cx="122" cy="188" r="9"/><circle cx="874" cy="238" r="7"/><circle cx="146" cy="742" r="7"/></g>
+    
+  <g>
+    
+    
+  <g stroke="#0A1230" stroke-width="15" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M 296 356 C 258 272 224 178 220 128 C 218 102 246 96 274 120 C 338 172 414 226 476 266 Z" fill="#1667FF"/>
+    <path d="M 296 356 C 258 272 224 178 220 128 C 218 102 246 96 274 120 C 338 172 414 226 476 266 Z" fill="#1667FF" transform="translate(1000,0) scale(-1,1)"/>
+  </g>
+  <g stroke="none">
+    <path d="M 322 330 C 300 272 282 212 281 178 C 280 162 294 160 310 174 C 350 208 398 242 438 270 Z" fill="#0C2E7A" opacity=".9"/>
+    <path d="M 322 330 C 300 272 282 212 281 178 C 280 162 294 160 310 174 C 350 208 398 242 438 270 Z" fill="#0C2E7A" opacity=".9" transform="translate(1000,0) scale(-1,1)"/>
+  </g>
+    
+  <path d="M 500 742 C 462 742 434 768 428 806 C 330 838 240 916 202 1012 L 798 1012 C 760 916 670 838 572 806 C 566 768 538 742 500 742 Z"
+        fill="url(#furGrad2)" stroke="#0A1230" stroke-width="16" stroke-linejoin="round"/>
+  <!-- shadow the fur just under the jaw, or the head looks pasted onto the body -->
+  <path d="M 428 806 C 470 830 530 830 572 806 C 560 852 440 852 428 806 Z" fill="#0A3AAE" opacity=".55"/>
+    
+  <path d="M 500 262 C 656 262 790 352 790 508 C 790 608 734 700 638 748 C 596 770 550 780 500 780 C 450 780 404 770 362 748 C 266 700 210 608 210 508 C 210 352 344 262 500 262 Z" fill="url(#furGrad)" stroke="#0A1230" stroke-width="16" stroke-linejoin="round"/>
+  <!-- cheek shading, kept inside the silhouette so no halo appears on dark backgrounds -->
+  <path d="M 214 476 C 228 620 326 726 450 758 C 320 772 216 664 210 540 Z" fill="#0A3AAE" opacity=".5"/>
+  <path d="M 786 476 C 772 620 674 726 550 758 C 680 772 784 664 790 540 Z" fill="#0A3AAE" opacity=".28"/>
+    
+  <g fill="#4C93FF" opacity=".92">
+    <path d="M 470 300 C 486 320 492 352 488 384 C 474 366 462 332 470 300 Z"/>
+    <path d="M 524 296 C 544 318 552 352 548 388 C 530 368 516 330 524 296 Z"/>
+    <path d="M 578 312 C 600 334 610 364 608 396 C 588 378 572 346 578 312 Z"/>
+    <path d="M 416 318 C 432 340 438 370 434 400 C 418 382 408 350 416 318 Z" opacity=".7"/>
+  </g>
+    
+    
+  <path d="M 500 434 C 552 496 604 522 660 540 C 716 558 744 606 732 658 C 714 728 620 784 500 784 C 380 784 286 728 268 658 C 256 606 284 558 340 540 C 396 522 448 496 500 434 Z" fill="url(#bibGrad)" stroke="#0A1230" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M 500 446 C 546 498 588 520 636 537 C 660 545 676 560 686 578 C 640 556 566 536 500 470 Z" fill="#CFDCEF" opacity=".55"/>
+    <defs><clipPath id="clipL"><ellipse cx="396" cy="470" rx="70" ry="76"/></clipPath>
+                 <clipPath id="clipR"><ellipse cx="604" cy="470" rx="70" ry="76"/></clipPath></defs>
+    <g>
+      <ellipse cx="396" cy="470" rx="70" ry="76" fill="#FFFFFF"/>
+      <ellipse cx="396" cy="474" rx="58" ry="64" fill="#7FA6C8"/>
+      <ellipse cx="396" cy="476" rx="32" ry="42" fill="#08122B"/>
+      <ellipse cx="378" cy="446" rx="16" ry="19" fill="#fff" opacity=".96"/>
+      <circle cx="412" cy="504" r="8" fill="#fff" opacity=".5"/>
+      <g clip-path="url(#clipL)">
+        <path d="M 296 320 L 496 320 L 496 430 L 296 460 Z" fill="#1667FF"/>
+        <path d="M 296 460 L 496 430" fill="none" stroke="#0A1230" stroke-width="11"/>
+      </g>
+      <ellipse cx="396" cy="470" rx="70" ry="76" fill="none" stroke="#0A1230" stroke-width="14"/>
+      <path d="M 472 356 C 426 336 362 348 322 380"
+             fill="none" stroke="#0A1230" stroke-width="17" stroke-linecap="round"/>
+    </g>
+    <g>
+      <ellipse cx="604" cy="470" rx="70" ry="76" fill="#FFFFFF"/>
+      <ellipse cx="604" cy="474" rx="58" ry="64" fill="#7FA6C8"/>
+      <ellipse cx="604" cy="476" rx="32" ry="42" fill="#08122B"/>
+      <ellipse cx="622" cy="446" rx="16" ry="19" fill="#fff" opacity=".96"/>
+      <circle cx="588" cy="504" r="8" fill="#fff" opacity=".5"/>
+      <g clip-path="url(#clipR)">
+        <path d="M 504 320 L 704 320 L 704 460 L 504 430 Z" fill="#1667FF"/>
+        <path d="M 504 430 L 704 460" fill="none" stroke="#0A1230" stroke-width="11"/>
+      </g>
+      <ellipse cx="604" cy="470" rx="70" ry="76" fill="none" stroke="#0A1230" stroke-width="14"/>
+      <path d="M 528 356 C 574 336 638 348 678 380"
+             fill="none" stroke="#0A1230" stroke-width="17" stroke-linecap="round"/>
+    </g>
+    
+  <path d="M 466 596 C 466 580 481 571 500 571 C 519 571 534 580 534 596 C 534 617 517 630 500 630 C 483 630 466 617 466 596 Z" fill="#0A1230"/>
+  <path d="M 500 630 L 500 654" stroke="#0A1230" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 452 668 L 548 668" fill="none" stroke="#0A1230" stroke-width="12" stroke-linecap="round"/>
+    
+  <g fill="#0A1230" opacity="0.45">
+    <circle cx="372" cy="606" r="7"/><circle cx="330" cy="636" r="7"/><circle cx="380" cy="656" r="7"/>
+    <circle cx="628" cy="606" r="7"/><circle cx="670" cy="636" r="7"/><circle cx="620" cy="656" r="7"/>
+  </g>
+  </g>
+    <g stroke="#0A1230" stroke-width="14" stroke-linejoin="round">
+      <path d="M 500 806 L 396 1010 L 188 1010 C 216 892 320 800 436 780 Z" fill="#171B26"/>
+      <path d="M 500 806 L 604 1010 L 812 1010 C 784 892 680 800 564 780 Z" fill="#11141D"/>
+      <path d="M 452 788 L 500 846 L 548 788 L 548 1010 L 452 1010 Z" fill="#F2F5FA"/>
+      <path d="M 500 846 L 466 900 L 500 1010 L 534 900 Z" fill="#1D2C55"/>
+    </g>
+    <!-- earpiece: the one prop that says agent without saying weapon -->
+    <path d="M 786 552 C 826 570 838 620 812 660 C 800 700 786 738 776 766" fill="none" stroke="#0B0D12" stroke-width="10" stroke-linecap="round" opacity=".9"/>
+    <circle cx="784" cy="548" r="17" fill="#0B0D12"/>
+    <rect width="1000" height="1000" fill="url(#vignette)" opacity=".8"/>
+</svg>
