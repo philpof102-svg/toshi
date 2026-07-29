@@ -64,8 +64,58 @@ t('__toshiSeq.cancel() / stopFocus() clean up without throw', () => {
   if (typeof s.cancel === 'function') s.cancel();
 });
 
+/* ── repertoire pack: WHEN Toshi moves on his own ───────────────────────────────────────────────────
+ * Loading it is not enough. The whole value of this pack is in the cases where it does NOT move, so the
+ * cases below assert the REFUSALS: a repertoire that plays regardless of context is exactly the
+ * interrupting companion the anti-Clippy gate exists to prevent. And `last().skipped` must name the
+ * reason — otherwise "Toshi is calm" and "the repertoire is broken" are the same observation, which is
+ * the defect this project hunts everywhere else. */
+let repWin;
+t('animations-repertoire.js loads + exposes __toshiRep', () => {
+  repWin = harness('animations-repertoire.js');
+  if (!repWin.__toshiRep || typeof repWin.__toshiRep !== 'object') throw new Error('__toshiRep not exposed');
+});
+t('the catalogue is non-empty and every entry is well-formed', () => {
+  const c = repWin.__toshiRep.catalogue();
+  if (!Array.isArray(c) || !c.length) throw new Error('empty catalogue');
+  for (const m of c) if (!m.name || !(m.weight > 0) || !(m.cost > 0)) throw new Error('bad entry: ' + JSON.stringify(m));
+});
+t('every move in the catalogue runs without throw', () => {
+  for (const m of repWin.__toshiRep.catalogue()) {
+    const played = repWin.__toshiRep.play(m.name);
+    if (played !== m.name) throw new Error(m.name + ' did not report itself as played (got ' + played + ')');
+  }
+});
+t('an unknown move is REFUSED and says so, instead of silently doing nothing', () => {
+  const r = repWin.__toshiRep.play('pas-une-pose');
+  if (r !== null) throw new Error('an unknown move must return null');
+  if (!/unknown move/.test(repWin.__toshiRep.last().skipped || '')) throw new Error('last().skipped must name it');
+});
+t('★ a tick too soon after a move is skipped WITH A REASON, not silently', () => {
+  repWin.__toshiRep.play('glance');            // sets lastAt = now
+  const r = repWin.__toshiRep.tick(false);
+  if (r !== null) throw new Error('it must not play twice in a row without the gap');
+  if (!/too soon/.test(repWin.__toshiRep.last().skipped || '')) throw new Error('the reason must say "too soon", got: ' + repWin.__toshiRep.last().skipped);
+});
+t('★ forcing a tick bypasses the gap and reports a move actually played', () => {
+  const r = repWin.__toshiRep.tick(true);
+  if (!r) throw new Error('a forced tick must play something');
+  if (repWin.__toshiRep.last().played !== r) throw new Error('last().played must match');
+  if (repWin.__toshiRep.last().skipped !== null) throw new Error('a played tick carries no skip reason');
+});
+t('★ never the same move twice in a row', () => {
+  const a = repWin.__toshiRep.tick(true), b = repWin.__toshiRep.tick(true);
+  if (a && b && a === b) throw new Error('picked ' + a + ' twice in a row');
+});
+t('★ start/stop are idempotent and stop leaves no timer behind', () => {
+  repWin.__toshiRep.start(5000); repWin.__toshiRep.start(5000);   // second start must be a no-op
+  repWin.__toshiRep.stop(); repWin.__toshiRep.stop();
+  if (repWin.__toshiRep.last().running !== false) throw new Error('running must be false after stop');
+});
+
 // let the internal timers fire once (that's where a bad interval/undeclared ref hides), then report
 setTimeout(() => {
+  try { repWin && repWin.__toshiRep && repWin.__toshiRep.stop(); } catch (e) { fail++; console.log('  ✗ repertoire stop threw\n      ' + e.message); }
   try { seqWin && seqWin.__toshiSeq && seqWin.__toshiSeq.cancel && seqWin.__toshiSeq.cancel(); } catch (e) { fail++; console.log('  ✗ post-timer cancel threw\n      ' + e.message); }
   console.log(`\n${pass} passed · ${fail} failed`);
   process.exit(fail ? 1 : 0);
