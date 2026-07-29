@@ -171,7 +171,70 @@ function createWindow() {
   // ── THE WATCHER (opt-in): TOSHI_WATCH=1 → Toshi glances near the cursor and comments. Pure addon —
   // its only output is window.__toshi.say(), so it never touches the animation. Privacy tiers below.
   if (process.env.TOSHI_WATCH === '1') startWatcher(win);
+  // ── THE AGENT'S EYE: always on, because its gate is the CONSENT GRANT, not an env var. See below.
+  startSeeServer(win);
   return win;
+}
+
+/* ── LES YEUX, EN UN SEUL EXEMPLAIRE ────────────────────────────────────────────────────────────────
+ * Le watcher (bavardage ambiant) et `toshi_see` (l'oeil de l'agent) sont deux fonctionnalites, mais ils
+ * doivent partager UN SEUL `eyes`. Deux `createEyes()` = deux magasins de consentement: une source
+ * accordee d'un cote resterait refusee de l'autre, et le refus se lirait comme « rien a voir ». C'est
+ * exactement le « deux copies d'une regle, et l'une des deux derive » que see-serve.cjs met en garde.
+ * Construit une fois, a la demande, partage ensuite. */
+let _yeux = null;
+function ensureEyes() {
+  if (_yeux) return _yeux;
+  const { desktopCapturer } = require('electron');
+  const { createEyes } = require('./eyes.cjs');
+  const { createReader } = require('./eyes-read.cjs');
+  const load = (p) => { try { return p ? require(p) : null; } catch { return null; } };
+  const eyes = createEyes({ capturer: desktopCapturer, now: () => Date.now() });
+  const reader = createReader({ ocr: load(process.env.TOSHI_OCR), vlm: load(process.env.TOSHI_VLM) });
+  // TOSHI_WATCH_GRANT=1 pre-accorde l'ecran entier. Sans lui, rien n'est accorde et TOUTE lecture de
+  // contenu est refusee — c'est la posture par defaut, et elle est volontairement stricte.
+  if (process.env.TOSHI_WATCH_GRANT === '1') {
+    eyes.enumerate().then((list) => { const s = list.find((x) => /screen/i.test(x.id)); if (s) eyes.grant(s.id, 'read'); }).catch(() => {});
+  }
+  _yeux = { eyes, reader };
+  return _yeux;
+}
+
+/* ── `toshi_see`: repondre a un agent qui demande ce qu'il y a a l'ecran ─────────────────────────────
+ * ⚠️ CECI N'EST PAS DERRIERE `TOSHI_WATCH`, ET C'EST LE CORRECTIF. Ce bloc vivait d'abord DANS
+ * startWatcher, donc lire l'ecran pour un agent exigeait d'activer les commentaires de la mascotte —
+ * deux fonctionnalites sans rapport nouees par un seul interrupteur, et la garde portee par le mauvais.
+ * La vraie garde est le CONSENTEMENT DE SOURCE: sans accord, `eyes.capture()` refuse, et see-serve.cjs
+ * remonte ce refus tel quel. Il n'y a donc rien a proteger avec un drapeau de plus — en ajouter un
+ * donnerait l'illusion que c'est LUI qui protege.
+ *
+ * Le cerveau MCP est du Node ordinaire: `desktopCapturer` n'existe que dans CE processus. Il met la
+ * demande en attente sur /see-pending et nous venons la chercher. On sonde depuis main.cjs et non depuis
+ * le panneau: le renderer ne peut pas capturer, et /see-pending est livre-une-fois — deux sondeurs et la
+ * demande se perd chez celui qui n'en fait rien. Toute la logique vit dans see-serve.cjs (isole, backends
+ * injectes, prouve hors ligne); ici il ne reste que le transport. */
+function startSeeServer(win) {
+  try {
+    const { createSeeServer } = require('./see-serve.cjs');
+    const http = require('node:http');
+    const { eyes, reader } = ensureEyes();
+    const BRAIN = Number(process.env.TOSHI_PORT || 4820);
+    const brainJson = (method, path, body) => new Promise((resolve) => {
+      const data = body ? JSON.stringify(body) : null;
+      const r = http.request({ host: '127.0.0.1', port: BRAIN, path, method, timeout: 4000,
+        headers: data ? { 'content-type': 'application/json', 'content-length': Buffer.byteLength(data) } : {} },
+      (res) => { let d = ''; res.on('data', (c) => (d += c)); res.on('end', () => { try { resolve(JSON.parse(d)); } catch { resolve(null); } }); });
+      r.on('error', () => resolve(null)); r.on('timeout', () => { r.destroy(); resolve(null); });
+      if (data) r.write(data); r.end();
+    });
+    const seeServer = createSeeServer({ eyes, reader, postJson: (p, b) => brainJson('POST', p, b) });
+    const seeTimer = setInterval(async () => {
+      const r = await brainJson('GET', '/see-pending', null);
+      if (r && r.seeRequest) { try { await seeServer.answerOnce(r.seeRequest); } catch (e) { console.error('[toshi] see failed:', e.message); } }
+    }, Number(process.env.TOSHI_SEE_POLL_MS) || 1000);
+    win.on('closed', () => clearInterval(seeTimer));
+    console.log(`[toshi] 👁 toshi_see ON — brain :${BRAIN}, ${process.env.TOSHI_WATCH_GRANT === '1' ? 'screen granted' : 'NO grant yet (content reads will be refused, by design)'}`);
+  } catch (e) { console.error('[toshi] see-server failed:', e.message); }
 }
 
 // Glance near the cursor → an in-character line. Reuses the dormant EYES (eyes.cjs/eyes-read.cjs).
@@ -182,17 +245,9 @@ function createWindow() {
 //                         line carries a provenance label ("screen read → …") — never hidden.
 function startWatcher(win) {
   try {
-    const { desktopCapturer } = require('electron');
-    const { createEyes } = require('./eyes.cjs');
-    const { createReader } = require('./eyes-read.cjs');
     const { makeWatcher } = require('./watch.cjs');
-    const load = (p) => { try { return p ? require(p) : null; } catch { return null; } };
-
-    const eyes = createEyes({ capturer: desktopCapturer, now: () => Date.now() });
-    const reader = createReader({ ocr: load(process.env.TOSHI_OCR), vlm: load(process.env.TOSHI_VLM) });
-    if (process.env.TOSHI_WATCH_GRANT === '1') {
-      eyes.enumerate().then((list) => { const s = list.find((x) => /screen/i.test(x.id)); if (s) eyes.grant(s.id, 'read'); }).catch(() => {});
-    }
+    // Le MEME `eyes` que toshi_see — un seul magasin de consentement (voir ensureEyes ci-dessus).
+    const { eyes, reader } = ensureEyes();
 
     const say = (text, ms) => {
       console.log('[toshi] 💬', text); // echo the quip to the console (a light verbose trail)
@@ -225,30 +280,6 @@ function startWatcher(win) {
     win.webContents.once('did-finish-load', () => watcher.start(Number(process.env.TOSHI_WATCH_POLL_MS) || 6000));
     win.on('closed', () => watcher.stop());
 
-    /* ── L'ŒIL DE L'AGENT: repondre a `toshi_see` ──────────────────────────────────────────────────
-     * Le cerveau MCP est du Node ordinaire — `desktopCapturer` n'existe que dans CE processus. Il met donc
-     * la demande en attente et nous venons la chercher. On sonde depuis main.cjs et NON depuis le panneau:
-     * le renderer ne peut pas capturer, et /see-pending est livre-une-fois — le laisser passer par deux
-     * sondeurs ferait perdre la demande a l'un des deux. Toute la logique vit dans see-serve.cjs (isole,
-     * backends injectes, prouve hors ligne par see-serve-smoke.cjs); ici il ne reste que le transport.
-     * Le meme `eyes` que le watcher: la garde de consentement est partagee, pas dupliquee. */
-    const { createSeeServer } = require('./see-serve.cjs');
-    const http = require('node:http');
-    const BRAIN = Number(process.env.TOSHI_PORT || 4820);
-    const brainJson = (method, path, body) => new Promise((resolve) => {
-      const data = body ? JSON.stringify(body) : null;
-      const r = http.request({ host: '127.0.0.1', port: BRAIN, path, method, timeout: 4000,
-        headers: data ? { 'content-type': 'application/json', 'content-length': Buffer.byteLength(data) } : {} },
-      (res) => { let d = ''; res.on('data', (c) => (d += c)); res.on('end', () => { try { resolve(JSON.parse(d)); } catch { resolve(null); } }); });
-      r.on('error', () => resolve(null)); r.on('timeout', () => { r.destroy(); resolve(null); });
-      if (data) r.write(data); r.end();
-    });
-    const seeServer = createSeeServer({ eyes, reader, postJson: (p, b) => brainJson('POST', p, b) });
-    const seeTimer = setInterval(async () => {
-      const r = await brainJson('GET', '/see-pending', null);
-      if (r && r.seeRequest) { try { await seeServer.answerOnce(r.seeRequest); } catch (e) { console.error('[toshi] see failed:', e.message); } }
-    }, Number(process.env.TOSHI_SEE_POLL_MS) || 1000);
-    win.on('closed', () => clearInterval(seeTimer));
     console.log(`[toshi] 👀 watcher ON — ${process.env.TOSHI_WATCH_GRANT === '1' ? 'contents' : 'title-only'} tier, ${allowCloud ? `agent lines (${LANG}, cloud, labeled)` : 'local template lines'}`);
   } catch (e) { console.error('[toshi] watcher failed:', e.message); }
 }
